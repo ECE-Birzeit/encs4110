@@ -175,8 +175,6 @@ The factorial of a number is the product of all the integers from 1 to that numb
 - The factorial of 5 can be expressed as:
   - 5! = 5 x 4 x 3 x 2 x 1 = 120
 
-- The factorial function can be defined recursively as:
-  - f(n) = n x f(n-1) ; f(0) = 1
 
 You are required to implement this by using a subroutine to calculate the factorial of a number. Recommendations for writing the program:
 
