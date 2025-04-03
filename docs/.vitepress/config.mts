@@ -6,7 +6,7 @@ export default defineConfig({
   },
   cleanUrls: true,
   lastUpdated: true,
-  
+
   base: "/encs4110/",
   head: [
     [
@@ -34,7 +34,8 @@ export default defineConfig({
   ],
 
   title: "Computer Design Laboratory",
-  description: "A comprehensive guide and resource for ARM assembly language experiments.",
+  description:
+    "A comprehensive guide and resource for ARM assembly language experiments.",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -44,7 +45,7 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "Experiments",
+        text: "ARM Assembly Language Experiments",
         items: [
           {
             text: "Introduction to ARM Assembly",
@@ -65,7 +66,20 @@ export default defineConfig({
           {
             text: "ARM Subroutines",
             link: "/Experiment-5.md",
-          }
+          },
+        ],
+      },
+      {
+        text: "TM4C123G LaunchPad Experiments",
+        items: [
+          {
+            text: "GPIO (General Purpose Input/Output)",
+            link: "/Experiment-6.md",
+          },
+          {
+            text: "External Interrupts",
+            link: "/Experiment-7.md",
+          },
         ],
       },
       {
