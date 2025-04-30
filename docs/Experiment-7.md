@@ -144,3 +144,27 @@ void GPIOF_Handler(void) {
     } 
 } 
 ```
+
+## Labwork 
+
+**1.** Modify Program 1 (using polling technique) to toggle the green LED with the press of a switch SW1.  
+The switch on PF4 will be configured as input, and the LED on PF3 (green LED) will be used as output.  
+At each press of the switch, the LED will toggle its present state — i.e., the LED will turn ON if it was OFF previously.
+
+> **Note:** The needed time for the user to press the push button is approximately 200 ms.  
+> The speed of the TM4C123G controller is very high, so the `while (true)` loop will be executed many times during this period (200 ms).  
+> This means the button may appear to have been pressed many times, though the user pressed it only once.  
+> Therefore, some delay is required after detecting a button click.
+
+---
+
+**2.** Modify Program 2 (using interrupt technique) so the onboard LEDs light on in the following sequence **R → B → G**, continuously,  
+whenever the onboard SW1 is pressed. On the other hand, the LEDs should light up in the reverse sequence **G → B → R**, continuously,  
+when SW2 is pressed. Each LED should stay ON for the same amount of time (e.g., around 0.5 seconds), and the sequence should keep repeating infinitely.
+
+---
+
+**3.** Write a program that changes the color of the onboard LED using the two onboard push button keys.  
+When the board is turned on, only the **RED** LED should be ON.  
+- When the right-side key is pressed, the **GREEN** LED should be ON (alone).  
+- When the left-side key is pressed, the **BLUE** LED should be ON (alone)
