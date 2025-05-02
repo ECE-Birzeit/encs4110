@@ -2,7 +2,6 @@
 
 This guide walks you through installing everything needed to program the **TM4C123GH6PM** microcontroller using **Keil uVision5** on **Windows 10/11**.
 
----
 
 ## ✅ Step 1: Install the TM4C Device Pack
 
@@ -10,8 +9,7 @@ Keil uses "Device Family Packs" (DFPs) to support different microcontrollers. Yo
 
 ### 🔗 Download the TM4C DFP
 
-- Click here to download the official pack:  
-  👉 [Keil.TM4C_DFP.1.1.0.pack](https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack)
+- Click here to download the official pack:[Keil.TM4C_DFP.1.1.0.pack](https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack)
 
 ### 🛠️ Install the Pack
 
@@ -20,7 +18,6 @@ Keil uses "Device Family Packs" (DFPs) to support different microcontrollers. Yo
 3. You can verify it by opening **Pack Installer** inside Keil (`Project → Manage → Pack Installer`) and searching for `TM4C123GH6PM`. It should appear as **installed**.
 
 
----
 
 ## ✅ Step 2: Install Stellaris ICDI Debugger Support
 
@@ -51,7 +48,6 @@ Replace `{YOUR_USERNAME}` with your actual Windows username.
 **"Stellaris ICDI"**
 
 
----
 
 ## ✅ Step 3: Install Stellaris ICDI USB Drivers
 
@@ -74,20 +70,6 @@ Click **Download Options** on the TI page and download the ZIP file. Extract it 
 - Make sure "Include subfolders" is checked → Click **Next**
 
 Repeat this for all Stellaris ICDI interfaces.
-
----
-
-## ✅ You’re Done!
-
-You’ve now:
-
-- Installed the **TM4C Device Pack**
-- Enabled the **Stellaris ICDI debugger**
-- Installed the **USB drivers**
-
-You’re ready to start building and flashing code to your TM4C123GH6PM board using Keil uVision5 🎉
-
----
 
 ## 🧩 Quick Reference Links
 
