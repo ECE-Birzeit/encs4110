@@ -73,6 +73,10 @@ export default defineConfig({
         text: "TM4C123G LaunchPad Experiments",
         items: [
           {
+            text: "Setting up Keil uVision5 IDE for TM4C123G LaunchPad",
+            link: "/setup.md",
+          },
+          {
             text: "GPIO (General Purpose Input/Output)",
             link: "/Experiment-6.md",
           },
@@ -85,10 +89,7 @@ export default defineConfig({
       {
         text: "Resources",
         items: [
-          {
-            text: "Setting up Keil uVision5 IDE for TM4C123G LaunchPad",
-            link: "/setup.md",
-          },
+
           {
             text: "Keil uVision5 IDE",
             link: "https://www.keil.com/demo/eval/arm.htm",
