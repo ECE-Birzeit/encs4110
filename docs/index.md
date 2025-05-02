@@ -9,9 +9,6 @@ hero:
     - theme: brand
       text: Experiments
       link: /Experiment-1
-    - theme: alt
-      text: Outline (Syllabus)
-      link: /outline 
 
 features:
   - icon: ⚡
