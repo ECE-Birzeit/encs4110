@@ -1,0 +1,123 @@
+---
+outline: deep
+lastUpdated: true
+---
+
+# Software Interrupts (Timer Interrupts) <Badge type="tip" text="Experiment 7" />
+
+## Introduction
+
+### GPTM (General-Purpose Timer Module)
+
+The TM4C123GH6PM microcontroller includes programmable General-Purpose Timer Modules (GPTM) that support various timing and counting functions. The module offers both 16/32-bit and 32/64-bit "Wide" timers with different capabilities and resolutions.
+
+### Key Differences Between Timer Types
+
+| Feature                  | 16/32-bit GPTM Blocks                                | 32/64-bit Wide GPTM Blocks                    |
+| ------------------------ | ---------------------------------------------------- | --------------------------------------------- |
+| **Timer Width**          | 16-bit timers (Timer A & B) or combined 32-bit timer | 32-bit timers (can combine as a 64-bit timer) |
+| **Prescaler Resolution** | 8-bit prescaler for 16-bit timers                    | 16-bit prescaler for 32-bit timers            |
+
+### Shared Timer Features
+
+Both types of timers support a range of versatile features that enable precise timing and event counting:
+
+**Operating Modes:**
+
+- **One-Shot Mode**: Timer runs once and stops automatically.
+- **Periodic Mode**: Timer repeats continuously, restarting after each cycle.
+- **RTC Mode**: Real-Time Clock operation using an external 32.768-KHz clock source for accurate timekeeping.
+- **Input Capture and Edge Counting**: Measures the time or counts the edges of an external signal, useful for event timing and counting applications.
+- **PWM Mode**: Generates Pulse Width Modulation (PWM) signals with programmable output inversion, commonly used for motor control, lighting, and other modulation applications.
+
+**Additional Features:**
+
+- **Counting Direction**: Timers can count **up** or **down**, adding flexibility for various timing scenarios.
+- **Capture Compare PWM (CCP) Pins**: Twelve pins are available for PWM generation, event capture, or comparison output.
+- **Timer Synchronization**: Select timers can start at the same time, enabling synchronized multi-timer applications.
+- **Daisy Chaining**: A timer can be set to trigger other timers in sequence, supporting complex, interdependent timing events.
+
+These features make TM4C123GH6PM timers highly adaptable for a wide array of applications, from real-time clocks and pulse generation to complex timing sequences and event counting.
+
+![Timers](image-2.png)
+
+## Timer Initialization and Configuration
+
+To use a GPTM module, you must configure the following registers:
+
+1. the appropriate TIMER*n* bit must be set in the `RCGCTIMER` or `RCGCWTIMER` register (see page `338` and page `357` of the **datasheet**).
+2. the timer must be disabled by clearing the `T[AB]EN` bit in the `GPTMCTL` register (see page `737` of the **datasheet**).
+   1. `TAEN` is the Timer A Enable bit (bit 0 of the `GPTMCTL` register).
+   2. `TBEN` is the Timer B Enable bit (bit 8 of the `GPTMCTL` register).
+3. Configure the GPTMCFG register
+   1. `0x0` Selects the 32-bit timer configuration for a 16/32-bit timer and the 64-bit timer configuration for a 32/64-bit wide timer.
+   2. `0x1` Selects the 32-bit (RTC) timer configuration for a 16/32-bit timer and the 64-bit (RTC) timer configuration for a 32/64-bit wide timer.
+   3. `0x4` Selects the 16-bit timer configuration for a 16/32-bit timer and the 32-bit timer configuration for a 32/64-bit wide timer.
+4. Configure the TnMR field in the GPTM Timer n Mode Register (GPTMTnMR):
+   1. Write a value of 0x1 for One-Shot mode.
+   2. Write a value of 0x2 for Periodic mode.
+   3. Write a value of 0x3 for Capture mode.
+
+```c
+#include "TM4C123.h"
+
+#define RED 0x02
+#define BLUE 0x04
+#define GREEN 0x08
+#define YELLOW RED + GREEN
+#define MAGENTA BLUE + RED
+#define CYAN GREEN + BLUE
+#define WHITE RED + GREEN + BLUE
+#define SW1 0x10
+#define SW2 0x01
+#define DELAY 900000
+
+
+
+const int sequence[] = {RED, BLUE, GREEN, YELLOW, MAGENTA, CYAN, WHITE};
+int index = 0;
+
+void delay( volatile unsigned long ulLoop ){
+	for (ulLoop = 0; ulLoop < DELAY; ulLoop++) {
+		for (ulLoop = 0; ulLoop < DELAY; ulLoop++) {
+  		}
+ 	}
+}
+
+int main(void)
+{
+	SYSCTL->RCGCGPIO |= (1<<5);
+	SYSCTL->RCGCTIMER |= (1<<1);
+	delay(0);
+	GPIOF->DIR |= BLUE;
+	GPIOF->DEN |= BLUE;
+
+	TIMER1->CTL = 0;        		// Disable the timer
+	TIMER1->CFG = 0x4;       		// Choose 16-bit mode
+	TIMER1->TAMR = 0x02;       		// Periodic mode
+	TIMER1->TAPR = 250  - 1;	// Prescaler
+	TIMER1->TAILR = 64000 - 1;  // Initial Value
+	TIMER1->ICR = 0x1;           	// Clear Any Prior Interupts
+	TIMER1->IMR |=(1<<0);			// Enable Timeout Interrupt
+	TIMER1->CTL |= 0x01;          	// Enable the timer
+	NVIC->ISER[0] |= (1<<21);
+    while(1)
+    {
+    }
+}
+
+
+void TIMER1A_Handler()
+{
+	if(TIMER1->MIS & 0x1)
+		GPIOF->DATA  ^= BLUE;
+ 	TIMER1->ICR = 0x1;
+}
+
+```
+
+## Lab Work
+
+1. Modify the code above to make the GREEN LED blinks every 500ms.  
+2. Modify the code above to make the RED LED blinks every 4s.
+3. Use the onboard LED and another two external LEDs with the TM4C123G board to make one LED flashes every 10 seconds, one flashes every 5 seconds, and one flashes every one second.

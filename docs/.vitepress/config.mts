@@ -84,6 +84,10 @@ export default defineConfig({
             text: "External Interrupts",
             link: "/Experiment-7.md",
           },
+          {
+            text: "Software Interrupts (Timer Interrupts)",
+            link: "/Experiment-8.md",
+          }
         ],
       },
       {
