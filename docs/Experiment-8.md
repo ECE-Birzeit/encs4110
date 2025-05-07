@@ -39,7 +39,6 @@ Both types of timers support a range of versatile features that enable precise t
 
 These features make TM4C123GH6PM timers highly adaptable for a wide array of applications, from real-time clocks and pulse generation to complex timing sequences and event counting.
 
-![Timers](image-2.png)
 
 ## Timer Initialization and Configuration
 
