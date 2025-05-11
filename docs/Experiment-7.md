@@ -24,7 +24,7 @@ There are two ways to debounce a switch:
 
 In this experiment, we will use software debouncing to debounce the switches.
 
-<!-- ![alt text](image.png) -->
+![alt text](/image.png)
 
 ## Switch configuration
 
@@ -59,7 +59,7 @@ Since this protection applies only to the NMI and JTAG/SWD pins, the other bits 
 
 If you need to unlock certain pins, such as GPIO pin 0 of port F, write 0x4C4F434B to the GPIOLOCK register. Then, set the appropriate GPIOCR register bit to 1 to enable configuration.
 
-<!-- ![alt text](image-1.png) -->
+![alt text](/image-1.png)
 
 
 ## Examples
