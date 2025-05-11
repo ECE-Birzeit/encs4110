@@ -1,9 +1,10 @@
 ---
 outline: deep
 lastUpdated: true
+next: false
 ---
 
-# Software Interrupts (Timer Interrupts) <Badge type="tip" text="Experiment 7" />
+# Software Interrupts (Timer Interrupts) <Badge type="tip" text="Experiment 8" />
 
 ## Introduction
 
@@ -38,8 +39,7 @@ Both types of timers support a range of versatile features that enable precise t
 - **Daisy Chaining**: A timer can be set to trigger other timers in sequence, supporting complex, interdependent timing events.
 
 These features make TM4C123GH6PM timers highly adaptable for a wide array of applications, from real-time clocks and pulse generation to complex timing sequences and event counting.
-
-
+![alt text](/image-2.png)
 ## Timer Initialization and Configuration
 
 To use a GPTM module, you must configure the following registers:
