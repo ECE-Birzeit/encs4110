@@ -1,5 +1,4 @@
-# 🚀 Setting Up Keil uVision5 for TM4C123GH6PM (Tiva C LaunchPad)
-
+# 🚀 Keil uVision5 IDE Setup
 This guide walks you through installing everything needed to program the **TM4C123GH6PM** microcontroller using **Keil uVision5** on **Windows 10/11**.
 
 
@@ -71,13 +70,12 @@ Click **Download Options** on the TI page and download the ZIP file. Extract it 
 
 Repeat this for all Stellaris ICDI interfaces.
 
-## 🧩 Quick Reference Links
+## Quick Reference Links
 
 | Tool | Link |
 |------|------|
 | TM4C Pack (Keil.TM4C_DFP.1.1.0.pack) | [Download](https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack) |
 | Stellaris ICDI USB Drivers | [TI Tool Page](https://www.ti.com/tool/STELLARIS_ICDI_DRIVERS) |
 | Stellaris ICDI Debugger Add-on | [Keil/ARM Guide](https://developer.arm.com/documentation/ka002280/latest/) |
-
 ---
 

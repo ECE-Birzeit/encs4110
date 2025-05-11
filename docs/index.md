@@ -7,8 +7,11 @@ hero:
   tagline: "From Bits to Circuits: Mastering Computer Design and Interfacing"
   actions:
     - theme: brand
-      text: Experiments
-      link: /Experiment-1
+      text: 🧭 Experiments
+      link: /landing
+    - theme: alt
+      text: 🚀 Setup Guide
+      link: /setup
 
 features:
   - icon: ⚡

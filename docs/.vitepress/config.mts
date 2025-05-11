@@ -3,6 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   markdown: {
     math: true,
+
   },
   cleanUrls: true,
   lastUpdated: true,
@@ -31,61 +32,80 @@ export default defineConfig({
         href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="90" font-size="90">💻</text></svg>',
       },
     ],
+    [
+      "meta",
+      {
+        property: "og:image",
+        content: "/path/to/image.png",
+      },
+    ],
+    [
+      "meta",
+      {
+        name: "twitter:image",
+        content: "/path/to/image.png",
+      },
+    ],
   ],
 
   title: "Computer Design Laboratory",
   description:
     "A comprehensive guide and resource for ARM assembly language experiments.",
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
-      { text: "Experiments", link: "/Experiment-1" },
+      { text: "Experiments", link: "/landing" },
     ],
 
     sidebar: [
       {
-        text: "ARM Assembly Language Experiments",
+        text: "🧭 Experiment Navigator",
+        link: "/landing",
+      },
+      {
+        text: "🚀 Keil uVision5 IDE Setup", 
+        link: "/setup",
+      },
+      {
+        text: "ARM Assembly Experiments",
+        collapsed: false,
         items: [
           {
-            text: "Introduction to ARM Assembly",
+            text: "1. Introduction to ARM Assembly",
             link: "/Experiment-1.md",
           },
           {
-            text: "ARM Data Processing Instructions",
+            text: "2. ARM Data Processing Instructions",
             link: "/Experiment-2.md",
           },
           {
-            text: "ARM Flow Control Instructions",
+            text: "3. ARM Flow Control Instructions",
             link: "/Experiment-3.md",
           },
           {
-            text: "ARM Addressing Modes",
+            text: "4. ARM Addressing Modes",
             link: "/Experiment-4.md",
           },
           {
-            text: "ARM Subroutines",
+            text: "5. ARM Subroutines",
             link: "/Experiment-5.md",
           },
         ],
       },
       {
         text: "TM4C123G LaunchPad Experiments",
+        collapsed: false,
         items: [
           {
-            text: "Setting up Keil uVision5 IDE for TM4C123G LaunchPad",
-            link: "/setup.md",
-          },
-          {
-            text: "GPIO (General Purpose Input/Output)",
+            text: "6. GPIO (General Purpose Input/Output)",
             link: "/Experiment-6.md",
           },
           {
-            text: "External Interrupts",
+            text: "7. External Interrupts (Hardware Interrupts)",
             link: "/Experiment-7.md",
           },
           {
-            text: "Software Interrupts (Timer Interrupts)",
+            text: "8. Software Interrupts (Timer Interrupts)",
             link: "/Experiment-8.md",
           }
         ],
@@ -93,7 +113,6 @@ export default defineConfig({
       {
         text: "Resources",
         items: [
-
           {
             text: "Keil uVision5 IDE",
             link: "https://www.keil.com/demo/eval/arm.htm",
@@ -103,9 +122,14 @@ export default defineConfig({
             link: "https://developer.arm.com/documentation/dui0041/latest/",
           },
           {
-            text: "ARM Insturction Set Summary",
+            text: "ARM Instruction Set Summary",
             link: "https://developer.arm.com/documentation/100165/0201/Programmers-Model/Instruction-set-summary/Processor-instructions",
           },
+          {
+            text: "TM4C123G Datasheet",
+            link: "https://www.ti.com/lit/ds/spms376e/spms376e.pdf",
+          },
+
         ],
       },
     ],
