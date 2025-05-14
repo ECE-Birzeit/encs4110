@@ -107,7 +107,11 @@ export default defineConfig({
           {
             text: "8. Software Interrupts (Timer Interrupts)",
             link: "/Experiment-8.md",
-          }
+          },
+          {
+            text: "9. Liquid Crystal Display (LCD) Interfacing",
+            link: "/Experiment-9.md",
+          },
         ],
       },
       {
