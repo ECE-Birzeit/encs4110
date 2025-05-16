@@ -6,46 +6,45 @@ next: false
 
 # Liquid Crystal Display (LCD) <Badge type="tip" text="Experiment 9" />
 
-
 ![alt text](/image-3.png)
+
 ## Introduction
 
-The 16x2 LCD module is one of the most commonly used display devices in embedded systems. It can display 16 characters per line on 2 lines and is widely used for text-based user interfaces. The LCD uses the HD44780 controller, which can operate in either 8-bit or 4-bit mode. In this experiment, we focus on interfacing a 16x2 LCD with the TM4C123 microcontroller using the efficient 4-bit mode.
+The 16x2 LCD module is a widely used display device in embedded systems. It can show 16 characters per line across 2 lines, making it ideal for text-based user interfaces. The LCD uses the HD44780 controller, which supports both 8-bit and 4-bit modes. In this experiment, we will interface a 16x2 LCD with the TM4C123 microcontroller using the more efficient 4-bit mode.
 
-### Why 4-bit Mode?
+### Why Use 4-bit Mode?
 
-Using 4-bit mode reduces the number of GPIO pins needed, as it sends data in two 4-bit nibbles rather than a single 8-bit byte. This mode is particularly useful when GPIO pins are limited.
+The 4-bit mode reduces the number of required GPIO pins by sending data in two 4-bit nibbles instead of a single 8-bit byte. This is especially useful when GPIO pins are limited.
 
 ### Understanding LCD Operation
 
 The LCD has two main registers:
 
-* **Command Register**: Used to send commands to the LCD (e.g., clear display, move cursor).
-* **Data Register**: Used to send data (characters) to be displayed.
+* **Command Register**: Used to send instructions to the LCD (e.g., clear display, move cursor).
+* **Data Register**: Used to send characters to be displayed.
 
-The LCD also has control pins that determine the mode of operation:
+The LCD also has several control pins:
 
-* **RS (Register Select)**: Selects between command and data register.
-* **RW (Read/Write)**: Selects between read and write operations.
-* **E (Enable)**: Latches the data into the LCD.
-* **D0-D7**: Data pins used to send commands and data.
-
+* **RS (Register Select)**: Chooses between the command and data register.
+* **RW (Read/Write)**: Selects between reading and writing.
+* **E (Enable)**: Latches data into the LCD.
+* **D0-D7**: Data pins for sending commands and data.
 
 ### Sending Commands and Data
 
 To send a **command**:
 
-1. Set **RS = 0** (Command mode).
-2. Set **RW = 0** (Write mode).
-3. Send the higher nibble (4 bits) using data pins (D4-D7).
+1. Set **RS = 0** (command mode).
+2. Set **RW = 0** (write mode).
+3. Send the higher nibble (4 bits) using data pins D4-D7.
 4. Toggle the **E (Enable)** pin to latch the data.
-5. Send the lower nibble similarly.
+5. Send the lower nibble in the same way.
 6. Wait for the command to complete.
 
 To send **data**:
 
-1. Set **RS = 1** (Data mode).
-2. Set **RW = 0** (Write mode).
+1. Set **RS = 1** (data mode).
+2. Set **RW = 0** (write mode).
 3. Send the higher nibble of the character.
 4. Toggle **E** to latch the data.
 5. Send the lower nibble.
@@ -53,35 +52,35 @@ To send **data**:
 
 ### How 4-bit Mode Works
 
-In 4-bit mode, only the upper 4 data pins (D4-D7) are used to send data to the LCD. The data is sent in two parts:
+In 4-bit mode, only the upper four data pins (D4-D7) are used. Data is sent in two parts:
 
 1. High nibble (upper 4 bits)
 2. Low nibble (lower 4 bits)
 
-This requires two data writes to send a single 8-bit command or character. The Enable (E) pin is toggled after each nibble to latch the data.
+Each 8-bit command or character requires two data writes. The Enable (E) pin is toggled after each nibble to latch the data.
 
 ### Initialization Process in 4-bit Mode
 
 1. Set RS, RW, and E pins to low.
-2. Wait for more than 40 ms after power-on.
-3. **Send command 0x30 (upper nibble only '0011') and wait >4.1ms**
-4. **Send command 0x30 (upper nibble only '0011') again and wait >100μs**
-5. **Send command 0x30 (upper nibble only '0011') a third time and wait >100μs**
-6. **Send command 0x20 (upper nibble only '0010') to switch to 4-bit mode and wait >100μs**
-7. Set the function to 4-bit mode, 2 lines, and 5x7 dots by sending the command `0x28`.
-8. Set the display on, cursor off, and blink off by sending the command `0x0C`.
-9. Set the entry mode to increment cursor and no display shift by sending the command `0x06`.
-10. Clear the display by sending the command `0x01`.
-11. Return home by sending the command `0x02`.
+2. Wait at least 40 ms after power-on.
+3. **Send command 0x30 (upper nibble only '0011'), then wait >4.1 ms**
+4. **Send command 0x30 (upper nibble only '0011') again, then wait >100 μs**
+5. **Send command 0x30 (upper nibble only '0011') a third time, then wait >100 μs**
+6. **Send command 0x20 (upper nibble only '0010') to switch to 4-bit mode, then wait >100 μs**
+7. Set the function to 4-bit mode, 2 lines, and 5x7 dots by sending command `0x28`.
+8. Turn the display on, cursor off, and blink off by sending command `0x0C`.
+9. Set the entry mode to increment cursor and no display shift by sending command `0x06`.
+10. Clear the display by sending command `0x01`.
+11. Return home by sending command `0x02`.
 
-**Note:** During steps 3-6 (initialization), only the upper nibble is sent because the LCD doesn't yet know it's in 4-bit mode. After step 6, both nibbles (upper and lower) must be sent for each command.
+**Note:** During steps 3-6 (initialization), only the upper nibble is sent because the LCD is not yet in 4-bit mode. After step 6, both nibbles must be sent for each command.
 
 ### **LCD Command Reference**
 
 | Command | Hex Code | Binary | Description | Effects and Details |
 |---------|----------|--------|-------------|---------------------|
-| **Clear Display** | 0x01 | 0000 0001 | Clears the entire display | Returns cursor to home position (0,0). Takes about 1.52ms to execute. |
-| **Return Home** | 0x02 | 0000 0010 | Returns cursor to home position | Moves cursor to the top-left position without clearing display. Takes about 1.52ms. |
+| **Clear Display** | 0x01 | 0000 0001 | Clears the entire display | Returns cursor to home position (0,0). Takes about 1.52 ms to execute. |
+| **Return Home** | 0x02 | 0000 0010 | Returns cursor to home position | Moves cursor to the top-left position without clearing the display. Takes about 1.52 ms. |
 | **Entry Mode Set** | 0x04/0x06 | 0000 01xx | Sets cursor movement direction and display shift | Bit 1 (I/D): 1=Increment cursor, 0=Decrement cursor.<br>Bit 0 (S): 1=Shift display, 0=No shift. |
 | **Display Control** | 0x08-0x0F | 0000 1DCB | Controls display, cursor, and blinking | Bit 2 (D): 1=Display on, 0=Display off.<br>Bit 1 (C): 1=Cursor on, 0=Cursor off.<br>Bit 0 (B): 1=Blinking on, 0=Blinking off. |
 | **Cursor/Display Shift** | 0x10-0x1F | 0001 SC00 | Moves cursor or shifts display | Bit 3 (S/C): 1=Display shift, 0=Cursor move.<br>Bit 2 (R/L): 1=Right shift, 0=Left shift. |
@@ -96,8 +95,8 @@ This requires two data writes to send a single 8-bit command or character. The E
 | **Display On, No Cursor** | 0x0C | Turns display on with no cursor |
 | **Display On with Cursor** | 0x0E | Turns display on with non-blinking cursor |
 | **Display On with Blinking Cursor** | 0x0F | Turns display on with blinking cursor |
-| **Move to Start of Line 1** | 0x80 | Positions cursor at the beginning of first line |
-| **Move to Start of Line 2** | 0xC0 | Positions cursor at the beginning of second line |
+| **Move to Start of Line 1** | 0x80 | Positions cursor at the beginning of the first line |
+| **Move to Start of Line 2** | 0xC0 | Positions cursor at the beginning of the second line |
 | **Create Custom Character** | 0x40+addr, followed by 8 bytes of pattern data | Stores custom character pattern in CGRAM |
 
 **Entry Mode Set Options (Command 0x04 + bits)**
@@ -118,9 +117,9 @@ This requires two data writes to send a single 8-bit command or character. The E
 | 0x0E | 0000 1110 | Display on, cursor on, blinking off |
 | 0x0F | 0000 1111 | Display on, cursor on, blinking on |
 
-
 ## Example Code
-```c
+
+```c [main.c]
 #include "TM4C123.h"
 
 // Define control pins (PB0: RS, PB2: EN)
@@ -145,11 +144,8 @@ int main(void)
 {
 
     LCD_Init();
-    delay_ms(100);      // Additional delay after init
     LCD_Clear();        // Ensure display is clear
-    delay_ms(5);        // Wait after clear
     LCD_SetCursor(0,0); // Set cursor to beginning
-    delay_ms(1);        // Wait after setting cursor
     LCD_Print("ENCS4110 Lab");
     
     while(1)
@@ -219,34 +215,20 @@ void LCD_Init(void)
     // The crucial three-time 0x30 initiation sequence
     // During initialization, we're only sending the upper nibble (0x3)
     // because the LCD doesn't know it's in 4-bit mode yet
-    
-    // First send of 0x30 (only upper nibble)
-    LCD_Command(0x30);
-    delay_ms(5);    // Wait > 4.1ms
-    
-    // Second send of 0x30 (only upper nibble)
-    LCD_Command(0x30);
-    delay_us(200);  // Wait > 100us
-    
-    // Third send of 0x30 (only upper nibble)
-    LCD_Command(0x30);
-    delay_us(200);  // Wait > 100us
-    
+
+    for (int i = 0; i < 3; i++) {
+        LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
+    }
+
     // Switch to 4-bit mode (only sending upper nibble 0x2)
     LCD_Command(0x20);
-    delay_us(200);  // Wait > 100us
     
     // Now in 4-bit mode - all subsequent commands will send both nibbles
     LCD_Command(0x28);  // Function set: 4-bit, 2 lines, 5x7 dots
-    delay_ms(1);
     LCD_Command(0x0C);  // Display ON, cursor OFF, blink OFF
-    delay_ms(1);
     LCD_Command(0x06);  // Entry mode set: Increment cursor
-    delay_ms(1);
     LCD_Command(0x01);  // Clear display
-    delay_ms(2);
     LCD_Command(0x02);  // Return home
-    delay_ms(2);
 }
 
 void LCD_Command(unsigned char command)
@@ -274,14 +256,13 @@ void LCD_Data(unsigned char data)
 {
     GPIOB->DATA |= RS;  // RS = 1 for data
     delay_us(1);
-    
+
     // Send upper nibble
     LCD_SendNibble(data);
     
     // Send lower nibble
     LCD_SendNibble(data << 4);
-    
-    delay_ms(1);  // Wait for data to complete
+    delay_ms(1);  // Wait for data to be processed
 }
 
 void LCD_Clear(void)
@@ -303,7 +284,12 @@ void LCD_Print(char *str)
     while (*str)
     {
         LCD_Data(*str++); // Print the current character
-        delay_ms(1);      // Small delay between characters
     }
 }
 ```
+
+## Lab Work
+
+1. Modify the code above to display your name on the first line and your ID on the second line.
+2. Write a program that displays your name on the LCD and allows it to move left or right. The direction should be controlled by the two on-board push buttons.
+3. Write a program that displays your name on the first row and your ID on the second row. The upper word should start from the left and shift continuously to the right, while the lower word moves in the opposite direction. This should begin after a button is pressed by the user.
