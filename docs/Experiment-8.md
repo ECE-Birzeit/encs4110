@@ -1,7 +1,6 @@
 ---
 outline: deep
 lastUpdated: true
-next: false
 ---
 
 # Software Interrupts (Timer Interrupts) <Badge type="tip" text="Experiment 8" />
@@ -57,7 +56,7 @@ To use a GPTM module, you must configure the following registers:
    2. Write a value of 0x2 for Periodic mode.
    3. Write a value of 0x3 for Capture mode.
 
-```c
+```c [main.c]
 #include "TM4C123.h"
 
 #define RED 0x02

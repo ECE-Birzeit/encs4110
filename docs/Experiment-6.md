@@ -133,7 +133,7 @@ delay2
 
 ### Example 2:  Blinking LED using C
 
-```c
+```c [main.c]
 
 #define SYSCTL_RCGCGPIO_R (*((volatile unsigned long *)0x400FE608))
 

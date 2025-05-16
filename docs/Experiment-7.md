@@ -65,7 +65,7 @@ If you need to unlock certain pins, such as GPIO pin 0 of port F, write 0x4C4F43
 ## Examples
 
 ### Example 1: Reading input using Polling
-```C
+```c [polling.c]
 //Program 1 
 #include "TM4C123GH6PM.h" 
 int main(void) { 
@@ -92,7 +92,7 @@ int main(void) {
 ```
 
 ### Example 2: External Interrupts
-```C
+```c [interrupt.c]
 //Program 2 
 /*PORTF PF0 and PF4 fall edge interrupt example*/ 
 /*This GPIO interrupt example code controls green LED with switches SW1 and SW2 external interrupts */ 
