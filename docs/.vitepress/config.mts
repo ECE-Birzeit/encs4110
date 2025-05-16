@@ -68,13 +68,13 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: "Home", link: "/" },
-      { text: "Experiments", link: "/landing" },
+      { text: "Experiments", link: "/experiments/" },
     ],
 
     sidebar: [
       {
         text: "🧭 Experiment Navigator",
-        link: "/landing",
+        link: "/experiments/",
       },
       {
         text: "🚀 Keil uVision5 IDE Setup",
@@ -86,23 +86,23 @@ export default defineConfig({
         items: [
           {
             text: "1. Introduction to ARM Assembly",
-            link: "/Experiment-1.md",
+            link: "experiments/1.md",
           },
           {
             text: "2. ARM Data Processing Instructions",
-            link: "/Experiment-2.md",
+            link: "experiments/2.md",
           },
           {
             text: "3. ARM Flow Control Instructions",
-            link: "/Experiment-3.md",
+            link: "experiments/3.md",
           },
           {
             text: "4. ARM Addressing Modes",
-            link: "/Experiment-4.md",
+            link: "experiments/4.md",
           },
           {
             text: "5. ARM Subroutines",
-            link: "/Experiment-5.md",
+            link: "experiments/5.md",
           },
         ],
       },
@@ -112,19 +112,19 @@ export default defineConfig({
         items: [
           {
             text: "6. GPIO (General Purpose Input/Output)",
-            link: "/Experiment-6.md",
+            link: "experiments/6.md",
           },
           {
             text: "7. External Interrupts (Hardware Interrupts)",
-            link: "/Experiment-7.md",
+            link: "experiments/7.md",
           },
           {
             text: "8. Software Interrupts (Timer Interrupts)",
-            link: "/Experiment-8.md",
+            link: "experiments/8.md",
           },
           {
             text: "9. Liquid Crystal Display (LCD) Interfacing",
-            link: "/Experiment-9.md",
+            link: "experiments/9.md",
           },
         ],
       },

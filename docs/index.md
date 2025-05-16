@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: 🧭 Experiments
-      link: /landing
+      link: /experiments
     - theme: alt
       text: 🚀 Setup Guide
       link: /setup
