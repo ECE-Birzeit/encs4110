@@ -13,7 +13,7 @@ Welcome to the Experiment Navigator! This document serves as a guide to the vari
 |  **Experiment 4: ARM Addressing Modes**              | Explore various ways to address memory and access data efficiently in ARM.                     |
 |  **Experiment 5: ARM Subroutines**                    | Organize and modularize your code using subroutine calls in ARM assembly.                      |
 
-Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil uVision5 IDE is configured and set up for development. To set up the IDE, follow the instructions in the [Setup Guide](setup.md).
+Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil uVision5 IDE is configured and set up for development. To set up the IDE, follow the instructions in the [Setup Guide](/setup.md).
 | Experiment                                          | Description                                                                                         |
 |-----------------------------------------------------|-----------------------------------------------------------------------------------------------------|
 |  **Experiment 6: GPIO (General Purpose Input/Output)** | Interface LEDs and buttons using GPIO pins on the TM4C123G LaunchPad.                                 |
