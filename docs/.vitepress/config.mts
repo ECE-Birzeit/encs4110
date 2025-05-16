@@ -1,10 +1,24 @@
 import { defineConfig } from "vitepress";
+import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+
 
 export default defineConfig({
   markdown: {
+    config(md) {
+      md.use(groupIconMdPlugin)
+    },
     math: true,
-
   },
+  vite: {
+    plugins: [
+      groupIconVitePlugin({
+        customIcon: {
+          'c': 'https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/c-program-icon.svg',
+        },
+      })
+    ],
+  },
+
   cleanUrls: true,
   lastUpdated: true,
 
@@ -63,7 +77,7 @@ export default defineConfig({
         link: "/landing",
       },
       {
-        text: "🚀 Keil uVision5 IDE Setup", 
+        text: "🚀 Keil uVision5 IDE Setup",
         link: "/setup",
       },
       {
