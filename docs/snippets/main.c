@@ -17,13 +17,3 @@ int main(void)
     {	
     }
 }
-
-
-
-void TIMER1A_Handler(void)
-{
-    // Clear the interrupt flag
-    TIMER1->ICR |= 0x01;
-    
-    // Your timer interrupt code here
-}
