@@ -152,7 +152,7 @@ export default defineConfig({
       },
     ],
 
-    socialLinks: [{ icon: "github", link: "https://github.com/mabushelbaia/" }],
+    socialLinks: [{ icon: "github", link: "https://github.com/mabushelbaia/encs4110" }],
     search: {
       provider: "local",
     },
