@@ -19,6 +19,7 @@ Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil
 |  **Experiment 6: GPIO (General Purpose Input/Output)** | Interface LEDs and buttons using GPIO pins on the TM4C123G LaunchPad.                                 |
 |  **Experiment 7: External Interrupts**                | Set up and handle external interrupts for responsive embedded applications.                           |
 |  **Experiment 8: Software Interrupts (Timer Interrupts)** | Utilize timer interrupts for periodic task execution and time-sensitive applications.                 |
+|  **Experiment 9: LCD (Liquid Crystal Display)**             | Interface and control an LCD display to show messages and data from the microcontroller.              |
 
 ### 📚 Additional Resources
 - 🔗 [Keil uVision5 IDE](https://www.keil.com/demo/eval/arm.htm) - Setup and development environment for ARM programming.
