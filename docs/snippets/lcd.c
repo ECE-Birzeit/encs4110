@@ -3,14 +3,14 @@
 void SysTick_Init(void)
 {
     SysTick->CTRL = 0;                   // Disable SysTick during setup
-    SysTick->LOAD = 16000000/1000 - 1;   // Load value for 1ms delay at 16MHz
+    SysTick->LOAD = 50000000/1000 - 1;   // Load value for 1ms delay at 50MHz
     SysTick->VAL = 0;                    // Clear current value
     SysTick->CTRL = 0x5;                 // Enable SysTick, use system clock
 }
 
 void delay_us(int us)
 {
-    SysTick->LOAD = (16 * us) - 1;     // 16 cycles = 1us at 16MHz
+    SysTick->LOAD = (50 * us) - 1;     // 50 cycles = 1us at 50MHz
     SysTick->VAL = 0;                  // Clear current value
     SysTick->CTRL |= 0x1;              // Enable SysTick
     while((SysTick->CTRL & 0x10000) == 0); // Wait for COUNT flag
@@ -18,7 +18,7 @@ void delay_us(int us)
 
 void delay_ms(int ms)
 {
-    SysTick->LOAD = (16000 * ms) - 1;  // 16000 cycles = 1ms at 16MHz
+    SysTick->LOAD = (50000 * ms) - 1;  // 50000 cycles = 1ms at 50MHz
     SysTick->VAL = 0;                  // Clear current value
     SysTick->CTRL |= 0x1;              // Enable SysTick
     while((SysTick->CTRL & 0x10000) == 0); // Wait for COUNT flag
