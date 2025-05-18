@@ -20,7 +20,8 @@ Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil
 |  **Experiment 7: External Interrupts**                | Set up and handle external interrupts for responsive embedded applications.                           |
 |  **Experiment 8: Software Interrupts (Timer Interrupts)** | Utilize timer interrupts for periodic task execution and time-sensitive applications.                 |
 |  **Experiment 9: LCD (Liquid Crystal Display)**             | Interface and control an LCD display to show messages and data from the microcontroller.              |
-
+| **Experiment 10: ADC (Analog to Digital Converter)**         | Read analog signals using the ADC module and process the data in ARM assembly.                        |
+| **Experiment 11: UART (Universal Asynchronous Receiver-Transmitter)**   | Implement serial communication using UART for data exchange with other devices.                       |
 ### 📚 Additional Resources
 - 🔗 [Keil uVision5 IDE](https://www.keil.com/demo/eval/arm.htm) - Setup and development environment for ARM programming.
 - 📑 [ARM Documentation](https://developer.arm.com/documentation/dui0041/latest/) - Comprehensive documentation for ARM architecture.

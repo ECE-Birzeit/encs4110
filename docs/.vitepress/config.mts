@@ -126,6 +126,10 @@ export default defineConfig({
             text: "9. Liquid Crystal Display (LCD) Interfacing",
             link: "experiments/9.md",
           },
+          {
+            text: "11. Universal Asynchronous Receiver-Transmitter (UART)",
+            link: "experiments/11.md",
+          },
         ],
       },
       {
