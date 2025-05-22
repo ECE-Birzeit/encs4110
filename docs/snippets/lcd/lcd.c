@@ -62,9 +62,9 @@ void LCD_Init(void)
     // During initialization, we're only sending the upper nibble (0x3)
     // because the LCD doesn't know it's in 4-bit mode yet
 
-    for (int i = 0; i < 3; i++) {
-        LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
-    }
+    LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
+    LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
+    LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
 
     // Switch to 4-bit mode (only sending upper nibble 0x2)
     LCD_Command(0x20);
