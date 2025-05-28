@@ -7,8 +7,6 @@ volatile unsigned int adc_value;
 int main(void)
 {
 
-    volatile float voltage;
-
     /* Enable Clock to ADC0 and GPIO pins*/
     SYSCTL->RCGCGPIO |= (1 << 4); /* Enable Clock to GPIOE or PE3/AN0 */
     SYSCTL->RCGCADC |= (1 << 0);  /* AD0 clock enable*/
@@ -40,8 +38,6 @@ int main(void)
         adc_value = ADC0->SSFIFO3; /* read adc coversion result from SS3 FIFO*/
         ADC0->ISC = 8;             /* clear coversion clear flag bit*/
 
-        /* convert digital value back into voltage */
-        voltage = (adc_value * 0.0008);
 
         if (adc_value >= 2048)
             GPIOF->DATA = 0x08; /* turn on green LED*/

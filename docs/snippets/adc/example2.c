@@ -4,7 +4,7 @@
 /* If AN0 channel value is less 2048 digital value than LED turns off and otherwise remain on */
 #include "TM4C123GH6PM.h"
 #include <stdio.h>
-
+#include "lcd.h"
 // Functions Declaration
 void delayUs(int); // Delay in Micro Seconds
 volatile unsigned int adc_value;
@@ -12,15 +12,17 @@ volatile unsigned int adc_value;
 void ADC0SS3_Handler(void)
 {
     adc_value = ADC0->SSFIFO3; /* read adc coversion result from SS3 FIFO*/
+	
+	if (adc_value >= 2048)
+		GPIOF->DATA = 0x08; /* turn on green LED*/
+	else if (adc_value < 2048)
+		GPIOF->DATA = 0x00; /* turn off green LED*/
     ADC0->ISC = 8;             /* clear coversion clear flag bit*/
     ADC0->PSSI |= (1 << 3);    /* Enable SS3 conversion or start sampling data from AN0 */
 }
 
 int main(void)
 {
-    char *str = "Tiva C starting"; // Write any string you want to display on LCD
-    char s[20];
-    volatile float voltage;
 
     /* Enable Clock to ADC0 and GPIO pins*/
     SYSCTL->RCGCGPIO |= (1 << 4); /* Enable Clock to GPIOE or PE3/AN0 */
@@ -50,17 +52,10 @@ int main(void)
     ADC0->ACTSS |= (1 << 3);     /* enable ADC0 sequencer 3 */
     ADC0->PSSI |= (1 << 3);      /* Enable SS3 conversion or start sampling data from AN0 */
 
+	LCD_Init();
+	
     while (1)
     {
 
-        /*control Green PF3->LED */
-        /* convert digital value back into voltage */
-        voltage = (adc_value * 0.0008);
-        // sprintf(s, "\r\nVoltage = %f", voltage);
-
-        if (adc_value >= 2048)
-            GPIOF->DATA = 0x08; /* turn on green LED*/
-        else if (adc_value < 2048)
-            GPIOF->DATA = 0x00; /* turn off green LED*/
     }
 }
