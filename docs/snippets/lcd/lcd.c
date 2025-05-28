@@ -10,18 +10,19 @@ void SysTick_Init(void)
 
 void delay_us(int us)
 {
-    SysTick->LOAD = (50 * us) - 1;     // 50 cycles = 1us at 50MHz
-    SysTick->VAL = 0;                  // Clear current value
-    SysTick->CTRL |= 0x1;              // Enable SysTick
-    while((SysTick->CTRL & 0x10000) == 0); // Wait for COUNT flag
+    SysTick->LOAD = 50 * us - 1;      // 1 us = 50 clock cycles at 50 MHz
+    SysTick->VAL = 0;
+    SysTick->CTRL = 0x5;              // Enable SysTick with system clock
+    while ((SysTick->CTRL & 0x10000) == 0); // Wait for COUNT flag
+    SysTick->CTRL = 0;                // Disable SysTick after done
 }
 
 void delay_ms(int ms)
 {
-    SysTick->LOAD = (50000 * ms) - 1;  // 50000 cycles = 1ms at 50MHz
-    SysTick->VAL = 0;                  // Clear current value
-    SysTick->CTRL |= 0x1;              // Enable SysTick
-    while((SysTick->CTRL & 0x10000) == 0); // Wait for COUNT flag
+    while (ms--)
+    {
+        delay_us(1000);  // 1 ms = 1000 us
+    }
 }
 
 void LCD_EnablePulse(void)
@@ -62,9 +63,9 @@ void LCD_Init(void)
     // During initialization, we're only sending the upper nibble (0x3)
     // because the LCD doesn't know it's in 4-bit mode yet
 
-    LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
-    LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
-    LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
+    for (int i = 0; i < 3; i++) {
+        LCD_Command(0x30);  // Send 0x30 (upper nibble only) 3 times
+    }
 
     // Switch to 4-bit mode (only sending upper nibble 0x2)
     LCD_Command(0x20);
@@ -114,7 +115,7 @@ void LCD_Data(unsigned char data)
 void LCD_Clear(void)
 {
     LCD_Command(0x01);  // Clear display command
-    delay_ms(2);        // Clear command needs 1.52ms
+    delay_ms(5);        // Clear command needs 1.52ms
 }
 
 void LCD_SetCursor(unsigned char row, unsigned char col)
