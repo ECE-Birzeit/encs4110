@@ -4,7 +4,7 @@
 /* If AN0 channel value is less 2048 digital value than LED turns off and otherwise remain on */
 #include "TM4C123GH6PM.h"
 #include <stdio.h>
-#include "lcd.h"
+
 // Functions Declaration
 void delayUs(int); // Delay in Micro Seconds
 volatile unsigned int adc_value;
@@ -52,7 +52,6 @@ int main(void)
     ADC0->ACTSS |= (1 << 3);     /* enable ADC0 sequencer 3 */
     ADC0->PSSI |= (1 << 3);      /* Enable SS3 conversion or start sampling data from AN0 */
 
-	LCD_Init();
 	
     while (1)
     {
