@@ -127,6 +127,10 @@ export default defineConfig({
             link: "/experiments/9.md",
           },
           {
+            text: "10. Analog-to-Digital Converter (ADC)",
+            link: "/experiments/10.md",
+          },
+          {
             text: "11. Universal Asynchronous Receiver-Transmitter (UART)",
             link: "/experiments/11.md",
           },
