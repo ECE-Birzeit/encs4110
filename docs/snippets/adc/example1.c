@@ -1,4 +1,4 @@
-#include "TM4C123GH6PM.h"
+#include "TM4C123.h"
 #include <stdio.h>
 
 

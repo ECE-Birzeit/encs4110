@@ -1,8 +1,4 @@
-/* TM4C123G Tiva C Series ADC Example */
-
-/* This Program controls the onboard green LED based on discrete digital value of ADC */
-/* If AN0 channel value is less 2048 digital value than LED turns off and otherwise remain on */
-#include "TM4C123GH6PM.h"
+#include "TM4C123G.h"
 #include <stdio.h>
 
 // Functions Declaration
@@ -12,13 +8,13 @@ volatile unsigned int adc_value;
 void ADC0SS3_Handler(void)
 {
     adc_value = ADC0->SSFIFO3; /* read adc coversion result from SS3 FIFO*/
-	
-	if (adc_value >= 2048)
-		GPIOF->DATA = 0x08; /* turn on green LED*/
-	else if (adc_value < 2048)
-		GPIOF->DATA = 0x00; /* turn off green LED*/
-    ADC0->ISC = 8;             /* clear coversion clear flag bit*/
-    ADC0->PSSI |= (1 << 3);    /* Enable SS3 conversion or start sampling data from AN0 */
+
+    if (adc_value >= 2048)
+        GPIOF->DATA = 0x08; /* turn on green LED*/
+    else if (adc_value < 2048)
+        GPIOF->DATA = 0x00; /* turn off green LED*/
+    ADC0->ISC = 8;          /* clear coversion clear flag bit*/
+    ADC0->PSSI |= (1 << 3); /* Enable SS3 conversion or start sampling data from AN0 */
 }
 
 int main(void)
@@ -52,9 +48,7 @@ int main(void)
     ADC0->ACTSS |= (1 << 3);     /* enable ADC0 sequencer 3 */
     ADC0->PSSI |= (1 << 3);      /* Enable SS3 conversion or start sampling data from AN0 */
 
-	
     while (1)
     {
-
     }
 }
