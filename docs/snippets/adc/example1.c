@@ -1,8 +1,7 @@
 #include "TM4C123.h"
 #include <stdio.h>
 
-
-volatile unsigned int adc_value; 
+volatile unsigned int adc_value;
 
 int main(void)
 {
@@ -38,10 +37,9 @@ int main(void)
         adc_value = ADC0->SSFIFO3; /* read adc coversion result from SS3 FIFO*/
         ADC0->ISC = 8;             /* clear coversion clear flag bit*/
 
-
         if (adc_value >= 2048)
             GPIOF->DATA = 0x08; /* turn on green LED*/
         else if (adc_value < 2048)
             GPIOF->DATA = 0x00; /* turn off green LED*/
     }
-}   
+}
