@@ -1,4 +1,4 @@
-#include "TM4C123G.h"
+#include "TM4C123.h"
 #include <stdio.h>
 
 // Functions Declaration
