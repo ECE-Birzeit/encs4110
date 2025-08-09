@@ -104,27 +104,27 @@ export default defineConfig({
         items: [
           {
             text: "4. GPIO (General Purpose Input/Output)",
-            link: "/experiments/6.md",
+            link: "/experiments/4.md",
           },
           {
             text: "5. External Interrupts (Hardware Interrupts)",
-            link: "/experiments/7.md",
+            link: "/experiments/5.md",
           },
           {
             text: "6. Software Interrupts (Timer Interrupts)",
-            link: "/experiments/8.md",
+            link: "/experiments/6.md",
           },
           {
             text: "7. Liquid Crystal Display (LCD) Interfacing",
-            link: "/experiments/9.md",
+            link: "/experiments/7.md",
           },
           {
             text: "8. Analog-to-Digital Converter (ADC)",
-            link: "/experiments/10.md",
+            link: "/experiments/8.md",
           },
           {
             text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
-            link: "/experiments/11.md",
+            link: "/experiments/9.md",
           },
         ],
       },
