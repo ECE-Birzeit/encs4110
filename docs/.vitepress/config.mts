@@ -85,24 +85,16 @@ export default defineConfig({
         collapsed: false,
         items: [
           {
-            text: "1. Introduction to ARM Assembly",
+            text: "1. Data Processing and Status Flags",
             link: "/experiments/1.md",
           },
           {
-            text: "2. ARM Data Processing Instructions",
+            text: "2. Flow Control and Addressing Modes",
             link: "/experiments/2.md",
           },
           {
-            text: "3. ARM Flow Control Instructions",
+            text: "3. Stack and Procedure Calls",
             link: "/experiments/3.md",
-          },
-          {
-            text: "4. ARM Addressing Modes",
-            link: "/experiments/4.md",
-          },
-          {
-            text: "5. ARM Subroutines",
-            link: "/experiments/5.md",
           },
         ],
       },
@@ -111,27 +103,27 @@ export default defineConfig({
         collapsed: false,
         items: [
           {
-            text: "6. GPIO (General Purpose Input/Output)",
+            text: "4. GPIO (General Purpose Input/Output)",
             link: "/experiments/6.md",
           },
           {
-            text: "7. External Interrupts (Hardware Interrupts)",
+            text: "5. External Interrupts (Hardware Interrupts)",
             link: "/experiments/7.md",
           },
           {
-            text: "8. Software Interrupts (Timer Interrupts)",
+            text: "6. Software Interrupts (Timer Interrupts)",
             link: "/experiments/8.md",
           },
           {
-            text: "9. Liquid Crystal Display (LCD) Interfacing",
+            text: "7. Liquid Crystal Display (LCD) Interfacing",
             link: "/experiments/9.md",
           },
           {
-            text: "10. Analog-to-Digital Converter (ADC)",
+            text: "8. Analog-to-Digital Converter (ADC)",
             link: "/experiments/10.md",
           },
           {
-            text: "11. Universal Asynchronous Receiver-Transmitter (UART)",
+            text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
             link: "/experiments/11.md",
           },
         ],
