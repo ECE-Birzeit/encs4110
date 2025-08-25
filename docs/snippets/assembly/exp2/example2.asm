@@ -1,4 +1,4 @@
- AREA RESET, CODE, READONLY
+    AREA RESET, CODE, READONLY
     EXPORT __Vectors
 __Vectors
     DCD 0x20001000          
