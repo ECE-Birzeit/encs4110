@@ -22,7 +22,7 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
 
-  base: "/encs4110/",
+  base: "/",
   head: [
     [
       "script",
