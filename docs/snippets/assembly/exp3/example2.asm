@@ -40,7 +40,7 @@ STOP
 ; Output:
 ;   R0 - sum of (array[i] % N)
 ;-----------------------------------------------
-SUM_MOD_N
+SUM_MOD_N PROC
     PUSH {R4, R5, R6, LR}   ; Save registers
     MOV R4, #0              ; accumulator
     MOV R5, R0              ; pointer to array
@@ -61,6 +61,7 @@ SUM_LOOP
 SUM_MOD_N_EXIT
     MOV R0, R4
     POP {R4, R5, R6, PC}
+ENDP
 
 ;-----------------------------------------------
 ; Procedure: MOD_N
@@ -71,7 +72,7 @@ SUM_MOD_N_EXIT
 ; Output:
 ;   R0 - remainder
 ;-----------------------------------------------
-MOD_N
+MOD_N PROC
     PUSH {R4, LR}                ; Save callee-saved registers and LR
 
     UDIV R4, R0, R2             ; R4 = quotient = dividend / divisor
@@ -79,5 +80,5 @@ MOD_N
     SUB R0, R0, R4              ; R0 = dividend - quotient * divisor (remainder)
 
     POP {R4, PC}                ; Restore R4 and return (pop PC = pop LR)
-
+ENDP
     END

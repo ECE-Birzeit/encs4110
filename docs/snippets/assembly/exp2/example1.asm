@@ -1,4 +1,3 @@
-
     AREA RESET, CODE, READONLY
     EXPORT __Vectors
 __Vectors
