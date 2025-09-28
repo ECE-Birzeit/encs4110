@@ -1,24 +1,20 @@
-//Program 1 
 #include "TM4C123.h" 
 
+#define RED_LED 0x02
+#define SWITCH 0x10
+
 int main(void) { 
-    unsigned int state; 
-    SYSCTL->RCGCGPIO |= 0x20;   /* enable clock to GPIOF */ 
-    GPIOF->LOCK = 0x4C4F434B;   // unlockGPIOCR register 
-    GPIOF->CR = 0x01;           
-    // Enable GPIOPUR register enable to commit 
-    GPIOF->PUR |= 0x10;        
-    GPIOF->DIR |= 0x02;          
-    GPIOF->DEN |= 0x12;         
-    // Enable Pull Up resistor PF4 
-    //set PF1 as an output and PF4 as an input pin 
-    // Enable PF1 and PF4 as a digital GPIO pins  
+    unsigned int state;      
+    SYSCTL->RCGCGPIO |= (1<<5); 			// Enable Port F
+    GPIOF->PUR |= SWITCH;                   // Enable pull-up resistor on PF4
+    GPIOF->DIR |= RED_LED;                  // Set PF1 as an output pin and PF4 as an input pin
+    GPIOF->DEN |= (RED_LED | SWITCH);       // Enable PF1 and PF4 as a digital GPIO pins
     while(1) {    
-        state = GPIOF->DATA & 0x10; 
-        if (state == 0) {
-            GPIOF->DATA |= 0x2;
-        } else {
-            GPIOF->DATA &= ~0x2;
+        state = GPIOF->DATA & SWITCH;       // Read the state of the switch
+        if (state == 0) {                   // If the switch is pressed (since it's Pull-up)
+            GPIOF->DATA |= RED_LED;         // Turn on the LED
+        } else {                            // If the switch is not pressed
+            GPIOF->DATA &= ~RED_LED;        // Turn off the LED
         }
     } 
 } 

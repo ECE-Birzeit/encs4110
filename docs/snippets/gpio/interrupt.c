@@ -1,49 +1,46 @@
-//Program 2 
-/*PORTF PF0 and PF4 fall edge interrupt example*/ 
-/*This GPIO interrupt example code controls green LED with switches SW1 and SW2 external interrupts */ 
-#include "TM4C123.h"                    
+#include "TM4C123.h"   
+
+#define GREEN_LED 0x08
+#define SW1 0x10
+#define SW2 0x01
+
 int main(void) 
 { 
-    SYSCTL->RCGCGPIO |= (1<<5);   /* Set bit5 of RCGCGPIO to enable clock to PORTF*/ 
-        
-    /* PORTF0 has special function, need to unlock to modify */ 
-    GPIOF->LOCK = 0x4C4F434B;   /* unlock commit register */ 
-    GPIOF->CR = 0x01;           /* make PORTF0 configurable */ 
+    SYSCTL->RCGCGPIO |= (1<<5);             // Enable clock to GPIOF
+
+    GPIOF->LOCK = 0x4C4F434B;               // unlock commit register
+    GPIOF->CR = 0x01;                       // make PORTF0 configurable
 
 
-    /*Initialize PF3 as a digital output, PF0 and PF4 as digital input pins */ 
+    // PINS Configurations
+    GPIOF->DIR &= ~(SW1 | SW2);             // Set SW1, SW2 as input pins
+    GPIOF->DIR |= GREEN_LED;                // Set GREEN_LED as output pin
 
-    GPIOF->DIR &= ~((1<<4)|(1<<0));  /* Set PF4 and PF0 as a digital input pins */ 
-    GPIOF->DIR |= (1<<3);           /* Set PF3 as digital output to control green LED */ 
-    GPIOF->DEN |= (1<<4)|(1<<3)|(1<<0);             /* make PORTF4-0 digital pins */ 
-    GPIOF->PUR |= (1<<4)|(1<<0);             /* enable pull up for PORTF4, 0 */ 
-        
-    /* configure PORTF4, 0 for falling edge trigger interrupt */ 
-    GPIOF->IS  &= ~((1<<4)|(1<<0));        /* make bit 4, 0 edge sensitive */ 
-    GPIOF->IBE &= ~((1<<4)|(1<<0));         /* trigger is controlled by IEV */ 
-    GPIOF->IEV &= ~((1<<4)|(1<<0));        /* falling edge trigger */ 
-    GPIOF->ICR |= (1<<4)|(1<<0);          /* clear any prior interrupt */ 
-    GPIOF->IM  |= (1<<4)|(1<<0);          /* unmask interrupt */ 
-        
-    /* enable interrupt in NVIC and set priority to 3 */ 
-    // NVIC->IP[30] = 3 << 5;     /* set interrupt priority to 3 */ 
-    NVIC->ISER[0] |= (1<<30);  /* enable IRQ30 (D30 of ISER[0]) */ 
-     
+    GPIOF->DEN |= (GREEN_LED | SW1 | SW2);  // Enable digital function for GREEN_LED, SW1, SW2
+    GPIOF->PUR |= (SW1 | SW2);              // Enable pull-up resistors on SW1, SW2
+
+    // Interrupt Configurations
+    GPIOF->IS  &= ~(SW1 | SW2);             // SW1, SW2 are edge-sensitive
+    GPIOF->IBE &= ~(SW1 | SW2);             // SW1, SW2 are not both edges
+    GPIOF->IEV &= ~(SW1 | SW2);             // falling edge trigger
+    GPIOF->ICR |= (SW1 | SW2);              // clear any prior interrupt
+    GPIOF->IM  |= (SW1 | SW2);              // unmask interrupt
+
+    // Enable Interrupts
+    NVIC->ISER[0] |= (1<<30);       				// enable interrupt 30 in NVIC
+    // NVIC_EnableIRQ(GPIOF_IRQn);  				// Alternative way using CMSIS function
     while(1) 
     { 
     } 
 } 
- 
-/* SW1 is connected to PF4 pin, SW2 is connected to PF0. */ 
-/* Both of them trigger PORTF falling edge interrupt */ 
+
 void GPIOF_Handler(void) {  
-    if (GPIOF->MIS & 0x10) { /* check if interrupt causes by PF4 SW1*/    
-        GPIOF->DATA |= (1<<3); 
-        GPIOF->ICR |= 0x10; /* clear the interrupt flag */ 
+    if (GPIOF->MIS & SW1) {                 // check if interrupt causes by PF4/SW1
+        GPIOF->DATA |= GREEN_LED;           // turn on green LED
+        GPIOF->ICR |= SW1;                  // clear the interrupt flag
     }  
-    else if (GPIOF->MIS & 0x01) {  /* check if interrupt causes by PF0/SW2 */ 
-       
-        GPIOF->DATA &= ~0x08; 
-        GPIOF->ICR |= 0x01; /* clear the interrupt flag */ 
+    else if (GPIOF->MIS & SW2) {            // check if interrupt causes by PF0/SW2
+        GPIOF->DATA &= ~GREEN_LED;          // turn off green LED
+        GPIOF->ICR |= SW2;                  // clear the interrupt flag
     } 
 } 

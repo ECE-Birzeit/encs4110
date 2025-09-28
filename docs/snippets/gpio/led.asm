@@ -47,7 +47,7 @@ delay1
 ; Set the data for PORT F to turn LED off 
     LDR R1 , =GPIO_PORTF_DATA_R 
     LDR R0 , [R1] 
-    AND R0 , R0 , #0xF7 
+    BIC R0 , R0 , #0x08
     STR R0 , [R1] 
     ; Delay loop 
     LDR R5 , =DELAY 

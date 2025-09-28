@@ -1,7 +1,6 @@
 #include "lcd.h"
 
-#define SYSTEM_CLOCK_HZ 50000000 // 50 MHz system clock
-#define CYCLES_PER_US   (SYSTEM_CLOCK_HZ / 1000000)
+#define CYCLES_PER_US   (SystemCoreClock / 1000000u)
 
 
 
