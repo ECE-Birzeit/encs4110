@@ -1,0 +1,426 @@
+\chapter{ARM Cortex-M4 Assembly Fundamentals}
+
+\section*{Learning Objectives}
+\begin{itemize}[nosep]
+  \item Describe the Cortex-M4 register set, xPSR flags, and ARMv7-M memory map.
+  \item Write and assemble a minimal ARM program with a vector table and \texttt{Reset\_Handler}.
+  \item Use core data-processing, shift/rotate, and compare/test instructions.
+  \item Apply conditional execution with condition codes (e.g., \texttt{ADDEQ}, \texttt{BNE}).
+  \item Debug in \keil: set breakpoints, single-step, inspect registers/memory, and interpret flags.
+\end{itemize}
+
+\section*{Experiment Overview}
+This experiment introduces low-level programming on the Cortex-M4. You will build a minimal startup image, practice common data-processing and control-flow instructions, and use the \keil\ debugger to observe register and memory effects while stepping through code. By the end, you will be able to implement and test short assembly routines that manipulate data and make decisions based on condition flags.
+
+\newpage
+\tableofcontents
+\newpage
+\section{Theoretical Background}
+\subsection{Cortex-M4 Architecture}
+\subsubsection{Registers Overview}
+The Cortex-M4 architecture includes a set of general-purpose registers (R0-R12), a stack pointer (SP), a link register (LR), a program counter (PC), and a program status register (xPSR), all of which are 32-bit registers. The general-purpose registers are used for data manipulation and temporary storage during program execution. The SP is used to manage the call stack, while the LR holds the return address for function calls. The PC points to the next instruction to be executed, and the xPSR contains flags and status information about the processor state.
+\paragraph{Program Status Register (xPSR)}
+holds the current state of the processor, including condition flags (Negative, Zero, Carry, Overflow), interrupt status, and execution state. These flags are updated based on the results of arithmetic and logical operations, allowing for conditional branching and decision-making in programs.
+
+\subsubsection{Memory Mapping}
+The Cortex-M4 uses a flat memory model, where all memory locations are accessible through a single address space. This model simplifies programming and allows for efficient access to data and instructions. The memory is divided into several regions, including code memory (for storing instructions), data memory (for storing variables), and peripheral memory (for interfacing with hardware components). The architecture supports both little-endian and big-endian data formats, with little-endian being the default.
+\begin{table}[H] % needs \usepackage{float}
+\centering
+\caption{Cortex-M4 Memory Regions (ARMv7-M)}
+\small
+\begin{tabularx}{\linewidth}{@{}p{0.22\linewidth}p{0.33\linewidth}X@{}}
+\toprule
+\textbf{Region} & \textbf{Address Range} & \textbf{Description} \\
+\midrule
+Code            & 0x0000\_0000 -- 0x1FFF\_FFFF & Flash / code memory \\
+SRAM            & 0x2000\_0000 -- 0x3FFF\_FFFF & On-chip static RAM \\
+Peripheral      & 0x4000\_0000 -- 0x5FFF\_FFFF & Memory-mapped peripheral registers \\
+External RAM    & 0x6000\_0000 -- 0x9FFF\_FFFF & External RAM (if implemented) \\
+External Device & 0xA000\_0000 -- 0xDFFF\_FFFF & External devices / memory (if implemented) \\
+PPB (Private Peripheral Bus) & 0xE000\_0000 -- 0xE00F\_FFFF & Cortex-M4 internal peripherals (NVIC, SysTick, MPU, SCB) \\
+System          & 0xE010\_0000 -- 0xFFFF\_FFFF & System region (reserved/system-level) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsection{Assembly Language Basics}
+
+Assembly language is a low-level programming language that provides a direct correspondence between human-readable instructions and the machine code executed by the processor. Each instruction encodes a specific operation, such as moving data, performing arithmetic or logic, or altering control flow. Because it maps so closely to hardware, assembly allows precise control of system resources and is commonly used in performance-critical routines or when direct access to hardware is required.
+
+Assembly programs are typically composed of three main elements: \emph{instructions}, \emph{directives}, and \emph{labels}.
+
+\paragraph{Instructions}  
+Instructions are the executable commands that the CPU carries out. Examples include data movement (\texttt{MOV}), arithmetic (\texttt{ADD}, \texttt{SUB}), logical operations (\texttt{AND}, \texttt{ORR}), and control flow (\texttt{B}, \texttt{BL}). Each instruction directly translates to one or more machine code opcodes and determines the actual behavior of the program.
+
+\paragraph{Directives}  
+Directives are commands to the assembler that guide how source code is translated into machine code but do not generate instructions themselves. Common examples include \texttt{AREA} (define a code or data section), \texttt{ALIGN} (align data to memory boundaries), \texttt{DCD} (allocate and initialize a word of storage), and \texttt{EXPORT} (export a symbol for linking). Directives organize program layout, control memory allocation, and manage symbol visibility.
+
+\paragraph{Labels}  
+Labels are symbolic names that mark specific locations in code or data. They act as targets for jumps and branches or as references for data access. Labels improve program readability and maintainability by avoiding hard-coded addresses. For instance, a label like \texttt{loop\_start} can be used as the destination of a branch instruction, and the assembler automatically computes the correct relative address.
+\subsubsection{Instruction Set Overview}
+The ARM Cortex-M4 instruction set is a subset of the ARMv7-M architecture, designed for efficient execution in embedded systems. It includes a variety of instructions for data processing, memory access, and control flow. Key categories of instructions include:
+\hfill
+\begin{itemize}[nosep]
+    \item \textbf{Data Processing Instructions}: These include arithmetic operations (e.g., \texttt{ADD}, \texttt{SUB}), logical operations (e.g., \texttt{AND}, \texttt{ORR}), and data movement instructions (e.g., \texttt{MOV}, \texttt{MVN}).
+    \item \textbf{Load and Store Instructions}: Instructions like \texttt{LDR} (load register) and \texttt{STR} (store register) are used to transfer data between registers and memory.
+    \item \textbf{Branch Instructions}: Control flow is managed using branch instructions such as \texttt{B} (branch), \texttt{BL} (branch with link), and conditional branches like \texttt{BEQ} (branch if equal).
+    \item \textbf{Special Instructions}: These include instructions for system control, such as \texttt{NOP} (no operation), \texttt{WFI} (wait for interrupt), and instructions for manipulating the stack and handling exceptions.
+\end{itemize}
+\subsubsection{General Instruction Format}
+
+Assembly source lines generally follow this shape:
+
+\[
+\texttt{[label]} \quad \texttt{OPCODE\{<cond>\}\{S\}} \quad \texttt{operands} \quad \texttt{\color{lightgray}; comment}
+\]
+
+where curly braces \texttt{\{\}} denote optional components, and:
+\begin{itemize}[nosep]
+  \item \texttt{label}: optional symbolic name marking the current address.
+  \item \texttt{OPCODE}: instruction mnemonic (e.g., \texttt{ADD}, \texttt{MOV}, \texttt{B}).
+  \item \texttt{<cond>}: optional condition code (e.g., \texttt{EQ}, \texttt{NE}, \texttt{LT}, \texttt{GE}) that predicates execution.
+  \item \texttt{S}: optional suffix indicating whether to update the condition flags (e.g., \texttt{ADDS}).
+  \item \texttt{operands}: registers, immediates, or memory operands (e.g., \texttt{R0, R1, \#1} or \texttt{[R2]}).
+  \item Anything after a semicolon (\texttt{;}) is a comment ignored by the assembler.
+\end{itemize}
+
+\begin{lstlisting}[caption={Instruction format example}]
+loop_start   ADDS   R0, R0, #1      ; R0 = R0 + 1, update flags (N,Z,C,V)
+             CMP    R0, #10         ; compare R0 with 10 (sets flags)
+             BLT    loop_start      ; branch if R0 < 10 (uses flags)
+\end{lstlisting}
+\subsubsection{Conditional Execution}
+
+Most ARM instructions can be made \emph{conditional} by appending a two-letter
+\emph{condition code} to the mnemonic (e.g., \texttt{ADDEQ}, \texttt{ADDNE}).
+The instruction is executed only if the condition evaluates true based on the
+\texttt{xPSR} flags $N$ (negative), $Z$ (zero), $C$ (carry), and $V$ (overflow).
+When no condition is supplied, the default is \texttt{AL} (always).
+
+\begin{table}[H]
+\centering
+\caption{Common ARM Condition Codes}
+\small
+\begin{tabularx}{0.72\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Cond.} & \textbf{Meaning} & \textbf{Description} \\
+\midrule
+EQ  & Equal                     & Execute if $Z=1$. \\
+NE  & Not equal                 & Execute if $Z=0$. \\
+CS/HS & Carry set / Unsigned higher or same & Execute if $C=1$. \\
+CC/LO & Carry clear / Unsigned lower        & Execute if $C=0$. \\
+MI  & Minus (negative)          & Execute if $N=1$. \\
+PL  & Plus (non-negative)       & Execute if $N=0$. \\
+VS  & Overflow set              & Execute if $V=1$. \\
+VC  & Overflow clear            & Execute if $V=0$. \\
+HI  & Unsigned higher           & Execute if $C=1$ \emph{and} $Z=0$. \\
+LS  & Unsigned lower or same    & Execute if $C=0$ \emph{or} $Z=1$. \\
+GE  & Greater or equal (signed) & Execute if $N=V$. \\
+LT  & Less than (signed)        & Execute if $N\neq V$. \\
+GT  & Greater than (signed)     & Execute if $Z=0$ \emph{and} $N=V$. \\
+LE  & Less or equal (signed)    & Execute if $Z=1$ \emph{or} $N\neq V$. \\
+AL  & Always                    & Always execute (default if no condition). \\
+NV  & Never                     & Reserved / do not use. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent\textit{Example:}
+\begin{lstlisting}[caption={Using conditional-suffix mnemonics},label={lst:cond-exec}]
+        CMP     R0, #0          ; set flags from (R0 - 0)
+        ADDEQ   R1, R1, #1      ; if Z==1: R1++
+        ADDNE   R2, R2, #1      ; if Z==0: R2++
+\end{lstlisting}
+
+\subsubsection{Barrel Shifter}
+    
+The barrel shifter is a hardware feature that allows …is a hardware feature that allows for efficient shifting and rotating of register values as part of data processing instructions. It can perform operations such as logical shifts (left or right), arithmetic shifts, and rotations on the second operand (\texttt{Operand2}) before it is used in the instruction without wasting extra instructions or cycles.
+
+\noindent Examples of barrel shifter usage:
+\begin{lstlisting}[caption={Barrel shifter examples}]
+    ADD    R0, R2, R1, LSL #2    ; R0 = R2 + (R1 << 2) using barrel shifter
+    SUB    R3, R4, R5, LSR #1    ; R3 = R4 - (R5 >> 1) using barrel shifter
+    ORR    R6, R7, R8, ROR #3    ; R6 = R7 | (R8 rotated right by 3)
+\end{lstlisting}
+
+\subsection{Data Processing Instructions}
+Data processing instructions perform arithmetic and logical operations on data stored in registers. They can also manipulate the condition flags in the xPSR based on the results of the operations. Common data processing instructions take the following form:
+\[
+\texttt{OPCODE\{<cond>\}\{S\} Rd, Rn, Operand2}
+\]
+where:
+\begin{itemize}[nosep]
+  \item \texttt{OPCODE}: the operation to be performed (e.g., \texttt{ADD}, \texttt{SUB}, \texttt{AND}, \texttt{ORR}).
+  \item \texttt{<cond>}: optional condition code that predicates execution.
+  \item \texttt{S}: optional suffix indicating whether to update the condition flags.
+  \item \texttt{Rd}: destination register where the result is stored.
+  \item \texttt{Rn}: first operand register.
+  \item \texttt{Operand2}: second operand, which can be an immediate value limited to 8 bits, a register, or a barrel shifter operation.
+\end{itemize}
+
+
+\subsubsection{Arithmetic Instructions}
+\begin{table}[H]
+\centering
+\caption{Common ARM Cortex-M4 Arithmetic Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+ADD  & \texttt{ADD\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn + Operand2$
+     & \emph{Operand2} may be a register, an immediate, or a shifted register. \\
+ADC  & \texttt{ADC\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn + Operand2 + C$
+     & Adds carry-in $C$. \\
+SUB  & \texttt{SUB\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn - Operand2$
+     & Standard subtraction. \\
+SBC  & \texttt{SBC\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn - Operand2 - (1 - C)$
+     & Subtract with borrow (borrow encoded via carry flag $C$). \\
+RSB  & \texttt{RSB\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Operand2 - Rn$
+     & Reverse subtract. \\
+MUL  & \texttt{MUL\{S\} Rd, Rn, Rm}
+     & $Rd \leftarrow (Rn \times Rm)_{[31{:}0]}$
+     & 32$\times$32 $\rightarrow$ low 32 bits. \\
+MLA  & \texttt{MLA Rd, Rn, Rm, Ra}
+     & $Rd \leftarrow (Rn \times Rm) + Ra$
+     & Multiply–accumulate. \\
+MLS  & \texttt{MLS Rd, Rn, Rm, Ra}
+     & $Rd \leftarrow Ra - (Rn \times Rm)$
+     & Multiply–subtract. \\
+UMULL & \texttt{UMULL RdLo, RdHi, Rn, Rm}
+      & $\{RdHi,RdLo\} \leftarrow Rn \times Rm$
+      & Unsigned 32$\times$32 $\rightarrow$ 64-bit product. \\
+SMULL & \texttt{SMULL RdLo, RdHi, Rn, Rm}
+      & $\{RdHi,RdLo\} \leftarrow Rn \times Rm$
+      & Signed 32$\times$32 $\rightarrow$ 64-bit product. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2pt}
+\footnotesize\emph{Note:} $C$ denotes the carry flag in \texttt{xPSR}. \emph{Operand2} may be an immediate or a shifted register depending on the encoding.
+\end{table}
+\subsubsection*{Logical and Move Instructions}
+\begin{table}[H]
+\centering
+\caption{Logical and Move Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+AND  & \texttt{AND Rd, Rn, Operand2} & $Rd \leftarrow Rn \,\&\, Operand2$ & Bitwise AND. \\
+ORR  & \texttt{ORR Rd, Rn, Operand2} & $Rd \leftarrow Rn \,|\, Operand2$ & Bitwise OR. \\
+EOR  & \texttt{EOR Rd, Rn, Operand2} & $Rd \leftarrow Rn \oplus Operand2$ & Bitwise XOR. \\
+BIC  & \texttt{BIC Rd, Rn, Operand2} & $Rd \leftarrow Rn \,\&\, \neg Operand2$ & Bit clear. \\
+MVN  & \texttt{MVN Rd, Operand2}     & $Rd \leftarrow \neg Operand2$ & Bitwise NOT of operand. \\
+MOV  & \texttt{MOV Rd, Operand2}     & $Rd \leftarrow Operand2$ & Register or immediate move. \\
+MOVW & \texttt{MOVW Rd, \#imm16}     & $Rd[15{:}0] \leftarrow imm16$ & Write low halfword. \\
+MOVT & \texttt{MOVT Rd, \#imm16}     & $Rd[31{:}16] \leftarrow imm16$ & Write high halfword (low preserved). \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2pt}
+\footnotesize\emph{Note:} $C$ denotes the carry flag in \texttt{xPSR}. \emph{Operand2} may be an immediate or a shifted register depending on the encoding.
+\end{table}
+\subsubsection{Shift and Rotate Instructions}
+\begin{table}[H]
+\centering
+\caption{Shift and Rotate Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+LSL & \texttt{LSL Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow Rm \ll sh$
+    & Logical left shift by immediate or by register. \\
+LSR & \texttt{LSR Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow Rm \gg sh$
+    & Logical right shift (zero fill). \\
+ASR & \texttt{ASR Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow Rm \gg sh$
+    & Arithmetic right shift (sign fill). \\
+ROR & \texttt{ROR Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow \mathrm{ROR}(Rm, sh)$
+    & Rotate right by immediate or by register. \\
+RRX & \texttt{RRX Rd, Rm}
+    & $Rd \leftarrow \mathrm{ROR}_{C}(Rm, 1)$
+    & Rotate right 1 bit through carry (uses $C$ as incoming bit 31, outgoing bit 0 $\rightarrow C$). \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2pt}
+\footnotesize\emph{Note:} Shift amount can be an immediate \texttt{\#sh} (0–31) or a register \texttt{Rs} (low 8 bits used). 
+For immediates: \texttt{LSL \#0} = no shift; \texttt{LSR \#0} is treated as shift by 32; \texttt{ASR \#0} is treated as shift by 32; \texttt{ROR \#0} means \texttt{RRX}.
+\end{table}
+
+\subsubsection{Compare and Test Instructions}
+\begin{table}[H]
+\centering
+\caption{Compare and Test Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+CMP & \texttt{CMP Rn, Operand2} & Flags from $(Rn - Operand2)$ & Comparison; no register result. \\
+CMN & \texttt{CMN Rn, Operand2} & Flags from $(Rn + Operand2)$ & “Compare negative” (add then set flags). \\
+TST & \texttt{TST Rn, Operand2} & Flags from $(Rn \,\&\, Operand2)$ & Bitwise test; no register result. \\
+TEQ & \texttt{TEQ Rn, Operand2} & Flags from $(Rn \oplus Operand2)$ & XOR test; no register result. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\clearpage
+\subsection{Basic Program Template (Boilerplate)}
+
+The minimal skeleton below shows a valid vector table in a \texttt{READONLY} \texttt{RESET} area, a \texttt{READWRITE} data area for variables, and a code area with the \texttt{Reset\_Handler} entry point.
+
+\begin{lstlisting}[caption={Cortex-M4 boilerplate with READWRITE data}]
+        AREA    RESET, CODE, READONLY     ; Vector table lives in read-only code
+        EXPORT  __Vectors                 ; Make symbol visible to the linker
+__Vectors
+        DCD     0x20001000                ; Initial SP value (top of stack in SRAM)
+        DCD     Reset_Handler             ; Reset vector: entry address
+        ALIGN        
+        ; -------------------- Read-Write Data --------------------
+        AREA    M_DATA, DATA, READWRITE   ; Variables go here (RAM)
+        EXPORT  COUNT                     ; Export if referenced by other modules
+COUNT   DCD     0                         ; Initialized RW variable (word)
+BUF     SPACE   16                        ; Uninitialized RW buffer (16 bytes)
+        ALIGN        
+        ; -------------------- Application Code -------------------
+        AREA    MYCODE, CODE, READONLY
+        ENTRY
+        EXPORT  Reset_Handler
+Reset_Handler
+        ; Example: COUNT++ and store to BUF[0]
+        LDR     R0, =COUNT                ; R0 <- &COUNT
+        LDR     R1, [R0]                  ; R1 <- COUNT
+        ADDS    R1, R1, #1                ; R1 = R1 + 1 (update flags)
+        STR     R1, [R0]                  ; COUNT <- R1        
+        LDR     R2, =BUF                  ; R2 <- &BUF
+        STRB    R1, [R2]                  ; BUF[0] <- (low byte of R1)
+STOP    B       STOP                      ; Stay here forever
+        END
+\end{lstlisting}
+
+\paragraph{What each directive does}
+\begin{itemize}[nosep]
+  \item \texttt{AREA <name>, CODE|DATA, READONLY|READWRITE}:
+        defines a section. Put the vector table and program text in \texttt{CODE, READONLY};
+        put variables in \texttt{DATA, READWRITE}.
+  \item \texttt{EXPORT <symbol>}: makes a label visible to the linker/other modules.
+  \item \texttt{DCD, DCW, DCB <values>}: allocate and initialize words, halfwords, or bytes.
+  \item \texttt{SPACE <n>}: reserve \textit{n} bytes of uninitialized storage in RAM.
+  \item \texttt{ALIGN}: align to a suitable boundary (commonly 4 bytes for words).
+  \item \texttt{ENTRY}: mark the entry point of the image for the toolchain.
+  \item \texttt{END}: end of source file.
+\end{itemize}
+
+\paragraph{Notes}
+\begin{itemize}[nosep]
+    \item The first two words in \texttt{\_\_Vectors} must be the initial stack pointer value and the address of \texttt{Reset\_Handler}.
+    \item The assembler/linker places sections in appropriate memory regions based on the target device and linker script.
+    \item Labels must start at the beginning of the line (no indentation), while instructions and directives should be indented for proper assembly.
+    \item Variables in \texttt{READWRITE} areas are initialized to zero by default. While you can specify initial values using directives like \texttt{DCD}, the linker will place these in flash and copy them to RAM during startup, or they may be zeroed out during RAM initialization.
+\end{itemize}
+
+\newpage
+\section{Procedure}
+\subsection{Setting Up the Keil uVision5 Environment}
+Make sure you have the \keil\ IDE installed on your computer. If not, download and install it from the official Keil website (\url{https://www.keil.com/demo/eval/arm.htm}).
+\subsubsection{Creating a New Project}
+\begin{enumerate}[nosep]
+    \item Open \keil\ and create a new project:
+    \begin{itemize}[nosep]
+        \item Go to \texttt{Project > New uVision Project...}
+        \item Choose a directory and name for your project (e.g., \texttt{Exp01\_ARM\_Assembly}).
+    \end{itemize}
+    \item Select the target device:
+    \begin{itemize}[nosep]
+        \item In the "Select Device for Target" dialog, choose ARM Cortex-M4 (ARMCM4) as we will be using it only for simulation.
+        \item Click "OK" to confirm.
+    \end{itemize}
+    \item Configure project settings:
+    \begin{itemize}[nosep]
+        \item Go to \texttt{Project > Options for Target 'Target 1'...}
+        \item Under the "Debug" tab, select "Use Simulator" as the debug driver.
+    \end{itemize}
+    \item Add a new assembly file to the project:
+    \begin{itemize}[nosep]
+        \item Right-click on "Source Group 1" in the Project window and select \texttt{Add New Item to Group 'Source Group 1'...}
+        \item In the "Add New Item" dialog, select "Assembly File" from the list.
+        \item Name the file (e.g., \texttt{main.s}) and click "Add".
+    \end{itemize}
+    \item Build the project:
+    \begin{itemize}[nosep]
+        \item Click on the "Build" button (or go to \texttt{Project > Build Target}), or use the shortcut \texttt{F7}.
+        \item Check the "Output" window for any errors or warnings. If there are errors, fix them in your assembly code and rebuild.
+        \item Once the build is successful, you should see a message indicating that the build was completed without errors.
+    \end{itemize}
+    \item Start a debugging session:
+    \item Click on the "Debug" button (or go to \texttt{Debug > Start/Stop Debug Session}), or use the shortcut \texttt{Ctrl + F5}.
+\end{enumerate}
+\subsubsection{Debugging and Running the Program}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{resources/keil_debug.png}
+    \caption{Keil uVision5 Debugging Interface}
+    \label{fig:keil_debug}
+\end{figure}
+Figure \ref{fig:keil_debug} shows the Keil uVision5 debugging interface. You can run and debug your assembly program using two main approaches:
+\begin{enumerate}[nosep]
+    \item \textbf{Step by Step Execution}:
+    \begin{itemize}[nosep]
+        \item Use the "Step" button (or press \texttt{F11}) marked in green in Figure \ref{fig:keil_debug} to execute your program one instruction at a time.
+        \item Observe the changes in the registers and memory as you step through each instruction.
+    \end{itemize}
+    \item \textbf{Run the entire program}:
+    \begin{itemize}[nosep]
+        \item Use the "Run" button (or press \texttt{F5}) marked in blue in Figure \ref{fig:keil_debug} to execute your program continuously until it hits a breakpoint or completes execution.
+        \item After running, you must stop the execution using the "Stop" button marked in yellow in Figure \ref{fig:keil_debug}.
+        \item Check the final values in the registers and memory to verify the program's behavior.
+    \end{itemize}
+\end{enumerate}
+\newpage
+\subsection{Examples}
+
+\subsubsection{Example 1 --- Arithmetic and Bitwise Operations}
+This example demonstrates basic arithmetic and bitwise operations in ARM assembly, showing how to set, clear, and flip bits.
+
+\lstinputlisting[caption={Arithmetic and bitwise operations example}]{snippets/assembly/exp1/example1.asm}
+\newpage
+\subsubsection{Example 2 --- Status Flags and Logical Tests}
+This example demonstrates the use of status flags and logical tests in ARM assembly, including conditional execution based on comparison results.
+
+\lstinputlisting[caption={Status flags and logical tests example}]{snippets/assembly/exp1/example2.asm}
+
+\subsection{Tasks}
+
+\subsubsection{Task 1 --- Bitwise Operations}
+Write an ARM assembly program that manipulates the contents of a register using bitwise operations (AND, OR, NOT, XOR) starting with Register R0 containing the value \texttt{0x0BADC0DE}.
+\begin{itemize}[nosep]
+    \item Clear bits 7--13 (inclusive)
+    \item Set bits 17--23 (inclusive)
+    \item Flip bits 24--31 (inclusive)
+\end{itemize}
+
+\emph{Hint:} Use appropriate masks with \texttt{BIC}, \texttt{ORR}, and \texttt{EOR} instructions to manipulate specific bit ranges.
+
+\subsubsection{Task 2 --- Arithmetic Operations}
+Write an ARM assembly program that performs the following arithmetic operations assuming R0 = 10 and R1 = 5:
+\begin{itemize}[nosep]
+    \item Add the values in R0 and R1, store the result in R2
+    \item Subtract the value in R1 from R0, store the result in R3
+    \item Multiply the values in R0 and R1, store the result in R4
+    \item Divide the value in R0 by R1, store the result in R5 (use unsigned division)
+    \item Using barrel shifter only, find the multiplication of R0 by 9, store the result in R6
+\end{itemize}
+

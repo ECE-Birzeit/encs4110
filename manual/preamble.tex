@@ -1,0 +1,141 @@
+% ---------- Base encoding & fonts ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{accsupp}  % lets us control ActualText for copy/paste
+
+\DeclareRobustCommand{\copyspace}{%
+  \BeginAccSupp{ActualText= }%  % what the clipboard receives (a real U+0020)
+  \kern0pt\ %                    % what is drawn (a normal space)
+  \EndAccSupp
+}
+% ---------- Graphics & links ----------
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  urlcolor=blue!60!black,
+  citecolor=blue!60!black
+}
+
+% ---------- Lists, tables, floats ----------
+\usepackage{enumitem}                % for [nosep]
+\usepackage{booktabs}                % \toprule etc.
+\usepackage{float}                   % [H] placement
+\usepackage{tabularx,array}
+\renewcommand{\arraystretch}{1.15}
+
+% ---------- KOMA (safe if class is scrreprt/scrartcl) ----------
+\makeatletter
+\@ifundefined{KOMAClassName}{}{%
+  \KOMAoptions{
+    DIV=14,
+    BCOR=0mm,
+    headinclude=true,
+    footinclude=false
+  }%
+}
+\makeatother
+
+% ---------- Numbering & ToC ----------
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}             % show down to subsubsection in ToC
+\renewcommand\thesection{\arabic{section}}
+\renewcommand\thesubsection{\thesection.\arabic{subsection}}
+\renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
+
+% ---------- Small helpers ----------
+\newcommand{\keil}{\textbf{Keil uVision5}}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% ---------- Listings: ARM assembly (colors + top/bottom rules only) ----------
+\usepackage{listings}
+\usepackage{listingsutf8}
+
+% Palette
+\definecolor{AsmMnemonic}{HTML}{005CC5}   % blue
+\definecolor{AsmDirective}{HTML}{6F42C1}  % purple
+\definecolor{AsmCond}{HTML}{D73A49}       % red
+\definecolor{AsmRegister}{HTML}{22863A}   % green
+\definecolor{AsmComment}{HTML}{6A737D}    % gray
+\definecolor{AsmLineNo}{HTML}{9AA0A6}     % light gray
+\definecolor{AsmRule}{HTML}{C0C4C8}       % rule color
+
+% Language
+\lstdefinelanguage{Assembler}{
+  % Mnemonics (include S-suffixed forms and conditional branch forms)
+  morekeywords={
+    ADC,ADCS,ADD,ADDS,ADR,AND,ANDS,ASR,ASRS,
+    B,BEQ,BNE,BCS,BHS,BCC,BLO,BMI,BPL,BVS,BVC,BHI,BLS,BGE,BLT,BGT,BLE,BAL,
+    BL,BLX,BX,
+    CBNZ,CBZ,CLZ,CMP,CMN,
+    EOR,EORS,
+    ISB,
+    LDM,LDR,LDRB,LDRH,
+    LSL,LSLS,LSR,LSRS,
+    MOV,MOVS,MOVT,MOVW,MSR,MRS,
+    MUL,MULS,
+    NOP,
+    ORR,ORRS,
+    POP,PUSH,
+    REV,REV16,REVSH,
+    ROR,RORS,
+    SBC,SBCS,
+    SEV,
+    STM,STR,STRB,STRH,
+    SUB,SUBS,
+    TBB,TBH,TST,
+    UXTB,UXTH,UXTB16,
+    WFE,WFI,
+    YIELD,
+    BKPT
+  },
+  % Directives
+  morekeywords=[2]{AREA,ALIGN,DCD,DCB,DCW,EXPORT,IMPORT,ENTRY,END,SPACE,KEEP,WEAK,LTORG},
+  % Condition-code tokens (when written separately; kept for completeness)
+  morekeywords=[3]{EQ,NE,CS,HS,CC,LO,MI,PL,VS,VC,HI,LS,GE,LT,GT,LE,AL},
+  morecomment=[l]{;},
+  sensitive=true
+}
+\lstdefinelanguage[ARM]{Assembler}[]{Assembler}{}
+
+
+\lstdefinestyle{labcode}{
+  language={[ARM]Assembler},
+  inputencoding=utf8,
+  basicstyle=\ttfamily\small,  % inconsolata will be used
+  columns=fixed,               % fixed-width columns -> real spaces in PDF
+  keepspaces=true,             % preserve all spaces (incl. leading)
+  tabsize=4,                   % set to the width you expect; or convert tabs to spaces
+  showstringspaces=false,
+  upquote=true,
+  keywordstyle={\color{AsmMnemonic}\bfseries},
+  keywordstyle=[2]{\color{AsmDirective}\bfseries},
+  keywordstyle=[3]{\color{AsmCond}\bfseries},
+  commentstyle={\itshape\color{AsmComment}},
+  emph={R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,SP,LR,PC,
+        APSR,IP,PSP,MSP,xPSR},
+  emphstyle={\color{AsmRegister}\bfseries},
+  showstringspaces=false,
+  tabsize=2,
+  keepspaces=true,
+  columns=fullflexible,
+  breaklines=true,
+  breakatwhitespace=true,
+  % frame: top & bottom only
+  frame=lines,
+  rulecolor={\color{AsmRule}},
+  xleftmargin=2em,
+  framexleftmargin=2em,
+  % line numbers
+  % line numbers disabled
+  % float control
+  float,
+  floatplacement=H,
+  captionpos=b,
+}
+\lstset{style=labcode}
+\usepackage{amsmath}

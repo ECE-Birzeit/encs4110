@@ -1,0 +1,778 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="560.70336" height="466.34304" xml:space="preserve" color-interpolation-filters="sRGB" class="st8" version="1.1">  
+ <style type="text/css">
+	<![CDATA[
+		.st1 {fill:none;stroke:#000000;stroke-linecap:butt;stroke-width:0.5}
+		.st2 {fill:#000000;font-family:Arial,Helvetica,sans-serif;font-size:0.666664em}
+		.st3 {fill:none;stroke:none;stroke-linecap:butt;stroke-width:0.5}
+		.st4 {fill:#000000;font-family:'Lucida Sans Typewriter','Lucida Console','Courier New',Courier,monospace;font-size:0.666664em}
+		.st5 {font-size:1em}
+		.st6 {stroke:#000000;stroke-linecap:butt;stroke-width:0.24}
+		.st7 {stroke:#000000;stroke-linecap:butt;stroke-width:0.5}
+		.st8 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style> 
+ <g> 
+  <title>Page-1</title>  
+  <g id="shape1-1" transform="translate(238.61,-310.942)"> 
+   <title>Sheet.1</title> 
+   <desc>
+    System
+   </desc>   
+   <rect x="0" y="315.742" width="124.724" height="34.0157" class="st1" /> 
+   <text x="49.01" y="335.15" class="st2">
+    System
+   </text> 
+  </g> 
+  <g id="shape2-4" transform="translate(238.61,-208.895)"> 
+   <title>Sheet.2</title> 
+   <desc>
+    External device
+   </desc>   
+   <rect x="0" y="287.395" width="124.724" height="62.3622" class="st1" /> 
+   <text x="35" y="320.98" class="st2">
+    External device
+   </text> 
+  </g> 
+  <g id="shape3-7" transform="translate(238.61,-140.863)"> 
+   <title>Sheet.3</title> 
+   <desc>
+    External RAM
+   </desc>   
+   <rect x="0" y="281.726" width="124.724" height="68.0315" class="st1" /> 
+   <text x="37.68" y="318.14" class="st2">
+    External RAM
+   </text> 
+  </g> 
+  <g id="shape4-10" transform="translate(238.61,-95.5087)"> 
+   <title>Sheet.4</title> 
+   <desc>
+    Peripheral
+   </desc>   
+   <rect x="0" y="304.403" width="124.724" height="45.3543" class="st1" /> 
+   <text x="44.12" y="329.48" class="st2">
+    Peripheral
+   </text> 
+  </g> 
+  <g id="shape5-13" transform="translate(238.61,-50.1544)"> 
+   <title>Sheet.5</title> 
+   <desc>
+    SRAM
+   </desc>   
+   <rect x="0" y="304.403" width="124.724" height="45.3543" class="st1" /> 
+   <text x="50.79" y="329.48" class="st2">
+    SRAM
+   </text> 
+  </g> 
+  <g id="shape6-16" transform="translate(238.61,-4.80003)"> 
+   <title>Sheet.6</title> 
+   <desc>
+    Code
+   </desc>   
+   <rect x="0" y="304.403" width="124.724" height="45.3543" class="st1" /> 
+   <text x="52.79" y="329.48" class="st2">
+    Code
+   </text> 
+  </g> 
+  <g id="shape7-19" transform="translate(363.335,-342.123)"> 
+   <title>Sheet.7</title> 
+   <desc>
+    0xFFFFFFFF
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0xFFFFFFFF
+   </text> 
+  </g> 
+  <g id="shape8-22" transform="translate(238.61,-291.099)"> 
+   <title>Sheet.8</title> 
+   <desc>
+    Private peripheral bus - External
+   </desc>   
+   <rect x="0" y="329.915" width="124.724" height="19.8428" class="st1" /> 
+   <text x="5.21" y="342.24" class="st2">
+    Private peripheral bus
+    <tspan class="st5"> 
+    </tspan>
+    <tspan class="st5">
+     -
+    </tspan>
+    <tspan class="st5"> 
+    </tspan>
+    <tspan class="st5">
+     External
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape9-29" transform="translate(363.335,-308.107)"> 
+   <title>Sheet.9</title> 
+   <desc>
+    0xE0100000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0xE0100000
+   </text> 
+  </g> 
+  <g id="shape12-32" transform="translate(363.335,-288.265)"> 
+   <title>Sheet.12</title> 
+   <desc>
+    0xE0040000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     4
+    </tspan>0000
+   </text> 
+  </g> 
+  <g id="shape14-36" transform="translate(363.335,-206.06)"> 
+   <title>Sheet.14</title> 
+   <desc>
+    0xA0000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0xA0000000
+   </text> 
+  </g> 
+  <g id="shape16-39" transform="translate(363.335,-138.028)"> 
+   <title>Sheet.16</title> 
+   <desc>
+    0x60000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0x60000000
+   </text> 
+  </g> 
+  <g id="shape18-42" transform="translate(363.335,-92.674)"> 
+   <title>Sheet.18</title> 
+   <desc>
+    0x40000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0x40000000
+   </text> 
+  </g> 
+  <g id="shape20-45" transform="translate(363.335,-47.3197)"> 
+   <title>Sheet.20</title> 
+   <desc>
+    0x20000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0x20000000
+   </text> 
+  </g> 
+  <g id="shape21-48" transform="translate(363.335,-1.96538)"> 
+   <title>Sheet.21</title> 
+   <desc>
+    0x00000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0x00000000
+   </text> 
+  </g> 
+  <g id="shape22-51" transform="translate(57.1929,-333.619)"> 
+   <title>Sheet.22</title> 
+   <desc>
+    ROM Table
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="41.9" y="346.49" class="st2">
+    ROM Table
+   </text> 
+  </g> 
+  <g id="shape23-54" transform="translate(57.1929,-310.942)"> 
+   <title>Sheet.23</title> 
+   <desc>
+    ETM
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="53.91" y="346.49" class="st2">
+    ETM
+   </text> 
+  </g> 
+  <g id="shape24-57" transform="translate(57.1929,-299.603)"> 
+   <title>Sheet.24</title> 
+   <desc>
+    TPIU
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="53.24" y="346.49" class="st2">
+    TPIU
+   </text> 
+  </g> 
+  <g id="shape25-60" transform="translate(57.1929,-265.587)"> 
+   <title>Sheet.25</title> 
+   <desc>
+    Reserved
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="45.23" y="346.49" class="st2">
+    Reserved
+   </text> 
+  </g> 
+  <g id="shape26-63" transform="translate(57.1929,-254.249)"> 
+   <title>Sheet.26</title> 
+   <desc>
+    SCS
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="54.13" y="346.49" class="st2">
+    SCS
+   </text> 
+  </g> 
+  <g id="shape27-66" transform="translate(57.1929,-242.91)"> 
+   <title>Sheet.27</title> 
+   <desc>
+    Reserved
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="45.23" y="346.49" class="st2">
+    Reserved
+   </text> 
+  </g> 
+  <g id="shape28-69" transform="translate(57.1929,-231.572)"> 
+   <title>Sheet.28</title> 
+   <desc>
+    FPB
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="54.57" y="346.49" class="st2">
+    FPB
+   </text> 
+  </g> 
+  <g id="shape29-72" transform="translate(57.1929,-220.233)"> 
+   <title>Sheet.29</title> 
+   <desc>
+    DWT
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="53.24" y="346.49" class="st2">
+    DWT
+   </text> 
+  </g> 
+  <g id="shape30-75" transform="translate(57.1929,-208.895)"> 
+   <title>Sheet.30</title> 
+   <desc>
+    ITM
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="55.46" y="346.49" class="st2">
+    ITM
+   </text> 
+  </g> 
+  <g id="shape31-78" transform="translate(57.1929,-322.28)"> 
+   <title>Sheet.31</title> 
+   <desc>
+    External PPB
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="38.56" y="346.49" class="st2">
+    External PPB
+   </text> 
+  </g> 
+  <g id="shape32-81" transform="translate(58.6616,338.73) rotate(-149.036)"> 
+   <title>Sheet.32</title> 
+   <path d="M0 349.76 L66.11 349.76" class="st6" /> 
+  </g> 
+  <g id="shape33-84" transform="translate(186.726,404.546) rotate(-171.469)"> 
+   <title>Sheet.33</title> 
+   <path d="M0 349.76 L57.33 349.76" class="st6" /> 
+  </g> 
+  <g id="shape35-87" transform="translate(0.5,-319.446)"> 
+   <title>Sheet.35</title> 
+   <desc>
+    0xE0042000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     42000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape36-91" transform="translate(0.5,-308.107)"> 
+   <title>Sheet.36</title> 
+   <desc>
+    0xE0041000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     41000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape37-95" transform="translate(0.5,-296.769)"> 
+   <title>Sheet.37</title> 
+   <desc>
+    0xE0040000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     40000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape39-99" transform="translate(0.5,-262.753)"> 
+   <title>Sheet.39</title> 
+   <desc>
+    0xE000F000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE000
+    <tspan class="st5">
+     F
+    </tspan>
+    <tspan class="st5">
+     000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape40-104" transform="translate(0.5,-251.414)"> 
+   <title>Sheet.40</title> 
+   <desc>
+    0xE000E000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE000
+    <tspan class="st5">
+     E
+    </tspan>
+    <tspan class="st5">
+     000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape41-109" transform="translate(0.5,-240.076)"> 
+   <title>Sheet.41</title> 
+   <desc>
+    0xE0003000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE000
+    <tspan class="st5">
+     3000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape42-113" transform="translate(0.5,-228.737)"> 
+   <title>Sheet.42</title> 
+   <desc>
+    0xE0002000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE000
+    <tspan class="st5">
+     2000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape43-117" transform="translate(0.5,-330.784)"> 
+   <title>Sheet.43</title> 
+   <desc>
+    0xE00FF000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     F
+    </tspan>F
+    <tspan class="st5">
+     000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape44-122" transform="translate(-42.4398,453.93) rotate(-126.529)"> 
+   <title>Sheet.44</title> 
+   <path d="M0 349.76 L95.25 349.76" class="st6" /> 
+  </g> 
+  <g id="shape45-125" transform="translate(70.0556,597.562) rotate(-151.189)"> 
+   <title>Sheet.45</title> 
+   <path d="M0 349.76 L64.7 349.76" class="st6" /> 
+  </g> 
+  <g id="shape46-128" transform="translate(439.183,586.135) rotate(145.008)"> 
+   <title>Sheet.46</title> 
+   <path d="M0 349.76 L69.2 349.76" class="st6" /> 
+  </g> 
+  <g id="shape47-131" transform="translate(0.5,-98.3433)"> 
+   <title>Sheet.47</title> 
+   <desc>
+    0x40000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x
+    <tspan class="st5">
+     40000000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape48-135" transform="translate(57.1929,-101.178)"> 
+   <title>Sheet.48</title> 
+   <desc>
+    Bit band region
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="37.66" y="346.49" class="st2">
+    Bit b
+    <tspan class="st5">
+     and region
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape49-139" transform="translate(57.1929,-140.863)"> 
+   <title>Sheet.49</title> 
+   <desc>
+    Bit band alias
+   </desc>   
+   <rect x="0" y="310.072" width="124.724" height="39.685" class="st1" /> 
+   <text x="38.33" y="332.31" class="st2">
+    Bit band alias
+   </text> 
+  </g> 
+  <g id="shape50-142" transform="translate(58.0402,-155.036)"> 
+   <title>Sheet.50</title> 
+   <desc>
+    32MB
+   </desc>   
+   <rect x="0" y="338.419" width="28.8086" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    32MB
+   </text> 
+  </g> 
+  <g id="shape51-145" transform="translate(58.2097,-101.178)"> 
+   <title>Sheet.51</title> 
+   <desc>
+    1MB
+   </desc>   
+   <rect x="0" y="338.419" width="28.4697" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    1MB
+   </text> 
+  </g> 
+  <g id="shape52-148" transform="translate(57.1929,-112.517)"> 
+   <title>Sheet.52</title>  
+   <rect x="0" y="321.411" width="124.724" height="28.3465" class="st1" /> 
+  </g> 
+  <g id="shape53-150" transform="translate(57.1929,-121.021)"> 
+   <title>Sheet.53</title> 
+   <desc>
+    31MB
+   </desc>   
+   <rect x="0" y="338.419" width="27.114" height="11.3386" class="st3" /> 
+   <text x="2" y="346.49" class="st2">
+    31
+    <tspan class="st5">
+     MB
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape54-154" transform="translate(0.5,-109.682)"> 
+   <title>Sheet.54</title> 
+   <desc>
+    0x40100000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x4
+    <tspan class="st5">
+     0
+    </tspan>100000
+   </text> 
+  </g> 
+  <g id="shape55-158" transform="translate(0.5,-138.028)"> 
+   <title>Sheet.55</title> 
+   <desc>
+    0x42000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x42
+    <tspan class="st5">
+     0
+    </tspan>00000
+   </text> 
+  </g> 
+  <g id="shape56-162" transform="translate(0.5,-177.713)"> 
+   <title>Sheet.56</title> 
+   <desc>
+    0x44000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x44000000
+   </text> 
+  </g> 
+  <g id="shape58-165" transform="translate(323.438,397.973) rotate(165.964)"> 
+   <title>Sheet.58</title> 
+   <path d="M0 349.76 L58.44 349.76" class="st6" /> 
+  </g> 
+  <g id="shape59-168" transform="translate(0.5,-217.398)"> 
+   <title>Sheet.59</title> 
+   <desc>
+    0xE0001000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE000
+    <tspan class="st5">
+     1000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape60-172" transform="translate(0.5,-206.06)"> 
+   <title>Sheet.60</title> 
+   <desc>
+    0xE0000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE000
+    <tspan class="st5">
+     0000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape61-176" transform="translate(238.61,-271.256)"> 
+   <title>Sheet.61</title> 
+   <desc>
+    Private peripheral bus - Internal
+   </desc>   
+   <rect x="0" y="329.915" width="124.724" height="19.8425" class="st1" /> 
+   <text x="6.54" y="342.24" class="st2">
+    Private peripheral bus
+    <tspan class="st5"> 
+    </tspan>
+    <tspan class="st5">
+     -
+    </tspan>
+    <tspan class="st5"> 
+    </tspan>
+    <tspan class="st5">
+     Internal
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape62-183" transform="translate(495.815,315.516) rotate(132.661)"> 
+   <title>Sheet.62</title> 
+   <path d="M0 349.76 L83.66 349.76" class="st6" /> 
+  </g> 
+  <g id="shape63-186" transform="translate(57.1929,-10.4693)"> 
+   <title>Sheet.63</title> 
+   <desc>
+    Bit band region
+   </desc>   
+   <rect x="0" y="338.419" width="124.724" height="11.3386" class="st1" /> 
+   <text x="37.66" y="346.49" class="st2">
+    Bit b
+    <tspan class="st5">
+     and region
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape64-190" transform="translate(57.1929,-50.1544)"> 
+   <title>Sheet.64</title> 
+   <desc>
+    Bit band alias
+   </desc>   
+   <rect x="0" y="310.072" width="124.724" height="39.685" class="st1" /> 
+   <text x="38.33" y="332.31" class="st2">
+    Bit band alias
+   </text> 
+  </g> 
+  <g id="shape65-193" transform="translate(58.3792,-64.3276)"> 
+   <title>Sheet.65</title> 
+   <desc>
+    32MB
+   </desc>   
+   <rect x="0" y="338.419" width="27.114" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    32MB
+   </text> 
+  </g> 
+  <g id="shape66-196" transform="translate(57.8708,-10.4693)"> 
+   <title>Sheet.66</title> 
+   <desc>
+    1MB
+   </desc>   
+   <rect x="0" y="338.419" width="27.114" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    1MB
+   </text> 
+  </g> 
+  <g id="shape67-199" transform="translate(57.1929,-21.8079)"> 
+   <title>Sheet.67</title>  
+   <rect x="0" y="321.411" width="124.724" height="28.3465" class="st1" /> 
+  </g> 
+  <g id="shape68-201" transform="translate(57.1929,-30.3118)"> 
+   <title>Sheet.68</title> 
+   <desc>
+    31MB
+   </desc>   
+   <rect x="0" y="338.419" width="27.114" height="11.3386" class="st3" /> 
+   <text x="2" y="346.49" class="st2">
+    31
+    <tspan class="st5">
+     MB
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape69-205" transform="translate(0.5,-7.63467)"> 
+   <title>Sheet.69</title> 
+   <desc>
+    0x20000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x
+    <tspan class="st5">
+     20000000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape70-209" transform="translate(0.5,-18.9733)"> 
+   <title>Sheet.70</title> 
+   <desc>
+    0x20100000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x
+    <tspan class="st5">
+     20100000
+    </tspan>
+   </text> 
+  </g> 
+  <g id="shape71-213" transform="translate(0.5,-47.3197)"> 
+   <title>Sheet.71</title> 
+   <desc>
+    0x22000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x
+    <tspan class="st5">
+     2
+    </tspan>2
+    <tspan class="st5">
+     0
+    </tspan>00000
+   </text> 
+  </g> 
+  <g id="shape74-218" transform="translate(334.988,-234.406)"> 
+   <title>Sheet.74</title> 
+   <desc>
+    1.0GB
+   </desc>   
+   <rect x="0" y="338.419" width="28.3465" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    1.0GB
+   </text> 
+  </g> 
+  <g id="shape75-221" transform="translate(334.988,-169.209)"> 
+   <title>Sheet.75</title> 
+   <desc>
+    1.0GB
+   </desc>   
+   <rect x="0" y="338.419" width="28.3465" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    1.0GB
+   </text> 
+  </g> 
+  <g id="shape76-224" transform="translate(334.988,-113.934)"> 
+   <title>Sheet.76</title> 
+   <desc>
+    0.5GB
+   </desc>   
+   <rect x="0" y="338.419" width="28.3465" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    0.5GB
+   </text> 
+  </g> 
+  <g id="shape77-227" transform="translate(334.988,-69.6425)"> 
+   <title>Sheet.77</title> 
+   <desc>
+    0.5GB
+   </desc>   
+   <rect x="0" y="338.419" width="28.3465" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    0.5GB
+   </text> 
+  </g> 
+  <g id="shape78-230" transform="translate(334.988,-23.9339)"> 
+   <title>Sheet.78</title> 
+   <desc>
+    0.5GB
+   </desc>   
+   <rect x="0" y="338.419" width="28.3465" height="11.3386" class="st3" /> 
+   <text x="1" y="346.49" class="st2">
+    0.5GB
+   </text> 
+  </g> 
+  <g id="shape80-233" transform="translate(363.335,-268.422)"> 
+   <title>Sheet.80</title> 
+   <desc>
+    0xE0000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="2" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     0
+    </tspan>0000
+   </text> 
+  </g> 
+  <g id="shape81-237" transform="translate(216.719,-99.4422) rotate(5.71059)"> 
+   <title>Sheet.81</title> 
+   <path d="M0 349.76 L56.98 349.76" class="st7" /> 
+  </g> 
+  <g id="shape10-240" transform="translate(0.5,-342.123)"> 
+   <title>Sheet.10</title> 
+   <desc>
+    0xE0100000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE0100000
+   </text> 
+  </g> 
+  <g id="shape11-243" transform="translate(0.5,-274.091)"> 
+   <title>Sheet.11</title> 
+   <desc>
+    0xE0040000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0xE00
+    <tspan class="st5">
+     4
+    </tspan>0000
+   </text> 
+  </g> 
+  <g id="shape13-247" transform="translate(0.5,-87.0048)"> 
+   <title>Sheet.13</title> 
+   <desc>
+    0x24000000
+   </desc>   
+   <rect x="0" y="344.088" width="56.6929" height="5.66929" class="st3" /> 
+   <text x="6.5" y="349.32" class="st4">
+    0x24000000
+   </text> 
+  </g> 
+ </g> 
+</svg>
