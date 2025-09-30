@@ -25,7 +25,7 @@ Reset_Handler
     ; Perform arithmetic
     ADD R3, R1, R2          ; R3 = 50 + 12 = 62
     SUB R3, R3, #4          ; R3 = 62 - 4 = 58
-    MUL R4, R3, R2          ; R4 = 58 × 12 = 696
+    MUL R4, R3, R2          ; R4 = 58 * 12 = 696
 
     ; Logical operations
     AND R5, R4, #0xFF       ; R5 = 696 & 0xFF = 0xB8 (184)

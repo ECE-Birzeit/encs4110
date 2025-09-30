@@ -1,4 +1,4 @@
-    AREA RESET, CODE, READONLY
+    AREA  RESET, CODE, READONLY
     EXPORT __Vectors
 __Vectors
     DCD 0x20001000
@@ -43,7 +43,7 @@ Reset_Handler
 
     ; Negative result example with ADDS
     MOVS R7, #5          ; R7 = 5
-    SUBS R7, R7, #10     ; R7 = 5 - 10 = -5 (two’s complement)
+    SUBS R7, R7, #10     ; R7 = 5 - 10 = -5 (two's complement)
     ; Flags:
     ; N=1 (negative), Z=0, C=0, V=0
 STOP    B STOP
