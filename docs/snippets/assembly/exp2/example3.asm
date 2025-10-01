@@ -44,5 +44,5 @@ STOP    B       STOP
         AREA    CONSTS, DATA, READONLY
 ARRAY   DCD     10, 20, 30, 40        ; four words at consecutive addresses
         AREA    MYDATA, DATA, READWRITE
-OUT     DCD     0, 0, 0, 0            ; capture buffer for observed loads or can by replaced by space 16
+OUT     DCD     0, 0, 0, 0            ; capture buffer for observed loads. Could by replaced by space 16
         END
