@@ -85,15 +85,15 @@ export default defineConfig({
         collapsed: false,
         items: [
           {
-            text: "1. Data Processing and Status Flags",
+            text: "1. ARM Cortex-M4 Assembly Fundamentals",
             link: "/experiments/1.md",
           },
           {
-            text: "2. Flow Control and Addressing Modes",
+            text: "2. ARM Cortex-M4 Instructions and Addressing Modes",
             link: "/experiments/2.md",
           },
           {
-            text: "3. Stack and Procedure Calls",
+            text: "3. ARM Cortex-M4 Flow Control, Procedures, and Stack",
             link: "/experiments/3.md",
           },
         ],

@@ -7,9 +7,9 @@ Welcome to the Experiment Navigator! This document serves as a guide to the vari
 ### 🛠️ ARM Assembly Language Experiments
 | Experiment                                  | Description                                                                                  |
 |---------------------------------------------|----------------------------------------------------------------------------------------------|
-|  [**Experiment 1: Data Processing and Status Flags**](/experiments/1)           | Learn how to use ARM assembly instructions for data processing and understand status flags. |
-|  [**Experiment 2:  Flow Control and Addressing Modes**](/experiments/2) | Learn how to implement flow control, memory access, and various addressing modes in ARM assembly.                  |
-|  [**Experiment 3: Stack and Procedure Calls**](/experiments/3)     | Implement stack management and procedure calls in ARM assembly.      |
+|  [**Experiment 1: ARM Cortex-M4 Assembly Fundamentals**](/experiments/1)           | Learn ARM Cortex-M4 architecture, registers, memory mapping, instruction formats, and assembly programming fundamentals. |
+|  [**Experiment 2: ARM Cortex-M4 Instructions and Addressing Modes**](/experiments/2) | Learn data processing, load/store instructions, conditional execution, and memory addressing modes in ARM assembly. |
+|  [**Experiment 3: ARM Cortex-M4 Flow Control, Procedures, and Stack**](/experiments/3)     | Learn branching, looping, procedure calls, stack operations, and control flow in ARM assembly.      |
 
 Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil uVision5 IDE is configured and set up for development. To set up the IDE, follow the instructions in the [Setup Guide](/setup.md).
 | Experiment                                  | Description                                                                                  |
