@@ -1,0 +1,388 @@
+\chapter{ARM Cortex-M4 Instructions and Addressing Modes}
+
+\section*{Learning Objectives}
+\begin{itemize}[nosep]
+  \item Recognize the three main categories of ARM Cortex-M4 instructions: data processing, load/store, and branch.  
+  \item Perform arithmetic, logical, shift/rotate, and compare/test operations on registers.  
+  \item Access memory using load and store instructions with different addressing modes (immediate, register offset, pre-/post-indexed).  
+  \item Apply conditional execution using condition codes in the \texttt{xPSR}.  
+  \item Observe and interpret the effects of instructions on registers, memory, and status flags using the \keil\ debugger.  
+\end{itemize}
+
+\section*{Experiment Overview}
+This experiment introduces the core instruction set of the ARM Cortex-M4 processor.  
+You will learn how to manipulate data in registers using arithmetic and logical instructions, how to transfer data between memory and registers using load/store instructions, and how to control program execution using condition codes and branches.  
+
+In the process, you will:  
+\begin{itemize}[nosep]
+  \item Step through assembly instructions in the debugger and watch how registers and memory change.  
+  \item Observe how flags (Z, N, C, V) are updated and used for conditional execution.  
+  \item Practice pointer-style memory access through different addressing modes.  
+\end{itemize}  
+
+By the end of this lab, you will have gained practical experience in writing, executing, and debugging ARM Cortex-M4 assembly programs. These foundational skills in instruction-level programming, register manipulation, and memory access will serve as essential building blocks for subsequent experiments on flow control, interrupt handling, and peripheral interfacing.
+
+\newpage
+\tableofcontents
+\newpage
+\section{Theoretical Background}
+As mentioned in Experiment 1, assembly instruction are split into three main categories: data processing, load/store, and branch instructions. This experiment focuses on data processing instructions, load/store instructions and their addressing modes. While branch instructions would be covered in more detail in Experiment 3 (Flow Control), a brief overview is provided here for completeness.
+\subsection{Data Processing Instructions}
+Data processing instructions perform arithmetic and logical operations on data stored in registers. They can also manipulate the condition flags in the xPSR based on the results of the operations. Common data processing instructions take the following form:
+\[
+\texttt{OPCODE\{<cond>\}\{S\} Rd, Rn, Operand2}
+\]
+where:
+\begin{itemize}[nosep]
+  \item \texttt{OPCODE}: the operation to be performed (e.g., \texttt{ADD}, \texttt{SUB}, \texttt{AND}, \texttt{ORR}).
+  \item \texttt{<cond>}: optional condition code that predicates execution.
+  \item \texttt{S}: optional suffix indicating whether to update the condition flags.
+  \item \texttt{Rd}: destination register where the result is stored.
+  \item \texttt{Rn}: first operand register.
+  \item \texttt{Operand2}: second operand, which can be an immediate value limited to 8 bits, a register, or a barrel shifter operation.
+\end{itemize}
+
+
+\subsubsection{Arithmetic Instructions}
+Arithmetic instructions perform basic mathematical operations. Some common arithmetic instructions include addition, subtraction, multiplication, and their variants. The following table summarizes some of the most commonly used arithmetic instructions in the ARM Cortex-M4 architecture.
+\begin{table}[H]
+\centering
+\caption{Common ARM Cortex-M4 Arithmetic Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+ADD  & \texttt{ADD\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn + Operand2$
+     & \emph{Operand2} may be a register, an immediate, or a shifted register. \\
+ADC  & \texttt{ADC\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn + Operand2 + C$
+     & Adds carry-in $C$. \\
+SUB  & \texttt{SUB\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn - Operand2$
+     & Standard subtraction. \\
+SBC  & \texttt{SBC\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Rn - Operand2 - (1 - C)$
+     & Subtract with borrow (borrow encoded via carry flag $C$). \\
+RSB  & \texttt{RSB\{S\} Rd, Rn, Operand2}
+     & $Rd \leftarrow Operand2 - Rn$
+     & Reverse subtract. \\
+MUL  & \texttt{MUL\{S\} Rd, Rn, Rm}
+     & $Rd \leftarrow (Rn \times Rm)_{[31{:}0]}$
+     & 32$\times$32 $\rightarrow$ low 32 bits. \\
+MLA  & \texttt{MLA Rd, Rn, Rm, Ra}
+     & $Rd \leftarrow (Rn \times Rm) + Ra$
+     & Multiply-accumulate. \\
+MLS  & \texttt{MLS Rd, Rn, Rm, Ra}
+     & $Rd \leftarrow Ra - (Rn \times Rm)$
+     & Multiply-subtract. \\
+UMULL & \texttt{UMULL RdLo, RdHi, Rn, Rm}
+      & $\{RdHi,RdLo\} \leftarrow Rn \times Rm$
+      & Unsigned 32$\times$32 $\rightarrow$ 64-bit product. \\
+SMULL & \texttt{SMULL RdLo, RdHi, Rn, Rm}
+      & $\{RdHi,RdLo\} \leftarrow Rn \times Rm$
+      & Signed 32$\times$32 $\rightarrow$ 64-bit product. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2pt}
+\footnotesize\emph{Note:} $C$ denotes the carry flag in \texttt{xPSR}. \emph{Operand2} may be an immediate or a shifted register depending on the encoding.
+\end{table}
+\subsubsection{Logical and Move Instructions}
+Logical instructions perform bitwise operations on data, while move instructions transfer data between registers or load immediate values. The following table summarizes some of the most commonly used logical and move instructions in the ARM Cortex-M4 architecture.
+\begin{table}[H]
+\centering
+\caption{Logical and Move Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+AND  & \texttt{AND Rd, Rn, Operand2} & $Rd \leftarrow Rn \,\&\, Operand2$ & Bitwise AND. \\
+ORR  & \texttt{ORR Rd, Rn, Operand2} & $Rd \leftarrow Rn \,|\, Operand2$ & Bitwise OR. \\
+EOR  & \texttt{EOR Rd, Rn, Operand2} & $Rd \leftarrow Rn \oplus Operand2$ & Bitwise XOR. \\
+BIC  & \texttt{BIC Rd, Rn, Operand2} & $Rd \leftarrow Rn \,\&\, \neg Operand2$ & Bit clear. \\
+MVN  & \texttt{MVN Rd, Operand2}     & $Rd \leftarrow \neg Operand2$ & Bitwise NOT of operand. \\
+MOV  & \texttt{MOV Rd, Operand2}     & $Rd \leftarrow Operand2$ & Register or immediate move. \\
+MOVW & \texttt{MOVW Rd, \#imm16}     & $Rd[15{:}0] \leftarrow imm16$ & Write low halfword. \\
+MOVT & \texttt{MOVT Rd, \#imm16}     & $Rd[31{:}16] \leftarrow imm16$ & Write high halfword (low preserved). \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2pt}
+\footnotesize\emph{Note:} $C$ denotes the carry flag in \texttt{xPSR}. \emph{Operand2} may be an immediate or a shifted register depending on the encoding.
+\end{table}
+We will be using bitwise logical instructions extensively in this experiment to manipulate specific bits in registers from setting, clearing, and flipping certain bits, or checking if certain bits are set or cleared.
+\subsubsection*{Setting and Clearing Bits}
+To set, clear, or toggle specific bits in a register, you can use the following logical instructions:
+\begin{itemize}[nosep]
+    \item \texttt{ORR Rd, Rn, \#mask}: Sets bits in \texttt{Rd} where the corresponding bits in \texttt{mask} are 1.
+    \item \texttt{BIC Rd, Rn, \#mask}: Clears bits in \texttt{Rd} where the corresponding bits in \texttt{mask} are 1.
+    \item \texttt{EOR Rd, Rn, \#mask}: Toggles bits in \texttt{Rd} where the corresponding bits in \texttt{mask} are 1.
+\end{itemize}
+to check if certain bits are set or cleared, you can use the \texttt{TST} instruction:
+\begin{itemize}[nosep]
+    \item \texttt{TST Rn, \#mask}: Performs a bitwise AND between \texttt{Rn} and \texttt{mask}, updating the condition flags based on the result. If the result is zero, the zero flag (Z) is set, indicating that none of the bits in \texttt{mask} are set in \texttt{Rn}.
+\end{itemize}
+
+\subsubsection{Shift and Rotate Instructions}
+\begin{table}[H]
+\centering
+\caption{Shift and Rotate Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+LSL & \texttt{LSL Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow Rm \ll sh$
+    & Logical left shift by immediate or by register. \\
+LSR & \texttt{LSR Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow Rm \gg sh$
+    & Logical right shift (zero fill). \\
+ASR & \texttt{ASR Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow Rm \gg sh$
+    & Arithmetic right shift (sign fill). \\
+ROR & \texttt{ROR Rd, Rm, \#sh\textbar Rs}
+    & $Rd \leftarrow \mathrm{ROR}(Rm, sh)$
+    & Rotate right by immediate or by register. \\
+RRX & \texttt{RRX Rd, Rm}
+    & $Rd \leftarrow \mathrm{ROR}_{C}(Rm, 1)$
+    & Rotate right 1 bit through carry (uses $C$ as incoming bit 31, outgoing bit 0 $\rightarrow C$). \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2pt}
+\footnotesize\emph{Note:} Shift amount can be an immediate \texttt{\#sh} (0--31) or a register \texttt{Rs} (low 8 bits used). 
+For immediates: \texttt{LSL \#0} = no shift; \texttt{LSR \#0} is treated as shift by 32; \texttt{ASR \#0} is treated as shift by 32; \texttt{ROR \#0} means \texttt{RRX}.
+\end{table}
+Not all shift/rotate instructions are explicitly present in the ARMv7-M ISA. For example, there is no ROL (rotate left) or ASL (arithmetic shift left) instruction, as these operations can be achieved using existing shift instructions: ROL can be implemented using ROR with a complementary shift amount, and ASL is equivalent to LSL.
+\subsubsection{Compare and Test Instructions}
+Compare and test instructions are used to compare values and set condition flags without producing a direct result in a register. These instructions are useful for conditional execution and branching based on the results of comparisons. The following table summarizes the compare and test instructions in the ARM Cortex-M4 architecture.
+\begin{table}[H]
+\centering
+\caption{Compare and Test Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
+\midrule
+CMP & \texttt{CMP Rn, Operand2} & Flags from $(Rn - Operand2)$ & Comparison; no register result. \\
+CMN & \texttt{CMN Rn, Operand2} & Flags from $(Rn + Operand2)$ & “Compare negative” (add then set flags). \\
+TST & \texttt{TST Rn, Operand2} & Flags from $(Rn \,\&\, Operand2)$ & Bitwise test; no register result. \\
+TEQ & \texttt{TEQ Rn, Operand2} & Flags from $(Rn \oplus Operand2)$ & XOR test; no register result. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Load and Store Instructions}
+Since the ARM Cortex-M4 architecture follows the RISC design philosophy, it uses a load/store architecture. This means that data processing instructions can only operate on data in registers, and any data in memory must first be loaded into a register before it can be processed. Similarly, results from data processing operations must be stored back to memory if they need to be preserved. The following table summarizes the load and store instructions in the ARM Cortex-M4 architecture.
+
+\begin{table}[H]
+\centering
+\caption{Load and Store Instructions (Summary)}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax Example} & \textbf{Description} \\
+\midrule
+LDR / STR       & \texttt{LDR/STR Rt, [Rn, \#off]} & Load/store a 32-bit word. \\
+LDRB / STRB     & \texttt{LDRB/STRB Rt, [Rn, \#off]} & Load/store an 8-bit byte. \\
+LDRH / STRH     & \texttt{LDRH/STRH Rt, [Rn, \#off]} & Load/store a 16-bit halfword. \\
+LDRSB / LDRSH   & \texttt{LDRSB/LDRSH Rt, [Rn, \#off]} & Load signed byte/halfword and sign-extend to 32 bits. \\
+LDRD / STRD     & \texttt{LDRD/STRD Rt, Rt2, [Rn, \#off]} & Load/store a 64-bit doubleword (two registers). \\
+\bottomrule
+\end{tabularx}
+\vspace{2pt}
+\end{table}
+
+\begin{itemize}[nosep]
+  \item \texttt{LDR Rt, =label} is a \emph{pseudo-instruction}. The assembler replaces it with code to load the \textbf{address} of \texttt{label} into \texttt{Rt}.
+  \item \texttt{LDR Rt, label} (without \texttt{=}) loads the \textbf{contents stored at} \texttt{label}.
+\end{itemize}
+\newpage
+\begin{lstlisting}[caption={Examples of Load and Store Instructions}]
+        AREA    MYDATA, DATA, READONLY
+XVAL    DCD     0x12345678        ; word in memory
+YPTR    DCD     YVAL              ; contains the address of YVAL
+
+        AREA    MYDATA2, DATA, READWRITE
+YVAL    DCD     0
+
+        AREA    MYCODE, CODE, READONLY
+        ENTRY
+        EXPORT  Reset_Handler
+
+Reset_Handler
+        LDR     R0, =XVAL         ; R0 = &XVAL (address of XVAL)
+        LDR     R1, [R0]          ; R1 = 0x12345678 (load word from memory)
+
+        LDRB    R2, [R0]          ; R2 = 0x78 (lowest byte of XVAL)
+        LDRH    R3, [R0]          ; R3 = 0x5678 (lowest halfword of XVAL)
+
+        MOV     R4, #0xFF
+        LDR     R0, YPTR          ; R0 = contents of YPTR = &YVAL
+        STRB    R4, [R0]          ; store 0xFF into YVAL (low byte only)
+
+STOP    B       STOP
+        END
+\end{lstlisting}
+\noindent\textit{Note:}  
+\begin{itemize}[nosep]
+    \item The line \texttt{YPTR DCD YVAL} allocates a 32-bit word at the label \texttt{YPTR} and initializes it with the address of \texttt{YVAL}.  
+    \item Executing \texttt{LDR R0, YPTR} loads the contents of \texttt{YPTR} (the address of \texttt{YVAL}) into \texttt{R0}, making \texttt{R0} a pointer to \texttt{YVAL}.  
+    \item By contrast, \texttt{LDR R0, =YVAL} directly loads the address of \texttt{YVAL} into \texttt{R0} without going through memory.  
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Address & Label & Contents \\
+\hline
+0x2000 & XVAL & 0x12345678 \\
+0x2004 & YPTR & 0x2008 (address of YVAL) \\
+0x2008 & YVAL & 0x00000000 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Branch Instructions and Condition Codes}
+Branch instructions change the flow of execution by jumping to a different part of the program. They can be unconditional or conditional based on the status flags in the xPSR. The following table summarizes the branch instructions in the ARM Cortex-M4 architecture.
+\begin{table}[H]
+\centering
+\caption{Branch Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax Example} & \textbf{Description} \\
+\midrule
+B    & \texttt{B label} & Unconditional branch to \texttt{label}. \\
+B<cond> & \texttt{B<cond> label} & Conditional branch based on condition flags. \\
+BL   & \texttt{BL label} & Branch with link (calls subroutine, saves return address in LR). \\
+BX   & \texttt{BX Rm} & Branch to address in register \texttt{Rm} (LR is usually used here). \\
+\bottomrule
+\end{tabularx}
+\vspace{2pt}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Condition Codes}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Cond.} & \textbf{Meaning} & \textbf{Description} \\
+\midrule
+EQ  & Equal          & Z set (zero result) \\
+NE  & Not equal      & Z clear (non-zero result) \\
+CS/HS & Carry set / Unsigned higher or same & C set \\
+CC/LO & Carry clear / Unsigned lower & C clear \\
+MI  & Minus / Negative & N set (negative result) \\
+PL  & Plus / Positive or zero & N clear \\
+VS  & Overflow set   & V set \\
+VC  & Overflow clear & V clear \\
+HI  & Unsigned higher & C set and Z clear \\
+LS  & Unsigned lower or same & C clear or Z set \\
+GE  & Signed greater than or equal & N == V \\
+LT  & Signed less than & N != V \\
+GT  & Signed greater than & Z clear and N == V \\
+LE  & Signed less than or equal & Z set or N != V \\
+AL  & Always         & (unconditional) \\
+NV  & Never          & (not used) \\
+\bottomrule
+\end{tabularx}
+\vspace{2pt}
+\end{table}
+\subsection{Addressing Modes}
+
+Addressing modes define how the effective address or operand value is obtained by an instruction. 
+The ARM Cortex-M4 supports several common addressing modes, summarized below:
+
+\begin{table}[H]
+\centering
+\caption{General Addressing Modes in ARM Cortex-M4}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Mode} & \textbf{Syntax Example} & \textbf{Description} \\
+\midrule
+Immediate      & \texttt{MOV R0, \#10}          & Operand is a constant value encoded in the instruction. \\
+Register Direct& \texttt{MOV R0, R1}            & Operand is taken directly from a register. \\
+Register Indirect & \texttt{LDR R0, [R1]}       & Register holds the address of the operand in memory. \\
+Register Offset & \texttt{LDR R0, [R1, R2]}     & Effective address = base register + offset register. \\
+Immediate Offset & \texttt{LDR R0, [R1, \#4]}   & Effective address = base register + constant offset. \\
+Pre-indexed    & \texttt{LDR R0, [R1, \#4]!}    & Base updated first, then memory access. \\
+Post-indexed   & \texttt{LDR R0, [R1], \#4}     & Memory access first, then base register updated. \\
+\bottomrule
+\end{tabularx}
+\vspace{2pt}
+\end{table}
+\newpage
+\begin{lstlisting}[caption={Examples of Offset, Pre-indexed, and Post-indexed Addressing Modes}]
+; Immediate Offset
+    LDR     R0, [R1, #4]     ; R0 = word at memory[R1 + 4]
+; Register Offset
+    LDR     R0, [R1, R2]    ; R0 = word at memory[R1 + R2]
+; Pre-indexed
+    LDR     R0, [R1, #4]!    ; R1 = R1 + 4, then load R0 = [R1]
+; Post-indexed
+    LDR     R0, [R1], #4     ; load R0 = [R1], then R1 = R1 + 4
+\end{lstlisting}
+
+\newpage
+\section{Procedure}
+
+\subsection{Examples}
+
+\subsubsection{Example 1 --- Arithmetic and Bitwise Operations}
+This example demonstrates basic arithmetic and bitwise operations in ARM assembly, showing how to set, clear, and flip bits.
+
+\lstinputlisting[caption={Arithmetic and bitwise operations example}]{snippets/assembly/exp2/example1.asm}
+\newpage
+\subsubsection{Example 2 --- Status Flags and Logical Tests}
+This example demonstrates the use of status flags and logical tests in ARM assembly, including conditional execution based on comparison results.
+
+\lstinputlisting[caption={Status flags and logical tests example}]{snippets/assembly/exp2/example2.asm}
+\newpage
+\subsubsection{Example 3 --- Load/Store with Different Addressing Modes}
+This example demonstrates load and store instructions using various addressing modes.
+\lstinputlisting[caption={Load/store with different addressing modes example}]{snippets/assembly/exp2/example3.asm}
+\subsection{Tasks}
+
+\subsubsection{Task 1 --- Bitwise Register Manipulation}
+Start with \texttt{R0 = 0x12345678}. Perform the following operations and observe the results in the debugger:
+\begin{itemize}[nosep]
+    \item Clear bits 4--7 (second hex nibble).
+    \item Set bits 8--11 (force nibble to \texttt{F}).
+    \item Toggle bits 28--31 (highest nibble).
+\end{itemize}
+\emph{Hint:} Use \texttt{BIC}, \texttt{ORR}, and \texttt{EOR} with appropriate masks.
+
+\subsubsection{Task 2 --- Arithmetic and Status Flags}
+Assume initial values \texttt{R0 = 25} and \texttt{R1 = 10}.
+\begin{itemize}[nosep]
+    \item Add \texttt{R0 + R1}, store the result in \texttt{R2}.
+    \item Subtract \texttt{R1} from \texttt{R0}, store the result in \texttt{R3}.
+    \item Multiply \texttt{R0} and \texttt{R1}, store the result in \texttt{R4}.
+    \item Compare \texttt{R0} and \texttt{R1} using \texttt{CMP}.
+          If greater, set \texttt{R5 = 1}; otherwise, set \texttt{R5 = 0}.
+\end{itemize}
+Observe how the \texttt{Z} (zero) and \texttt{N} (negative) flags in the xPSR are affected.
+
+\subsubsection{Task 3 --- Addressing Modes with an Array}
+Given the following array:
+\begin{lstlisting}
+ARRAY   DCD  0x11, 0x22, 0x33, 0x44
+\end{lstlisting}
+
+Perform the following loads using different addressing modes:
+\begin{itemize}[nosep]
+    \item Load the first element (\texttt{0x11}) using \emph{immediate offset}.
+    \item Load the second element (\texttt{0x22}) using \emph{pre-indexed} addressing.
+    \item Load the third element (\texttt{0x33}) using \emph{post-indexed} addressing.
+    \item Load the fourth element (\texttt{0x44}) using a \emph{register offset} (offset in another register).
+\end{itemize}
+
+Store each result into an output buffer \texttt{OUT} and verify the results in memory.
+

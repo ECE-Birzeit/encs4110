@@ -1,50 +1,32 @@
-    AREA  RESET, CODE, READONLY
-    EXPORT __Vectors
+
+        AREA    RESET, CODE, READONLY
+        EXPORT  __Vectors
 __Vectors
-    DCD 0x20001000
-    DCD Reset_Handler
-    ALIGN
-
-    AREA MYCODE, CODE, READONLY
-    ENTRY
-    EXPORT Reset_Handler
-
+        DCD     0x20001000            ; Initial SP (example top-of-stack)
+        DCD     Reset_Handler         ; Reset vector
+        AREA    MYCODE, CODE, READONLY
+        ENTRY
+        EXPORT  Reset_Handler
 Reset_Handler
-    ; Set up registers
-    MOVS R0, #10         ; R0 = 10, updates flags (N=0, Z=0)
-    MOVS R1, #10         ; R1 = 10, updates flags
 
-    ; Compare R0 and R1 using SUBS (R0 - R1)
-    SUBS R2, R0, R1      ; R2 = 10 - 10 = 0
-    ; Flags after SUBS:
-    ; Z=1 (result zero), N=0, C=1 (no borrow), V=0
+; ========== Part A Barrel shifter ============
+        MOV     R3, #3
+        ADD     R4, R3, R3, LSL #2    ; R4 = 3 + (3 << 2) = 15
+                                      ; R4 = ?  (confirm)  FLAGS? (unchanged)
+        ADD     R4, R3, R3, LSR #1    ; R4 = 3 + (3 >> 1) = 4
+                                      ; R4 = ?  (confirm)  FLAGS? (unchanged)
+; ========== Part E: Conditional execution  ===========
+        ; Compare and update either R6 or R7 based on Z flag
+        MOV     R6, #0
+        MOV     R7, #0
 
-    ; Compare with immediate using TST (bitwise AND, updates flags)
-    MOV R3, #0x0F        ; R3 = 0x0F (binary 00001111)
-    TST R3, #0x08        ; Test bit 3
-    ; Flags:
-    ; Z=0 (bit 3 is set), N=0
+        MOV     R0, #0                ; try #0 first, then change to #5 and rebuild
+        CMP     R0, #0
+        ADDEQ   R6, R6, #1            ; if Z==1: R6++
+        ADDNE   R7, R7, #1            ; if Z==0: R7++
+        ; After running once, edit "MOV R0, #0" -> "MOV R0, #5", rebuild, run again.
 
-    TST R3, #0x10        ; Test bit 4
-    ; Flags:
-    ; Z=1 (bit 4 not set), N=0
 
-    ; Test equivalence using TEQ (bitwise XOR, updates flags)
-    MOV R4, #0x55        ; 0x55 = 01010101b
-    MOV R5, #0x55        ; same value
-    TEQ R4, R5           ; R4 XOR R5 = 0
-    ; Flags:
-    ; Z=1 (equal), N=0
+STOP    B       STOP                   ; infinite loop
 
-    MOV R6, #0x33        ; 0x33 = 00110011b
-    TEQ R4, R6           ; 0x55 XOR 0x33 != 0
-    ; Flags:
-    ; Z=0, N=0
-
-    ; Negative result example with ADDS
-    MOVS R7, #5          ; R7 = 5
-    SUBS R7, R7, #10     ; R7 = 5 - 10 = -5 (two's complement)
-    ; Flags:
-    ; N=1 (negative), Z=0, C=0, V=0
-STOP    B STOP
-    END
+        END

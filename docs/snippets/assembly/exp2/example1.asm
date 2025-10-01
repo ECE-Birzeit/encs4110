@@ -1,43 +1,44 @@
-    AREA RESET, CODE, READONLY
+    AREA  RESET, CODE, READONLY
     EXPORT __Vectors
 __Vectors
     DCD 0x20001000
     DCD Reset_Handler
     ALIGN
-    AREA M_DATA, DATA, READONLY
-N      DCD 5
-ARRAY  DCD 3, -7, 2, -2, 10
-PTR_A  DCD ARRAY
 
-string1 DCB "Hello, ARM!", 0
-PTR_S   DCD string1
+; Data section
+NUM1    DCD 50              ; First integer
+NUM2    DCD 12              ; Second integer
+RP      DCD RESULT          ; Pointer to RESULT variable
+
+    AREA MYDATA, DATA, READWRITE
+RESULT  DCD 0               ; Will hold the final computed value
 
     AREA MYCODE, CODE, READONLY
     ENTRY
     EXPORT Reset_Handler
+
 Reset_Handler
+    ; Load values from memory into registers
+    LDR R1, NUM1            ; R1 = 50
+    LDR R2, NUM2            ; R2 = 12
 
-; ---- Array loop using length counter ----
-    LDR R1, N        ; Number of elements
-    LDR R2, PTR_A    ; Pointer to array
-    MOV R0, #0       ; Sum accumulator
+    ; Perform arithmetic
+    ADD R3, R1, R2          ; R3 = 50 + 12 = 62
+    SUB R3, R3, #4          ; R3 = 62 - 4 = 58
+    MUL R4, R3, R2          ; R4 = 58 * 12 = 696
 
-arrayLoop
-    LDR R3, [R2], #4 ; Load next element, post-increment pointer
-    ADD R0, R0, R3
-    SUBS R1, R1, #1
-    BGT arrayLoop
+    ; Logical operations
+    AND R5, R4, #0xFF       ; R5 = 696 & 0xFF = 0xB8 (184)
+    ORR R5, R5, #0x01       ; R5 = 0xB8 | 0x01 = 0xB9 (185)
+    BIC R5, R5, #0x08       ; R5 = 0xB9 & ~0x08 = 0xB1 (177)
+    EOR R5, R5, #0x02       ; R5 = 0xB1 ^ 0x02 = 0xB3 (179)
 
-; ---- String loop using null terminator ----
-    LDR R4, PTR_S    ; Pointer to string
-    MOV R5, #0       ; Character counter
+    ; Store result in memory using a pointer
+    LDR R6, RP              ; R6 = address of RESULT
+    STR R5, [R6]            ; RESULT = R5
 
-stringLoop
-    LDRB R6, [R4], #1 ; Load next char
-    CBZ R6, stringDone
-    ADD R5, R5, #1
-    B stringLoop
+    ; Read back for verification
+    LDR R7, [R6]            ; R7 = RESULT
+STOP    B STOP
 
-stringDone
-STOP B STOP
     END
