@@ -12,7 +12,7 @@ Reset_Handler
         MOV     R2, #0x01             ; R2 = ?   (after step)
         ; 2) 16-bit low half into R5
         MOV     R5, #0x3210           ; R5 = ?   (low 16 bits set)
-        ; 3) High half into R5 (Thumb-2): combine with (2)
+        ; 3) High half into R5: combine with (2)
         MOVT    R5, #0x7654           ; R5 = ?   (now 0x76543210)
         ; 4) 32-bit immediate with MOV32 macro (emits MOVW+MOVT)
         MOV32   R6, #0x87654321       ; R6 = ?

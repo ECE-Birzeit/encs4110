@@ -1,35 +1,42 @@
-    AREA RESET, CODE, READONLY
-    EXPORT __Vectors
+        AREA    RESET, CODE, READONLY
+        EXPORT  __Vectors
 __Vectors
-    DCD 0x20001000
-    DCD Reset_Handler
-    ALIGN
+        DCD     0x20001000          ; Initial SP
+        DCD     Reset_Handler       ; Reset vector
+        ALIGN
 
-N       DCD 5           ; Sum numbers 1 to 5
-    AREA MYDATA, DATA, READWRITE
-RESULT  DCD 0           ; Store sum result
+        AREA    MYCODE, CODE, READONLY
+        ENTRY
+        EXPORT  Reset_Handler
 
-    AREA MYCODE, CODE, READONLY
-    ENTRY
-    EXPORT Reset_Handler
-
-; Procedure to compute sum 1+2+...+N (input in R0), returns sum in R0
-SumUp PROC
-    MOV R1, #0          ; R1 = accumulator
-LoopSum
-    ADD R1, R1, R0      ; Add current number
-    SUBS R0, R0, #1     ; Decrement counter
-    BGT LoopSum         ; Continue if R0 > 0
-    MOV R0, R1          ; Move result to R0
-    BX LR               ; Return
-ENDP
-
+; Find maximum element in ARR[0..LEN-1]
+; Result (max) is written to MAXRES.
 Reset_Handler
-    LDR R0, N
-    BL SumUp            ; Call sum procedure
+        LDR     R0, =ARR            ; R0 = &ARR[0]
+        MOV     R1, #0              ; R1 = i (index)
+        LDR     R2, [R0]            ; R2 = max = ARR[0]
 
-    LDR R1, =RESULT
-    STR R0, [R1]        ; Store result (should be 15)
-	LDR R2, [R1]
-STOP B STOP
-	END
+for_start
+        CMP     R1, #LEN            ; i >= LEN ?
+        BGE     for_end             ; yes -> done
+
+        LDR     R3, [R0, R1, LSL #2]; R3 = ARR[i]
+        CMP     R3, R2              ; if ARR[i] > max
+        MOVGT   R2, R3              ;    max = ARR[i]
+        ADD     R1, R1, #1          ; i++
+        B       for_start
+
+for_end
+        LDR     R4, =MAXRES         ; store result for easy checking
+        STR     R2, [R4]
+
+STOP    B       STOP
+
+        AREA    CONSTANTS, DATA, READONLY
+ARR     DCD     10, 20, 30, -5, 11, 0
+LEN     EQU     6
+
+        AREA    MYDATA, DATA, READWRITE
+MAXRES  DCD     0                   ; expect 30
+
+        END

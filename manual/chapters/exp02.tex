@@ -228,7 +228,7 @@ Reset_Handler
 STOP    B       STOP
         END
 \end{lstlisting}
-\noindent\textit{Note:}  
+\paragraph{Note:}  
 \begin{itemize}[nosep]
     \item The line \texttt{YPTR DCD YVAL} allocates a 32-bit word at the label \texttt{YPTR} and initializes it with the address of \texttt{YVAL}.  
     \item Executing \texttt{LDR R0, YPTR} loads the contents of \texttt{YPTR} (the address of \texttt{YVAL}) into \texttt{R0}, making \texttt{R0} a pointer to \texttt{YVAL}.  

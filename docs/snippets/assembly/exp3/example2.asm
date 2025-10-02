@@ -1,84 +1,43 @@
- AREA RESET, CODE, READONLY
-    EXPORT __Vectors
+        AREA    RESET, CODE, READONLY
+        EXPORT  __Vectors
 __Vectors
-    DCD 0x20001000             ; Initial Stack Pointer value
-    DCD Reset_Handler          ; Reset handler address
-    ALIGN
+        DCD     0x20001000          ; Initial SP
+        DCD     Reset_Handler       ; Reset vector
+        ALIGN
 
-ARR     DCD 23, 25, 9, 11, 6, 90  ; Array of 6 integers
-LEN     DCB 6                     ; Length of the array (6 elements)
-N       DCB 3                     ; Modulus value (3)
+        AREA    MYCODE, CODE, READONLY
+        ENTRY
+        EXPORT  Reset_Handler
 
-    AREA MYDATA, DATA, READWRITE
-RESULT  DCD 0                     ; Variable to store the final result (sum)
-
-    AREA MYCODE, CODE, READONLY
-    ENTRY
-    EXPORT Reset_Handler
-
+; Count uppercase ASCII letters in the null-terminated string MYSTR.
+; Result (count) is written to UPPERCOUNT.
 Reset_Handler
-    LDR R0, =ARR                  ; R0 = address of array
-    LDRB R1, LEN                  ; R1 = length of array
-    LDRB R2, N                    ; R2 = modulus N
+        LDR     R0, =MYSTR          ; R0 = ptr to string
+        MOV     R1, #0              ; R1 = count
 
-    BL SUM_MOD_N                  ; Call procedure: sum modulo elements
+while_next
+        LDRB    R2, [R0], #1        ; R2 = *p++; post-increment pointer
+        CBZ     R2, while_end       ; if '\0' -> exit
 
-    LDR R3, =RESULT               ; R3 = address of RESULT
-    STR R0, [R3]                  ; Store sum result in RESULT
+        CMP     R2, #'A'            ; below 'A'?
+        BLT     while_next
+        CMP     R2, #'Z'            ; above 'Z'?
+        BGT     while_next
 
-    ; Infinite loop to halt here
-STOP
-    B STOP                        ; Loop forever
+        ADD     R1, R1, #1          ; count++
 
-;-----------------------------------------------
-; Procedure: SUM_MOD_N
-; Sum elements of an integer array after applying modulo N to each element.
-; Inputs:
-;   R0 - pointer to start of array
-;   R1 - number of elements
-;   R2 - modulus value N
-; Output:
-;   R0 - sum of (array[i] % N)
-;-----------------------------------------------
-SUM_MOD_N PROC
-    PUSH {R4, R5, R6, LR}   ; Save registers
-    MOV R4, #0              ; accumulator
-    MOV R5, R0              ; pointer to array
-    MOV R6, R1              ; save LEN
+        B       while_next
 
-SUM_LOOP
-    CBZ R6, SUM_MOD_N_EXIT
-    LDR R3, [R5], #4        ; load element
+while_end
+        LDR     R3, =UPPERCOUNT
+        STR     R1, [R3]
 
-    MOV R0, R3              ; dividend
-    MOV R1, R2              ; divisor
-    BL MOD_N
+STOP    B       STOP
 
-    ADD R4, R4, R0
-    SUBS R6, R6, #1         ; decrement loop counter
-    BNE SUM_LOOP
+        AREA    CONSTANTS, DATA, READONLY
+MYSTR   DCB     "Hello ARM World!", 0
 
-SUM_MOD_N_EXIT
-    MOV R0, R4
-    POP {R4, R5, R6, PC}
-ENDP
+        AREA    MYDATA, DATA, READWRITE
+UPPERCOUNT DCD  0                   ; expect 5 ('H','A','R','M','W')
 
-;-----------------------------------------------
-; Procedure: MOD_N
-; Compute remainder R0 = R0 % R1 (modulus operation).
-; Inputs:
-;   R0 - dividend
-;   R1 - divisor
-; Output:
-;   R0 - remainder
-;-----------------------------------------------
-MOD_N PROC
-    PUSH {R4, LR}                ; Save callee-saved registers and LR
-
-    UDIV R4, R0, R2             ; R4 = quotient = dividend / divisor
-    MUL R4, R4, R2              ; R4 = quotient * divisor
-    SUB R0, R0, R4              ; R0 = dividend - quotient * divisor (remainder)
-
-    POP {R4, PC}                ; Restore R4 and return (pop PC = pop LR)
-ENDP
-    END
+        END

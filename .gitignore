@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
+manual/build
 # Junction link to avoid duplication
 manual/snippets/
 # Diagnostic reports (https://nodejs.org/api/report.html)
