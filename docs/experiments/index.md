@@ -1,16 +1,16 @@
 ---
 outline: false
 ---
-# 🧭 Experiment Navigator
+# Experiment Navigator
 
 Welcome to the Experiment Navigator! This document serves as a guide to the various experiments and resources available for ARM assembly language programming and embedded systems development using the TM4C123G LaunchPad.
-### 🛠️ ARM Assembly Language Experiments
+### ARM Cortex-M4 Assembly Language Basics
 | Experiment                                  | Description                                                                                  |
 |---------------------------------------------|----------------------------------------------------------------------------------------------|
 |  [**Experiment 1: ARM Cortex-M4 Assembly Fundamentals**](/experiments/1)           | Learn ARM Cortex-M4 architecture, registers, memory mapping, instruction formats, and assembly programming fundamentals. |
 |  [**Experiment 2: ARM Cortex-M4 Instructions and Addressing Modes**](/experiments/2) | Learn data processing, load/store instructions, conditional execution, and memory addressing modes in ARM assembly. |
 |  [**Experiment 3: ARM Cortex-M4 Flow Control, Procedures, and Stack**](/experiments/3)     | Learn branching, looping, procedure calls, stack operations, and control flow in ARM assembly.      |
-
+#### EK-TM4C123GXL Microcontroller
 Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil uVision5 IDE is configured and set up for development. To set up the IDE, follow the instructions in the [Setup Guide](/setup.md).
 | Experiment                                  | Description                                                                                  |
 |---------------------------------------------|----------------------------------------------------------------------------------------------|
@@ -21,7 +21,8 @@ Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil
 | [**Experiment 8: Analog-to-Digital Conversion (ADC)**](/experiments/8) | Configure ADC channels, perform sampling and conversion, basic filtering and reading analog sensors. |
 | [**Experiment 9: UART Communication**](/experiments/9) | Implement UART communication for serial data exchange, configure baud rate, and handle interrupts. |
 
-### 📚 Additional Resources
-- 🔗 [Keil uVision5 IDE](https://www.keil.com/demo/eval/arm.htm) - Setup and development environment for ARM programming.
-- 📑 [ARM Documentation](https://developer.arm.com/documentation/dui0041/latest/) - Comprehensive documentation for ARM architecture.
-- 📝 [ARM Instruction Set Summary](https://developer.arm.com/documentation/100165/0201/Programmers-Model/Instruction-set-summary/Processor-instructions) - Detailed instruction set reference.
+###  Additional Resources
+-  [Keil uVision5 IDE](https://www.keil.com/demo/eval/arm.htm) - Setup and development environment for ARM programming.
+-  [ARM Documentation](https://developer.arm.com/documentation/dui0041/latest/) - Comprehensive documentation for ARM architecture.
+-  [ARM Instruction Set Summary](https://developer.arm.com/documentation/100165/0201/Programmers-Model/Instruction-set-summary/Processor-instructions) - Detailed instruction set reference.
+-  [TM4C123GH6PM Microcontroller Datasheet](https://www.ti.com/lit/ds/symlink/tm4c123gh6pm.pdf) - Technical specifications and features of the TM4C123G microcontroller.

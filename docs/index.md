@@ -1,27 +1,36 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
+# VitePress Home Page Configuration
 layout: home
+
 hero:
-  text: "Computer Design Laboratory"
   name: "ENCS4110"
-  tagline: "From Bits to Circuits: Mastering Computer Design and Interfacing"
+  text: "Computer Design Laboratory"
+  tagline: "Department of Electrical & Computer Engineering"
   actions:
     - theme: brand
-      text: 🧭 Experiments
+      text: "Start Experiments"
       link: /experiments
     - theme: alt
-      text: 🚀 Setup Guide
+      text: "Setup Guide"
       link: /setup
 
 features:
   - icon: ⚡
-    title:  ARM Architecture
-    details: Explore ARM processor components, instruction sets, registers, and operating modes through structured lab exercises
+    title: "ARM Cortex-M4 Architecture"
+    details: |
+      Understand the ARM Cortex-M4 processor through
+      structured labs covering its components, registers,
+      instruction set, and operating modes.
   - icon: 💻
-    title: Assembly Programming
-    details: Step-by-step assembly language programming exercises with visual execution flow and register state monitoring
+    title: "Assembly Programming"
+    details: |
+      Gain hands-on experience writing ARM assembly code,
+      focusing on data processing, flow control, procedures,
+      and stack management.
   - icon: 🛠️
-    title: Hardware Integration
-    details: Practical experiments connecting microprocessors with sensors, displays, and peripheral devices
+    title: "EK-TM4C123GXL Microcontroller"
+    details: |
+      Apply theory to practice by programming the Tiva C
+      LaunchPad, interfacing with sensors, displays, and
+      other peripherals.
 ---
-

@@ -73,11 +73,11 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "🧭 Experiment Navigator",
+        text: "Experiment Navigator",
         link: "/experiments/",
       },
-      {
-        text: "🚀 Keil uVision5 IDE Setup",
+      { 
+        text: "Keil uVision5 IDE Setup",
         link: "/setup",
       },
       {
@@ -85,15 +85,15 @@ export default defineConfig({
         collapsed: false,
         items: [
           {
-            text: "1. ARM Cortex-M4 Assembly Fundamentals",
+            text: "1. Assembly Fundamentals",
             link: "/experiments/1.md",
           },
           {
-            text: "2. ARM Cortex-M4 Instructions and Addressing Modes",
+            text: "2. Instructions and Addressing Modes",
             link: "/experiments/2.md",
           },
           {
-            text: "3. ARM Cortex-M4 Flow Control, Procedures, and Stack",
+            text: "3. Flow Control, Procedures, and Stack",
             link: "/experiments/3.md",
           },
         ],
