@@ -81,7 +81,7 @@ export default defineConfig({
         link: "/setup",
       },
       {
-        text: "ARM Assembly Experiments",
+        text: "ARM Cortex-M4 Assembly Language Basics",
         collapsed: false,
         items: [
           {
@@ -99,8 +99,8 @@ export default defineConfig({
         ],
       },
       {
-        text: "TM4C123G LaunchPad Experiments",
-        collapsed: false,
+        text: "EK-TM4C123GXL Microcontroller",
+        collapsed: false, 
         items: [
           {
             text: "4. GPIO (General Purpose Input/Output)",

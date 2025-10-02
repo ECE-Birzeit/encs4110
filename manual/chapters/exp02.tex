@@ -360,7 +360,11 @@ Start with \texttt{R0 = 0x12345678}. Perform the following operations and observ
 \emph{Hint:} Use \texttt{BIC}, \texttt{ORR}, and \texttt{EOR} with appropriate masks.
 
 \subsubsection{Task 2 --- Arithmetic and Status Flags}
-Assume initial values \texttt{R0 = 25} and \texttt{R1 = 10}.
+Assume initial values:
+\[
+\texttt{R0 = 25}, \quad \texttt{R1 = 10}
+\]
+
 \begin{itemize}[nosep]
     \item Add \texttt{R0 + R1}, store the result in \texttt{R2}.
     \item Subtract \texttt{R1} from \texttt{R0}, store the result in \texttt{R3}.
@@ -368,7 +372,7 @@ Assume initial values \texttt{R0 = 25} and \texttt{R1 = 10}.
     \item Compare \texttt{R0} and \texttt{R1} using \texttt{CMP}.
           If greater, set \texttt{R5 = 1}; otherwise, set \texttt{R5 = 0}.
 \end{itemize}
-Observe how the \texttt{Z} (zero) and \texttt{N} (negative) flags in the xPSR are affected.
+\paragraph{Explain:} The status flag change after the \texttt{CMP} instruction and how it affects the conditional execution of setting \texttt{R5}.
 
 \subsubsection{Task 3 --- Addressing Modes with an Array}
 Given the following array:
