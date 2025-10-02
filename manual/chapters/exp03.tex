@@ -50,16 +50,13 @@ CBNZ    & \texttt{CBNZ Rn, label} & Branch if \texttt{Rn != 0}. Example: loop un
 \end{tabularx}
 \end{table}
 
-\begin{quote}
-\textbf{Note on \texttt{CBZ/CBNZ}:}
-On Cortex-M4, these instructions have specific constraints:
+\paragraph{\texttt{CBZ/CBNZ}} instructions have specific constraints:
 \begin{itemize}[nosep]
   \item \textbf{Register}: operand must be a low register \texttt{R0--R7}.
-  \item \textbf{Range}: branch is \emph{forward-only}; the destination must be within 0--126 bytes after the instruction (halfword aligned). 
+  \item \textbf{Range}: branch is \emph{forward-only}; the destination must be within 0--126 bytes after the instruction.
   \item \textbf{Flags}: does not update condition flags (\texttt{N, Z, C, V}).
 \end{itemize}
 For backward or longer jumps, use \texttt{CMP}/\texttt{TST} with conditional branches (\texttt{BEQ}, \texttt{BNE}, \texttt{BGT}, \dots).
-\end{quote}
 \subsubsection{How Branch Instructions Work}
 
 Branch instructions change the flow of execution by modifying the Program Counter (\texttt{PC}). 
@@ -289,6 +286,7 @@ This example demonstrates a nested call: \texttt{CountUpperNested(ptr)} scans a 
 \lstinputlisting[caption={Nested procedure call to count uppercase letters}]{snippets/assembly/exp3/example3.asm}
 \paragraph{Check:} Verify that \texttt{UPPERCOUNT} contains \texttt{5} for the test string.
 
+\subsection{Tasks}
 
 \subsubsection{Task 1: Count Vowels in a String}
 Implement procedures to process strings with the following requirements:
