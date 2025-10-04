@@ -1,35 +1,88 @@
 \chapter{ARM Cortex-M4 Flow Control, Procedures, and Stack}
 
 \section*{Learning Objectives}
+After completing this experiment, you will be able to:
 \begin{itemize}[nosep]
   \item Implement conditional and unconditional branching using ARM branch instructions.
-  \item Design and implement loops (for, while) using compare and branch instructions.
+  \item Design and implement loop constructs (\texttt{for}, \texttt{while}) using compare and branch instructions.
   \item Create and call procedures with proper parameter passing and return mechanisms.
   \item Manage the stack for local variables, parameter passing, and nested procedure calls.
-  \item Apply the ARM Procedure Call Standard (AAPCS) for register usage and calling conventions.
+  \item Apply the ARM Procedure Call Standard (AAPCS) to ensure correct register usage and calling conventions.
 \end{itemize}
 
 \section*{Experiment Overview}
-This experiment explores program control flow, procedure implementation, and stack management in ARM Cortex-M4 assembly. You will learn to control program execution using branches and loops, create reusable code modules through procedures, and manage memory efficiently using the stack.
+This experiment introduces program control flow, procedure implementation, and stack management on the ARM Cortex-M4 processor. 
+You will learn how to control program execution using branches and loops, create modular and reusable code using procedures, and manage memory efficiently through stack operations.
 
-\noindent You will:
+\noindent In this experiment, you will:
 \begin{itemize}[nosep]
-  \item Implement various loop constructs and conditional statements in assembly.
-  \item Write procedures that follow standard calling conventions.
-  \item Handle nested procedure calls and parameter passing.
-  \item Manage stack operations for local variables and return addresses.
+  \item Implement conditional branches and loop structures at the assembly level.
+  \item Write and call procedures that follow standard calling conventions.
+  \item Handle nested calls and parameter passing using the stack.
+  \item Observe and analyze how the stack changes during procedure entry and return.
 \end{itemize}
-After completing this experiment, you will understand how to use branches and loops in ARM assembly, write simple procedures that follow standard conventions, and manage the stack for function calls.
+
+By the end of this lab, you will understand how to use branching and looping for program control, write well-structured procedures that follow AAPCS rules, and manage the stack during function calls and nested procedures.
 
 \newpage
-\tableofcontents
+\etocsetnexttocdepth{subsubsection}
+\localtableofcontents
+\bigskip
 \newpage
 \section{Theoretical Background}
-
-\subsection{Flow Control Instructions}
+\subsection{Flow Control}
 Flow control instructions alter the sequential execution of instructions by changing the program counter (PC). These instructions enable the implementation of conditional statements, loops, and procedure calls that are fundamental to structured programming.
 
-\subsubsection{Branch Instructions}
+\subsubsection{Condition Evaluation}
+Before implementing control flow, we must understand how to evaluate conditions and set processor flags. ARM provides dedicated instructions for comparing values and testing bit patterns that update the condition flags without storing results.
+
+\begin{table}[H]
+\centering
+\caption{ARM Cortex-M4 Compare and Test Instructions}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Instr.} & \textbf{Syntax} & \textbf{Description / Usage} \\
+\midrule
+CMP     & \texttt{CMP Rn, Operand2}   & Compare \texttt{Rn} with \texttt{Operand2} (\texttt{Rn - Operand2}); updates flags (Z, N, C, V). \\
+CMN     & \texttt{CMN Rn, Operand2}   & Compare negative (\texttt{Rn + Operand2}); used for checking against negative values. \\
+TST     & \texttt{TST Rn, Operand2}   & Logical AND test (\texttt{Rn AND Operand2}); sets Z if all tested bits are 0. \\
+TEQ     & \texttt{TEQ Rn, Operand2}   & Logical XOR test (\texttt{Rn EOR Operand2}); sets Z if operands are equal. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Usage Notes:}
+\begin{itemize}[nosep]
+  \item These instructions only affect the condition flags (N, Z, C, V) — they do not store a result.
+  \item \texttt{CMP}/\texttt{CMN} are arithmetic comparisons; \texttt{TST}/\texttt{TEQ} are logical bitwise comparisons.
+  \item Many data-processing instructions can update flags by appending \texttt{S} (e.g., \texttt{ADDS}, \texttt{SUBS}).
+  \item Common use: immediately followed by conditional branches such as \texttt{BEQ}, \texttt{BNE}, \texttt{BGT}, etc.
+\end{itemize}
+
+\noindent\paragraph{Examples:}
+\hfill
+\begin{lstlisting}[caption={Arithmetic comparison using CMP}]
+    CMP     R0, #10          ; Compare R0 with 10
+    BLT     LessThan10       ; Branch if R0 < 10
+    BGE     GreaterOrEqual   ; Otherwise, R0 >= 10
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Bit test using TST}]
+    MOV     R1, #0x12        ; R1 = 0001 0010b
+    TST     R1, #0x10        ; Test if bit 4 is set
+    BEQ     BitClear         ; Branch if bit 4 = 0 (Z=1)
+    BNE     BitSet           ; Branch if bit 4 = 1 (Z=0)
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Equality check using TEQ}]
+    MOV     R2, #0x55
+    MOV     R3, #0x55
+    TEQ     R2, R3           ; XOR -> result 0, sets Z=1
+    BEQ     ValuesEqual      ; Branch if equal
+\end{lstlisting}
+
+\subsubsection{Conditional Branching}
 Branch instructions are the primary mechanism for implementing flow control in ARM assembly. They modify the program counter to jump to different parts of the code based on conditions or unconditionally.
 
 \begin{table}[H]
@@ -57,6 +110,30 @@ CBNZ    & \texttt{CBNZ Rn, label} & Branch if \texttt{Rn != 0}. Example: loop un
   \item \textbf{Flags}: does not update condition flags (\texttt{N, Z, C, V}).
 \end{itemize}
 For backward or longer jumps, use \texttt{CMP}/\texttt{TST} with conditional branches (\texttt{BEQ}, \texttt{BNE}, \texttt{BGT}, \dots).
+
+\subsubsection{Conditional Execution}
+ARM assembly supports conditional execution, where most instructions can be conditionally executed based on the current state of the condition flags. This feature allows for efficient implementation of conditional statements without explicit branching.
+
+\paragraph{Conditional Instruction Format:}
+Most ARM instructions can be made conditional by appending a condition code suffix:
+\[
+\texttt{OPCODE\{<cond>\} Rd, Rn, Operand2}
+\]
+
+\paragraph{Examples:}
+\begin{itemize}[nosep]
+    \item \texttt{ADDEQ R0, R1, R2} — Add only if equal (Z=1)
+    \item \texttt{MOVNE R3, \#10} — Move only if not equal (Z=0)
+    \item \texttt{SUBGT R4, R4, \#1} — Subtract only if greater than (signed)
+\end{itemize}
+
+\paragraph{Advantages of Conditional Execution:}
+\begin{itemize}[nosep]
+    \item \textbf{Performance}: Eliminates branch instructions for simple conditional operations
+    \item \textbf{Code density}: Reduces the number of instructions needed
+    \item \textbf{Pipeline efficiency}: Avoids branch prediction penalties for simple conditions
+    \item \textbf{Atomic operations}: Multiple related conditional operations can be grouped
+\end{itemize}
 \subsubsection{How Branch Instructions Work}
 
 Branch instructions change the flow of execution by modifying the Program Counter (\texttt{PC}). 
@@ -79,9 +156,9 @@ The effective target address will be:
 This means the processor jumps \textbf{backward} to an earlier instruction.  
 Such negative offsets are typically used to implement loops (e.g., repeat until zero).
 
-
 \subsubsection{Condition Codes}
 Conditional branches use condition codes that test the processor status flags (N, Z, C, V) set by previous instructions. These conditions enable implementation of high-level constructs like if-statements and loops.
+
 \begin{table}[H]
 \centering
 \caption{Common ARM Condition Codes}
@@ -109,7 +186,8 @@ NV  & Never                     & Reserved / do not use. \\
 \bottomrule
 \end{tabularx}
 \end{table}
-\subsection{Loop Implementation}
+
+\subsection{Loop Patterns}
 Loops are fundamental control structures that repeat a block of code based on conditions. ARM assembly implements loops using combinations of compare instructions, conditional branches, and counters.
 
 \subsubsection{For Loop Structure}
@@ -119,7 +197,6 @@ A typical for loop has the structure: initialization, condition check, body exec
 array   DCD 10, 20, 30, 40, 50   ; array of 5 integers
 length  EQU 5                    ; number of elements (; just a constant, no memory)
 \end{lstlisting}
-\newpage
 \begin{lstlisting}[caption={For loop implementation pattern}]
         ; Initialization
         MOV     R0, #0                  ; i = 0
@@ -148,6 +225,8 @@ While loops check the condition before executing the loop body, potentially exec
 mystring DCB "Hello World!", 0    ; null-terminated string
 \end{lstlisting}
 \paragraph{Note:} \texttt{0} and \texttt{'0'} are two different values, as the former is actually zero, while the latter is the ASCII code for the character '0' (which is 48 in decimal).
+\newpage
+
 \begin{lstlisting}[caption={While loop with string processing example}]
     ; Intialization
     LDR     R0, =mystring   ; pointer to string
@@ -166,25 +245,12 @@ while_start
 while_end
 \end{lstlisting}
 
-\subsection{Procedures (Subroutines)}
 
-Procedures are reusable blocks of code that encapsulate a specific task. They promote modular design, code reuse, and clearer program structure.  
-In ARM assembly, procedures are implemented using branch-and-link instructions (\texttt{BL}, \texttt{BLX}) along with register usage conventions defined by the ARM Architecture Procedure Call Standard (AAPCS).
-
-\subsubsection{Basic Structure}
-A procedure is entered with a \texttt{BL} (branch-with-link) instruction, which stores the return address in the link register \texttt{LR}. The callee returns by branching to \texttt{LR} (e.g., \texttt{BX LR}). By the AAPCS, the first four arguments are passed in \texttt{R0--R3} and the primary return value is placed in \texttt{R0}. 
-
-\paragraph{Example:} simple procedure that expects two integers in \texttt{R0} and \texttt{R1} and returns their sum in \texttt{R0}.
-
-\begin{lstlisting}[caption={Basic procedure structure}]
-AddTwo  PROC
-        ADD R0, R0, R1   ; return R0+R1 in R0
-        BX  LR
-        ENDP
-\end{lstlisting}
-\paragraph{Note:} The \texttt{PROC} and \texttt{ENDP} directives are assembler-specific and may vary between assemblers. They help define the start and end of a procedure for readability and organization and could be omitted if not supported.
+\subsection{Procedures and Stack}
 
 \subsubsection{ARM Architecture Procedure Call Standard (AAPCS)}
+
+Procedures are reusable blocks of code that encapsulate a specific task. They promote modular design, code reuse, and clearer program structure. In ARM assembly, procedures are implemented using branch-and-link instructions along with register usage conventions defined by the ARM Architecture Procedure Call Standard (AAPCS).
 
 The AAPCS is the set of rules that define how functions exchange data and how registers must be preserved during a procedure call:
 
@@ -197,58 +263,41 @@ The AAPCS is the set of rules that define how functions exchange data and how re
 \end{itemize}
 \paragraph{Note:} Callees are the procedures being called, while callers are the ones calling the procedure.
 
-\subsection{Stack Management}
+\subsubsection{Procedure Templates}
 
-The stack is a memory region used to hold return addresses, local variables, and saved registers.  
-On the Cortex-M4, the stack is implemented as a \emph{full descending stack}: it grows from high memory addresses to low addresses, and the stack pointer (\texttt{SP}) always points to the last stored value.
+A procedure is entered with a \texttt{BL} (branch-with-link) instruction, which stores the return address in the link register \texttt{LR}. The callee returns by branching to \texttt{LR} (e.g., \texttt{BX LR}). By the AAPCS, the first four arguments are passed in \texttt{R0--R3} and the primary return value is placed in \texttt{R0}.
+\newpage
+\paragraph{Basic Procedure Template}
 
-\paragraph{Stack Terminology}
-\begin{itemize}[nosep]
-    \item \textbf{Full stack}: The stack pointer (\texttt{SP}) points to the last used location.  
-          The memory at the address of \texttt{SP} contains valid data.
-    \item \textbf{Empty stack}: The stack pointer (\texttt{SP}) points to the next free location.  
-          The memory at the address of \texttt{SP} is unused.
-    \item \textbf{Ascending stack}: The stack grows toward higher memory addresses (not used in ARM Cortex-M).
-    \item \textbf{Descending stack}: The stack grows toward lower memory addresses (the model used by ARM Cortex-M).
-\end{itemize}
-\subsubsection{Stack Operations}
+\paragraph{Example:} simple procedure that expects two integers in \texttt{R0} and \texttt{R1} and returns their sum in \texttt{R0}.
 
-The Cortex-M4 provides \texttt{PUSH} and \texttt{POP} instructions that automatically update the stack pointer (\texttt{SP}) and allow saving or restoring multiple registers in one instruction.
-
-\paragraph{PUSH}
-\begin{itemize}[nosep]
-    \item \textbf{Format:} \texttt{PUSH \{<reglist>\}}
-    \item \textbf{Operation:} \texttt{SP} is decremented to create space, then the registers in \texttt{<reglist>} are stored on the stack.
-    \item \textbf{Storage order:} Registers are always stored in \emph{ascending register number order}, regardless of how they appear in the reglist.  
-          After the operation, the lowest numbered register is at the lowest memory address of the block, and the highest numbered register at the highest address.  
-          Example:
-\begin{lstlisting}
-        PUSH {R4, R0, R2, LR}
+\begin{lstlisting}[caption={Basic procedure structure}]
+AddTwo  PROC
+        ADD R0, R0, R1   ; return R0+R1 in R0
+        BX  LR
+        ENDP
 \end{lstlisting}
-          In memory (from lowest to highest address): R0, R2, R4, LR.  
-          The order in the curly braces does not matter.
-    \item \textbf{Restriction:} The program counter (\texttt{PC}) cannot be pushed.
-    \item \textbf{Effect on SP:} \texttt{SP} decreases by 4 bytes per register pushed.
-\end{itemize}
+\paragraph{Note:} The \texttt{PROC} and \texttt{ENDP} directives help define the start and end of a procedure and they could be safely omitted.
 
+\paragraph{Procedure with Preserved Registers}
 
+When a procedure uses callee-saved registers (R4-R11), it must preserve their original values by saving them on the stack and restoring them before returning:
 
-\paragraph{POP}
-\begin{itemize}[nosep]
-    \item \textbf{Format:} \texttt{POP \{<reglist>\}}
-    \item \textbf{Operation:} Registers in \texttt{<reglist>} are restored from the stack, then \texttt{SP} is incremented.
-    \item \textbf{Load order:} Registers are always loaded in ascending register number order, not in the order written.
-    \item \textbf{Example:}
-\begin{lstlisting}
-        POP {R4, R0, R2}
+\begin{lstlisting}[caption={Procedure using preserved registers}]
+ProcessArray PROC
+        PUSH    {R4-R6, LR}     ; Save used registers and LR
+        MOV     R4, R0          ; Save array pointer
+        MOV     R5, R1          ; Save array length  
+        MOV     R6, #0          ; Initialize counter
+        
+        ; Process array using R4, R5, R6...
+        
+        MOV     R0, R6          ; Return counter value
+        POP     {R4-R6, PC}     ; Restore registers and return
+        ENDP
 \end{lstlisting}
-          Restores R0, then R2, then R4 (in register number order).
-    \item \textbf{Special case:} If \texttt{PC} is included, the loaded value becomes the new program counter, effectively returning from the procedure.
-    \item \textbf{Effect on SP:} \texttt{SP} increases by 4 bytes per register popped.
-\end{itemize}
 
-
-\subsubsection{Nested Procedure Calls}
+\paragraph{Nested Procedure Calls}
 
 When one procedure calls another, the link register (\texttt{LR}) must be preserved, otherwise the return address would be lost. This is done by pushing \texttt{LR} onto the stack before making another call.
 
@@ -263,6 +312,336 @@ InnerProc
         MOV     R0, #42         ; Return value
         BX      LR              ; Return
 \end{lstlisting}
+
+\subsubsection{Stack Operations}
+
+The stack is a memory region used to hold return addresses, local variables, and saved registers.  
+On the Cortex-M4, the stack is implemented as a \emph{full descending stack}: it grows from high memory addresses to low addresses, and the stack pointer (\texttt{SP}) always points to the last stored value.
+
+\subsubsection{Stack Model (Full, Descending)}
+There are four common stack models based on two characteristics: whether the stack is full or empty, and whether it grows up (ascending) or down (descending). 
+\begin{itemize}[nosep]
+    \item \textbf{Full Ascending}: SP points to the last used location; stack grows toward higher addresses.
+    \item \textbf{Empty Ascending}: SP points to the next free location; stack grows toward higher addresses.
+    \item \textbf{Empty Descending}: SP points to the next free location; stack grows toward lower addresses.
+    \item \textbf{Full Descending}: SP points to the last used location; stack grows toward lower addresses.
+\end{itemize}
+The ARM Cortex-M4 uses a \textbf{full descending stack}, meaning:
+\begin{itemize}[nosep]
+    \item The stack pointer (\texttt{SP}) points to the last used location (full).
+    \item The stack grows toward lower memory addresses (descending).
+\end{itemize}
+\subsubsection{Stack Operations}
+
+The Cortex-M4 provides \texttt{PUSH} and \texttt{POP} instructions that automatically update the stack pointer (\texttt{SP}) and allow saving or restoring multiple registers in a single instruction.  
+These operations are essential for implementing procedure calls, local variables, and context switching.
+\paragraph{PUSH}
+
+The \texttt{PUSH} instruction saves one or more registers onto the stack in a single operation.
+When executed, the stack pointer (\texttt{SP}) is decremented to reserve space, and the specified registers are written to consecutive memory locations starting from the new \texttt{SP} value.
+\textbf{Rule:} \texttt{PUSH} stores registers on the stack, with the \textbf{lowest-numbered register} placed at the \textbf{lowest memory address} and the \textbf{highest-numbered register} placed at the \textbf{highest memory address}.
+This guarantees a consistent and predictable memory layout for saved contexts.
+
+\medskip
+\noindent
+\textbf{Example:}
+\begin{lstlisting}
+    PUSH {R4, R0, R2, LR}
+\end{lstlisting}
+
+Even if the list appears unordered, values are laid out by register number: R0 (lowest address), then R2, R4, and LR (highest address).
+Each register occupies 4 bytes, so \texttt{SP} decreases by 16 bytes in total.
+The program counter (\texttt{PC}) cannot be pushed by this instruction.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Stack frame
+        \draw[thick] (0,0) rectangle (2,4);
+        
+        % Grid lines for 4 cells
+        \foreach \y in {1,2,3} {
+            \draw[thin, gray!50] (0,\y) -- (2,\y);
+        }
+        
+        % Memory addresses (descending)
+        \node[anchor=east] at (-0.1,4) {\tiny 0x20001000};
+        \node[anchor=east] at (-0.1,3) {\tiny 0x20000FFC};
+        \node[anchor=east] at (-0.1,2) {\tiny 0x20000FF8};
+        \node[anchor=east] at (-0.1,1) {\tiny 0x20000FF4};
+        \node[anchor=east] at (-0.1,0) {\tiny 0x20000FF0};
+        
+        % Stack pointer arrow
+        \draw[->, thick, red] (2.5,4) -- (2.1,4);
+        \node[right, red] at (2.5,4) {\textbf{SP}};
+        
+        % Title
+        \node[below] at (1,-0.3) {\small Initial Stack};
+    \end{tikzpicture}
+    \caption{Initial empty stack}
+    \label{fig:stack-initial}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Stack frame
+        \draw[thick] (0,0) rectangle (2,4);
+        
+        % Grid lines for 4 cells
+        \foreach \y in {1,2,3} {
+            \draw[thin, gray!50] (0,\y) -- (2,\y);
+        }
+        
+        % Memory addresses (descending)
+        \node[anchor=east] at (-0.1,4) {\tiny 0x20001000};
+        \node[anchor=east] at (-0.1,3) {\tiny 0x20000FFC};
+        \node[anchor=east] at (-0.1,2) {\tiny 0x20000FF8};
+        \node[anchor=east] at (-0.1,1) {\tiny 0x20000FF4};
+        \node[anchor=east] at (-0.1,0) {\tiny 0x20000FF0};
+        
+        % Old SP position (grayed out)
+        \draw[->, thin, gray] (2.5,4) -- (2.1,4);
+        \node[right, gray] at (2.5,4) {\small Old SP};
+        
+        % New SP position after PUSH {R0, R2, R4, LR}
+        \draw[->, thick, red] (2.5,0) -- (2.1,0);
+        \node[right, red] at (2.5,0) {\textbf{SP-16}};
+        
+        
+        
+        % Title
+        \node[below] at (1,-0.3) {\small SP Updated};
+    \end{tikzpicture}
+    \caption{Stack pointer decremented}
+    \label{fig:stack-sp-update}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Stack frame
+        \draw[thick] (0,0) rectangle (2,4);
+        
+        % Grid lines for 4 cells
+        \foreach \y in {1,2,3} {
+            \draw[thin, gray!50] (0,\y) -- (2,\y);
+        }
+        
+        % Memory addresses (descending)
+        \node[left, anchor=south west] at (-0.1,4) {\tiny 0x20001000};
+        \node[left, anchor=south west] at (-0.1,3) {\tiny 0x20000FFC};
+        \node[left, anchor=south west] at (-0.1,2) {\tiny 0x20000FF8};
+        \node[left, anchor=south west] at (-0.1,1) {\tiny 0x20000FF4};
+        \node[left, anchor=south west] at (-0.1,0) {\tiny 0x20000FF0};
+        
+        % Stored registers (in ascending order by number)
+        \fill[blue!20] (0,3) rectangle (2,4);
+        \node at (1,3.5) {\textbf{LR}};
+        
+        \fill[green!20] (0,2) rectangle (2,3);
+        \node at (1,2.5) {\textbf{R4}};
+        
+        \fill[yellow!30] (0,1) rectangle (2,2);
+        \node at (1,1.5) {\textbf{R2}};
+        
+        \fill[orange!20] (0,0) rectangle (2,1);
+        \node at (1,0.5) {\textbf{R0}};
+        
+        % Stack pointer pointing to last used location
+        \draw[->, thick, red] (2.5,0) -- (2.1,0);
+        \node[right, red] at (2.5,0) {\textbf{SP}};
+        
+        % Annotations
+        \node[left] at (-0.1,4) {\tiny Higher addr.};
+        \node[left] at (-0.1,0) {\tiny Lower addr.};
+        
+        % Title
+        \node[below] at (1,-0.3) {\small Values Stored};
+    \end{tikzpicture}
+    \caption{Registers stored in order}
+    \label{fig:stack-values}
+\end{subfigure}
+\caption{Stack operation sequence for \texttt{PUSH \{R4, R0, R2, LR\}}}
+\label{fig:stack-push-sequence}
+\end{figure}
+
+\noindent\textbf{Explanation:}
+Figure~\ref{fig:stack-push-sequence}\textbf{(a)} shows the empty stack with \texttt{SP} at the top (highest address).
+When \texttt{PUSH} executes, the processor \textbf{decrements \texttt{SP} by 16 bytes} to reserve space for four registers (Figure~\ref{fig:stack-push-sequence}\textbf{(b)}).
+Finally, in Figure~\ref{fig:stack-push-sequence}\textbf{(c)}, values are stored according to the rule: the lowest-numbered register (R0) at the lowest address, then R2 and R4, and the highest-numbered (LR) at the highest address.
+Because the stack grows downward, \texttt{SP} points to the last written word after the operation.
+
+\bigskip
+\paragraph{POP}
+
+The \texttt{POP} instruction restores one or more registers from the stack.
+Conceptually, the processor reads each value from the addresses currently covered by \texttt{SP} and then releases that stack space.
+\textbf{Rule:} \texttt{POP} loads registers from the stack such that the \textbf{lowest-numbered register} is restored from the \textbf{lowest memory address}, and the \textbf{highest-numbered register} from the \textbf{highest memory address}.
+After all specified registers are restored, \texttt{SP} has increased by 4 bytes per register.
+
+\medskip
+\noindent
+\textbf{Example:}
+\begin{lstlisting}
+    POP {R6-R8}
+\end{lstlisting}
+
+This restores R6, then R7, then R8 from successively higher addresses; the stack pointer increases by 12 bytes overall.
+If \texttt{PC} is included in the list, the loaded value becomes the new program counter, returning from the current procedure.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Stack frame
+        \draw[thick] (0,0) rectangle (2,4);
+        
+        % Grid lines for 4 cells
+        \foreach \y in {1,2,3} {
+            \draw[thin, gray!50] (0,\y) -- (2,\y);
+        }
+        
+
+        
+        % Stored registers (in ascending order by number)
+        \fill[blue!20] (0,3) rectangle (2,4);
+        \node at (1,3.5) {\textbf{LR}};
+        
+        \fill[green!20] (0,2) rectangle (2,3);
+        \node at (1,2.5) {\textbf{R4}};
+        
+        \fill[yellow!30] (0,1) rectangle (2,2);
+        \node at (1,1.5) {\textbf{R2}};
+        
+        \fill[orange!20] (0,0) rectangle (2,1);
+        \node at (1,0.5) {\textbf{R0}};
+        
+        % Stack pointer pointing to last used location
+        \draw[->, thick, red] (2.5,0) -- (2.1,0);
+        \node[right, red] at (2.5,0) {\textbf{SP+12}};
+        
+        % Annotations
+        % Memory addresses (descending)
+        \node[anchor=east] at (-0.1,4) {\tiny 0x20001000};
+        \node[anchor=east] at (-0.1,3) {\tiny 0x20000FFC};
+        \node[anchor=east] at (-0.1,2) {\tiny 0x20000FF8};
+        \node[anchor=east] at (-0.1,1) {\tiny 0x20000FF4};
+        \node[anchor=east] at (-0.1,0) {\tiny 0x20000FF0};
+        
+        % Title
+        \node[below] at (1,-0.3) {\small Initial Stack};
+    \end{tikzpicture}
+    \caption{Initial stack after Figure \ref{fig:stack-push-sequence}}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Stack frame
+        \draw[thick] (0,0) rectangle (2,4);
+        
+        % Grid lines for 4 cells
+        \foreach \y in {1,2,3} {
+            \draw[thin, gray!50] (0,\y) -- (2,\y);
+        }
+        
+
+        
+        % Stored registers (in ascending order by number)
+        \fill[blue!20] (0,3) rectangle (2,4);
+        \node at (1,3.5) {\textbf{LR}};
+        
+        \fill[gray!20] (0,2) rectangle (2,3);
+        \node at (1,2.5) {\textbf{R4}};
+        
+        \fill[gray!30] (0,1) rectangle (2,2);
+        \node at (1,1.5) {\textbf{R2}};
+        
+        \fill[gray!20] (0,0) rectangle (2,1);
+        \node at (1,0.5) {\textbf{R0}};
+        
+        % Stack pointer pointing to last used location
+        \draw[->, thin, gray] (2.5,0) -- (2.1,0);
+        \node[right, gray] at (2.5,0) {\small{Old SP}}; 
+
+        \draw[->, thick, red] (2.5,3) -- (2.1,3);
+        \node[right, red] at (2.5,3) {\textbf{SP+12}};
+        
+        % Annotations
+        % Memory addresses (descending)
+        \node[anchor=east] at (-0.1,4) {\tiny 0x20001000};
+        \node[anchor=east] at (-0.1,3) {\tiny 0x20000FFC};
+        \node[anchor=east] at (-0.1,2) {\tiny 0x20000FF8};
+        \node[anchor=east] at (-0.1,1) {\tiny 0x20000FF4};
+        \node[anchor=east] at (-0.1,0) {\tiny 0x20000FF0};
+        
+        % Title
+        \node[below] at (1,-0.3) {\small SP Updated};
+    \end{tikzpicture}
+    \caption{Stack pointer incremented}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Stack frame
+        \draw[thick] (0,0) rectangle (2,4);
+        
+        % Grid lines for 4 cells
+        \foreach \y in {1,2,3} {
+            \draw[thin, gray!50] (0,\y) -- (2,\y);
+        }
+        
+
+        
+        % Stored registers (in ascending order by number)
+        \fill[blue!20] (0,3) rectangle (2,4);
+        \node at (1,3.5) {\textbf{LR}};
+        
+        \fill[gray!20] (0,2) rectangle (2,3);
+        \node at (1,2.5) {\small{R4 $\rightarrow$ R8}};
+        
+        \fill[gray!30] (0,1) rectangle (2,2);
+        \node at (1,1.5) {\small{R2 $\rightarrow$ R7}};
+
+        \fill[gray!20] (0,0) rectangle (2,1);
+        \node at (1,0.5) {\small{R0 $\rightarrow$ R6}};
+        
+        % Stack pointer pointing to last used location
+        \draw[->, thick, red] (2.5,3) -- (2.1,3);
+        \node[right, red] at (2.5,3) {\textbf{SP}};
+        
+        % Annotations
+        % Memory addresses (descending)
+        \node[anchor=east] at (-0.1,4) {\tiny 0x20001000};
+        \node[anchor=east] at (-0.1,3) {\tiny 0x20000FFC};
+        \node[anchor=east] at (-0.1,2) {\tiny 0x20000FF8};
+        \node[anchor=east] at (-0.1,1) {\tiny 0x20000FF4};
+        \node[anchor=east] at (-0.1,0) {\tiny 0x20000FF0};
+        
+        % Title
+        \node[below] at (1,-0.3) {\small Values Restored};
+    \end{tikzpicture}
+    \caption{Registers restored in order}
+    \label{fig:stack-sp-update}
+\end{subfigure}
+
+\caption{Stack operation sequence for \texttt{POP \{R6-R8\}}}
+\label{fig:stack-pop-sequence}
+\end{figure}
+\noindent\textbf{Explanation:}
+In Figure~\ref{fig:stack-pop-sequence}\textbf{(a)}, the stack contains values saved earlier.
+Executing \texttt{POP \{R6-R8\}} \textbf{reclaims 12 bytes of stack space} (three registers) by moving \texttt{SP} upward in memory (Figure~\ref{fig:stack-pop-sequence}\textbf{(b)}).
+Then, as shown in Figure~\ref{fig:stack-pop-sequence}\textbf{(c)}, registers are restored following the rule: the lowest-numbered register (R6) comes from the lowest address, followed by R7 and R8 from higher addresses.
+After the last load, \texttt{SP} points to the top of the reclaimed block, completing the reversal of the earlier push.
+
+
 
 \newpage
 \section{Procedure}
@@ -286,6 +665,7 @@ This example demonstrates a nested call: \texttt{CountUpperNested(ptr)} scans a 
 \lstinputlisting[caption={Nested procedure call to count uppercase letters}]{snippets/assembly/exp3/example3.asm}
 \paragraph{Check:} Verify that \texttt{UPPERCOUNT} contains \texttt{5} for the test string.
 
+\newpage
 \subsection{Tasks}
 
 \subsubsection{Task 1: Count Vowels in a String}

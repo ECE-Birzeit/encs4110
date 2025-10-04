@@ -1,29 +1,32 @@
 \chapter{ARM Cortex-M4 Instructions and Addressing Modes}
 \section*{Learning Objectives}
+After completing this experiment, you will be able to:
 \begin{itemize}[nosep]
-  \item Identify the three main categories of ARM Cortex-M4 instructions: data processing, load/store, and branch.  
-  \item Perform arithmetic, logical, and shift operations using data processing instructions.  
-  \item Access and modify memory using load and store instructions with various addressing modes (immediate, register offset, pre-/post-indexed).  
-  \item Define and initialize data in memory using assembler directives and pointer-based access.  
+  \item Classify ARM Cortex-M4 instructions into data-processing, load/store, and branch categories.
+  \item Perform arithmetic, logical, and shift/rotate operations using data-processing instructions (including \texttt{Operand2} with the barrel shifter).
+  \item Move data between registers and memory using load/store instructions with immediate, register-offset, and pre-/post-indexed addressing modes.
+  \item Declare and initialize data objects (arrays, strings, buffers) with assembler directives, and use pointers to access and modify them.
+  \item Trace how instructions affect registers and xPSR flags using the \keil\ debugger (breakpoints, single-step, register/memory views).
 \end{itemize}
-
 \section*{Experiment Overview}
-This experiment introduces the fundamental instruction set of the ARM Cortex-M4 processor.  
-You will learn how to manipulate data in registers through arithmetic, logical, and shift operations; how to transfer data between memory and registers using load and store instructions; and how to manage data stored in memory using pointers and assembler directives.  
+This experiment develops fluency with the ARM Cortex-M4 instruction set for data manipulation and memory access. 
+You will practice using arithmetic, logical, and shift/rotate instructions, and learn how data moves between registers and memory through load/store instructions and their addressing modes. 
+You will also define data with assembler directives and use pointers to read and update memory.
 
-Throughout this experiment, you will:
+\noindent In this experiment, you will:
 \begin{itemize}[nosep]
-  \item Write and execute assembly programs that perform arithmetic, logical, and shift operations.  
-  \item Observe how data flows between registers and memory using different addressing modes.  
-  \item Declare and initialize data objects such as arrays and strings using assembler directives.  
-  \item Use pointers to access and modify variables stored in memory.  
-  \item Analyze the effects of each instruction on registers and status flags using the \keil\ debugger.  
+  \item Write and run short assembly routines that use data-processing instructions to transform register values.
+  \item Apply immediate, register-offset, and pre-/post-indexed addressing modes to load from and store to memory.
+  \item Define arrays, strings, and buffers with directives, and use pointers to traverse and modify them.
+  \item Observe instruction effects on registers and flags with the \keil\ debugger to verify correctness.
 \end{itemize}
 
-By the end of this lab, you will be able to write, assemble, and debug ARM Cortex-M4 programs that perform register-level computations and memory operations—forming the foundation for future experiments involving flow control, subroutines, and peripheral interfacing.
+By the end of this lab, you will be able to implement, assemble, and debug Cortex-M4 programs that perform register-level computation and structured memory access—providing the foundation for flow control and procedure calls in later experiments.
 
 \newpage
-\tableofcontents
+\etocsetnexttocdepth{subsubsection}
+\localtableofcontents
+\bigskip
 \newpage
 \section{Theoretical Background}
 As mentioned in Experiment 1, assembly instructions are split into three main categories: data processing, load/store, and branch instructions. This experiment focuses on data processing instructions, load/store instructions and their addressing modes. branch instructions and flow control will be covered in the next experiment.

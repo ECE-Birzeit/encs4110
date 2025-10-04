@@ -1,19 +1,32 @@
 \chapter{ARM Cortex-M4 Assembly Fundamentals}
-
 \section*{Learning Objectives}
+After completing this experiment, you will be able to:
 \begin{itemize}[nosep]
-  \item Describe the Cortex-M4 register set, xPSR flags, and ARMv7-M memory map.
-  \item Write and assemble a minimal ARM program with a vector table and \texttt{Reset\_Handler}.
-  \item Use core data-processing, shift/rotate, and compare/test instructions.
-  \item Apply conditional execution with condition codes (e.g., \texttt{ADDEQ}, \texttt{BNE}).
-  \item Debug in \keil: set breakpoints, single-step, inspect registers/memory, and interpret flags.
+  \item Identify the main components of the ARM Cortex-M4 architecture, including general-purpose registers, stack pointer, link register, program counter, and program status register (xPSR).
+  \item Write, assemble, and debug a minimal ARM assembly program containing a vector table and \texttt{Reset\_Handler}.
+  \item Use core data-processing, shift/rotate, and compare/test instructions to manipulate register data.
+  \item Apply conditional execution and branching using condition codes (\texttt{EQ}, \texttt{NE}, \texttt{GT}, \texttt{LT}, etc.).
+  \item Debug assembly programs in \keil\ using breakpoints, single-stepping, and register/memory inspection to analyze instruction effects.
 \end{itemize}
 
 \section*{Experiment Overview}
-This experiment introduces low-level programming on the Cortex-M4. You will build a minimal startup image, practice common data-processing and control-flow instructions, and use the \keil\ debugger to observe register and memory effects while stepping through code. By the end, you will be able to implement and test short assembly routines that manipulate data and make decisions based on condition flags.
+This experiment introduces the fundamentals of ARM Cortex-M4 assembly programming and the structure of a minimal embedded program. 
+You will explore the processor's register set, status flags, and memory map, and learn how to write and debug low-level code that manipulates data and controls program flow.
+
+\noindent In this experiment, you will:
+\begin{itemize}[nosep]
+  \item Examine the Cortex-M4 register architecture and understand how flags in the xPSR reflect instruction results.
+  \item Build and assemble a minimal startup image with a vector table and \texttt{Reset\_Handler}.
+  \item Practice data-processing and control-flow instructions, observing how they affect registers and flags.
+  \item Use the \keil\ debugger to single-step through instructions and inspect register and memory changes.
+\end{itemize}
+
+By the end of this lab, you will understand the core building blocks of ARM assembly programming, from program structure and instruction execution to debugging at the register level.
 
 \newpage
-\tableofcontents
+\etocsetnexttocdepth{subsubsection}
+\localtableofcontents
+\bigskip
 \newpage
 \section{Theoretical Background}
 \subsection{Cortex-M4 Architecture}
@@ -91,9 +104,6 @@ loop_start   ADDS   R0, R0, #1      ; R0 = R0 + 1, update flags (N,Z,C,V)
 \end{lstlisting}
 
 
-
-
-\newpage
 \subsection{Basic Program Template (Boilerplate)}
 
 The minimal skeleton below shows a valid vector table in a \texttt{READONLY} \texttt{RESET} area, a \texttt{READWRITE} data area for variables, and a code area with the \texttt{Reset\_Handler} entry point.
@@ -151,7 +161,7 @@ STOP    B       STOP                      ; Stay here forever
 \newpage
 \section{Procedure}
 \subsection{Setting Up the Keil uVision5 Environment}
-Make sure you have the \keil\ IDE installed on your computer. If not, download and install it from the official Keil website (\url{https://www.keil.com/demo/eval/arm.htm}).
+Make sure you have the \keil\ IDE installed on your computer. If not, download and install it from the official Keil website (\url{https://www.keil.com/demo/eval/arm.htm}). 
 \subsubsection{Creating a New Project}
 \begin{enumerate}[nosep]
     \item Open \keil\ and create a new project:
@@ -208,10 +218,5 @@ Figure \ref{fig:keil_debug} shows the Keil uVision5 debugging interface. You can
 \newpage
 \subsection{Examples}
 \subsubsection{Example 1: Simple Arithmetic Operations and Flag Manipulation}
-The following example demonstrates basic arithmetic operations, flag manipulation, and conditional execution using ARM assembly language. It includes comments to guide you through each step.
+The following example demonstrates basic arithmetic operations, flag manipulation.
 \lstinputlisting[caption={Example 1: Simple Arithmetic Operations and Flag Manipulation}]{snippets/assembly/exp1/example1.asm}
-\newpage
-\subsubsection{Example 2: Using the Barrel Shifter and Conditional Execution}
-The following example demonstrates the use of the barrel shifter for efficient data manipulation and conditional execution based on status flags. It includes comments to guide you through each step.
-\lstinputlisting[caption={Example 2: Using the Barrel Shifter and Conditional Execution}]{snippets/assembly/exp1/example2.asm}
-
