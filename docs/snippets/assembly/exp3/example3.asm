@@ -7,8 +7,7 @@ __Vectors
         AREA    MYCODE, CODE, READONLY
         ENTRY
         EXPORT  Reset_Handler
-; IsUpper(R0 = ch) -> R0 = 1 if 'A'..'Z', else 0
-IsUpper
+IsUpper                              ; IsUpper(R0 = ch) -> R0 = 1 if 'A'..'Z', else 0
         CMP     R0, #'A'
         BLT     not_upper
         CMP     R0, #'Z'
@@ -18,12 +17,10 @@ IsUpper
 not_upper
         MOV     R0, #0
         BX      LR
-; CountUpperNested(R0 = ptr) -> R0 = count of uppercase letters
-CountUpperNested
+CountUpperNested                    ; CountUpperNested(R0 = ptr) -> R0 = Upper Count
         PUSH    {R4, LR}            ; save callee-saved + return address
         MOV     R1, R0              ; R1 = ptr (keep pointer here)
         MOV     R4, #0              ; R4 = count
-
 cu_next
         LDRB    R0, [R1], #1        ; R0 = *ptr++; post-increment pointer in R1
         CBZ     R0, cu_done         ; if null terminator, finish

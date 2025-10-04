@@ -25,8 +25,6 @@ Reset_Handler
         ; Now set R3 to all ones, then add with flags
         MOV32   R3, #0xFFFFFFFF       ; R3 = ?
         ADDS    R1, R2, R3            ; R1 = ?   FLAGS? (N,Z,C,V)
-                                      ; - Record xPSR.N, xPSR.Z, xPSR.C, xPSR.V
-        ; Subtract with flags
         SUBS    R1, R2, R3            ; R1 = ?   FLAGS? (N,Z,C,V)
         ; Same add but without S (no flag update)
         MOV     R4, #0xFF             ; small value for contrast
