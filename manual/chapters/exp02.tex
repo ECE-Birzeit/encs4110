@@ -1,45 +1,49 @@
 \chapter{ARM Cortex-M4 Instructions and Addressing Modes}
-
 \section*{Learning Objectives}
 \begin{itemize}[nosep]
-  \item Recognize the three main categories of ARM Cortex-M4 instructions: data processing, load/store, and branch.  
-  \item Perform arithmetic, logical, shift/rotate, and compare/test operations on registers.  
-  \item Access memory using load and store instructions with different addressing modes (immediate, register offset, pre-/post-indexed).  
-  \item Apply conditional execution using condition codes in the \texttt{xPSR}.  
-  \item Observe and interpret the effects of instructions on registers, memory, and status flags using the \keil\ debugger.  
+  \item Identify the three main categories of ARM Cortex-M4 instructions: data processing, load/store, and branch.  
+  \item Perform arithmetic, logical, and shift operations using data processing instructions.  
+  \item Access and modify memory using load and store instructions with various addressing modes (immediate, register offset, pre-/post-indexed).  
+  \item Define and initialize data in memory using assembler directives and pointer-based access.  
 \end{itemize}
 
 \section*{Experiment Overview}
-This experiment introduces the core instruction set of the ARM Cortex-M4 processor.  
-You will learn how to manipulate data in registers using arithmetic and logical instructions, how to transfer data between memory and registers using load/store instructions, and how to control program execution using condition codes and branches.  
+This experiment introduces the fundamental instruction set of the ARM Cortex-M4 processor.  
+You will learn how to manipulate data in registers through arithmetic, logical, and shift operations; how to transfer data between memory and registers using load and store instructions; and how to manage data stored in memory using pointers and assembler directives.  
 
-In the process, you will:  
+Throughout this experiment, you will:
 \begin{itemize}[nosep]
-  \item Step through assembly instructions in the debugger and watch how registers and memory change.  
-  \item Observe how flags (Z, N, C, V) are updated and used for conditional execution.  
-  \item Practice pointer-style memory access through different addressing modes.  
-\end{itemize}  
+  \item Write and execute assembly programs that perform arithmetic, logical, and shift operations.  
+  \item Observe how data flows between registers and memory using different addressing modes.  
+  \item Declare and initialize data objects such as arrays and strings using assembler directives.  
+  \item Use pointers to access and modify variables stored in memory.  
+  \item Analyze the effects of each instruction on registers and status flags using the \keil\ debugger.  
+\end{itemize}
 
-By the end of this lab, you will have gained practical experience in writing, executing, and debugging ARM Cortex-M4 assembly programs. These foundational skills in instruction-level programming, register manipulation, and memory access will serve as essential building blocks for subsequent experiments on flow control, interrupt handling, and peripheral interfacing.
+By the end of this lab, you will be able to write, assemble, and debug ARM Cortex-M4 programs that perform register-level computations and memory operations—forming the foundation for future experiments involving flow control, subroutines, and peripheral interfacing.
 
 \newpage
 \tableofcontents
 \newpage
 \section{Theoretical Background}
-As mentioned in Experiment 1, assembly instruction are split into three main categories: data processing, load/store, and branch instructions. This experiment focuses on data processing instructions, load/store instructions and their addressing modes. While branch instructions would be covered in more detail in Experiment 3 (Flow Control), a brief overview is provided here for completeness.
+As mentioned in Experiment 1, assembly instructions are split into three main categories: data processing, load/store, and branch instructions. This experiment focuses on data processing instructions, load/store instructions and their addressing modes. branch instructions and flow control will be covered in the next experiment.
 \subsection{Data Processing Instructions}
 Data processing instructions perform arithmetic and logical operations on data stored in registers. They can also manipulate the condition flags in the xPSR based on the results of the operations. Common data processing instructions take the following form:
 \[
-\texttt{OPCODE\{<cond>\}\{S\} Rd, Rn, Operand2}
+\begin{aligned}
+\texttt{\{LABEL\}} \quad & \texttt{OPCODE\{<cond>\}\{S\} Rd, Rn, Operand2}
+\end{aligned}
 \]
+
 where:
 \begin{itemize}[nosep]
-  \item \texttt{OPCODE}: the operation to be performed (e.g., \texttt{ADD}, \texttt{SUB}, \texttt{AND}, \texttt{ORR}).
-  \item \texttt{<cond>}: optional condition code that predicates execution.
-  \item \texttt{S}: optional suffix indicating whether to update the condition flags.
-  \item \texttt{Rd}: destination register where the result is stored.
-  \item \texttt{Rn}: first operand register.
-  \item \texttt{Operand2}: second operand, which can be an immediate value limited to 8 bits, a register, or a barrel shifter operation.
+    \item \texttt{LABEL}: optional label for branching.
+    \item \texttt{OPCODE}: the operation to be performed (e.g., \texttt{ADD}, \texttt{SUB}, \texttt{AND}, \texttt{ORR}).
+    \item \texttt{<cond>}: optional condition code that predicates execution.
+    \item \texttt{S}: optional suffix indicating whether to update the condition flags.
+    \item \texttt{Rd}: destination register where the result is stored.
+    \item \texttt{Rn}: first operand register.
+    \item \texttt{Operand2}: second operand, which can be an immediate value limited to 8 bits, a register, or a barrel shifter operation (see Section~\ref{sec:barrel-shifter}).
 \end{itemize}
 
 
@@ -63,8 +67,8 @@ SUB  & \texttt{SUB\{S\} Rd, Rn, Operand2}
      & $Rd \leftarrow Rn - Operand2$
      & Standard subtraction. \\
 SBC  & \texttt{SBC\{S\} Rd, Rn, Operand2}
-     & $Rd \leftarrow Rn - Operand2 - (1 - C)$
-     & Subtract with borrow (borrow encoded via carry flag $C$). \\
+    & $Rd \leftarrow Rn - Operand2 - \overline{C}$
+    & Subtract with carry. If carry flag is clear, result is reduced by one. Used for multiword arithmetic. \\
 RSB  & \texttt{RSB\{S\} Rd, Rn, Operand2}
      & $Rd \leftarrow Operand2 - Rn$
      & Reverse subtract. \\
@@ -88,7 +92,7 @@ SMULL & \texttt{SMULL RdLo, RdHi, Rn, Rm}
 
 \vspace{2pt}
 \footnotesize\emph{Note:} $C$ denotes the carry flag in \texttt{xPSR}. \emph{Operand2} may be an immediate or a shifted register depending on the encoding.
-\end{table}
+\end{table} 
 \subsubsection{Logical and Move Instructions}
 Logical instructions perform bitwise operations on data, while move instructions transfer data between registers or load immediate values. The following table summarizes some of the most commonly used logical and move instructions in the ARM Cortex-M4 architecture.
 \begin{table}[H]
@@ -113,18 +117,29 @@ MOVT & \texttt{MOVT Rd, \#imm16}     & $Rd[31{:}16] \leftarrow imm16$ & Write hi
 \vspace{2pt}
 \footnotesize\emph{Note:} $C$ denotes the carry flag in \texttt{xPSR}. \emph{Operand2} may be an immediate or a shifted register depending on the encoding.
 \end{table}
-We will be using bitwise logical instructions extensively in this experiment to manipulate specific bits in registers from setting, clearing, and flipping certain bits, or checking if certain bits are set or cleared.
-\subsubsection*{Setting and Clearing Bits}
+
+In this experiment, you will work with bitwise logical instructions to manipulate individual bits within registers.
+Such operations are fundamental in microcontroller programming, where control and status registers often contain multiple configuration fields packed into a single 32-bit word.
+Understanding how to set, clear, toggle, or test specific bits without altering the rest of the register is essential for safely modifying hardware configurations and controlling peripherals.
+\paragraph{Set and Clear Bits}
 To set, clear, or toggle specific bits in a register, you can use the following logical instructions:
 \begin{itemize}[nosep]
     \item \texttt{ORR Rd, Rn, \#mask}: Sets bits in \texttt{Rd} where the corresponding bits in \texttt{mask} are 1.
     \item \texttt{BIC Rd, Rn, \#mask}: Clears bits in \texttt{Rd} where the corresponding bits in \texttt{mask} are 1.
     \item \texttt{EOR Rd, Rn, \#mask}: Toggles bits in \texttt{Rd} where the corresponding bits in \texttt{mask} are 1.
 \end{itemize}
-to check if certain bits are set or cleared, you can use the \texttt{TST} instruction:
+
+BIC is essentially an AND operation with the negated mask, i.e., \texttt{BIC Rd, Rn, \#mask} is equivalent to \texttt{AND Rd, Rn, \#\textasciitilde{}mask}.\\
+
+\paragraph{Check Bits}
+To check whether certain bits are set or cleared, you can use the \texttt{AND} instruction followed by a comparison:
 \begin{itemize}[nosep]
-    \item \texttt{TST Rn, \#mask}: Performs a bitwise AND between \texttt{Rn} and \texttt{mask}, updating the condition flags based on the result. If the result is zero, the zero flag (Z) is set, indicating that none of the bits in \texttt{mask} are set in \texttt{Rn}.
+    \item \texttt{AND Rd, Rn, \#mask}: Isolates bits in \texttt{Rn} where the corresponding bits in \texttt{mask} are 1. The result is stored in \texttt{Rd}.
+    \item You can then use \texttt{CMP Rd, \#0} to determine if the result is zero (all masked bits cleared) or non-zero (at least one bit set).
+    \item Alternatively, you can use \texttt{TST Rn, \#mask}, which performs the AND operation and updates the condition flags without storing the result.
 \end{itemize}
+
+\noindent\textit{The \texttt{TST} instruction and its interaction with the condition flags will be explored in more detail in the next experiment, where you will learn how conditional execution and branching depend on flag states.}
 
 \subsubsection{Shift and Rotate Instructions}
 \begin{table}[H]
@@ -157,27 +172,24 @@ RRX & \texttt{RRX Rd, Rm}
 \footnotesize\emph{Note:} Shift amount can be an immediate \texttt{\#sh} (0--31) or a register \texttt{Rs} (low 8 bits used). 
 For immediates: \texttt{LSL \#0} = no shift; \texttt{LSR \#0} is treated as shift by 32; \texttt{ASR \#0} is treated as shift by 32; \texttt{ROR \#0} means \texttt{RRX}.
 \end{table}
-Not all shift/rotate instructions are explicitly present in the ARMv7-M ISA. For example, there is no ROL (rotate left) or ASL (arithmetic shift left) instruction, as these operations can be achieved using existing shift instructions: ROL can be implemented using ROR with a complementary shift amount, and ASL is equivalent to LSL.
-\subsubsection{Compare and Test Instructions}
-Compare and test instructions are used to compare values and set condition flags without producing a direct result in a register. These instructions are useful for conditional execution and branching based on the results of comparisons. The following table summarizes the compare and test instructions in the ARM Cortex-M4 architecture.
-\begin{table}[H]
-\centering
-\caption{Compare and Test Instructions}
-\small
-\begin{tabularx}{\linewidth}{@{}l l l X@{}}
-\toprule
-\textbf{Instr.} & \textbf{Syntax} & \textbf{Operation} & \textbf{Description} \\
-\midrule
-CMP & \texttt{CMP Rn, Operand2} & Flags from $(Rn - Operand2)$ & Comparison; no register result. \\
-CMN & \texttt{CMN Rn, Operand2} & Flags from $(Rn + Operand2)$ & “Compare negative” (add then set flags). \\
-TST & \texttt{TST Rn, Operand2} & Flags from $(Rn \,\&\, Operand2)$ & Bitwise test; no register result. \\
-TEQ & \texttt{TEQ Rn, Operand2} & Flags from $(Rn \oplus Operand2)$ & XOR test; no register result. \\
-\bottomrule
-\end{tabularx}
-\end{table}
+Not all shift/rotate instructions are explicitly present in the ARMv7-M ISA.\@ For example, there is no ROL (rotate left) or ASL (arithmetic shift left) instruction, as these operations can be achieved using existing shift instructions: ROL can be implemented using ROR with a complementary shift amount, and ASL is equivalent to LSL.
+
+\subsubsection{Barrel Shifter}
+\label{sec:barrel-shifter}
+
+The barrel shifter is a hardware feature that allows for efficient shifting and rotating of register values as part of data processing instructions. It can perform operations such as logical shifts (left or right), arithmetic shifts, and rotations on the second operand (\texttt{Operand2}) before it is used in the instruction without wasting extra instructions or cycles.
+
+\noindent Examples of barrel shifter usage:
+\begin{lstlisting}[caption={Barrel shifter examples}]
+    ADD    R0, R2, R1, LSL #2    ; R0 = R2 + (R1 << 2) using barrel shifter
+    SUB    R3, R4, R5, LSR #1    ; R3 = R4 - (R5 >> 1) using barrel shifter
+    ORR    R6, R7, R8, ROR #3    ; R6 = R7 | (R8 rotated right by 3)
+\end{lstlisting}
 
 \subsection{Load and Store Instructions}
-Since the ARM Cortex-M4 architecture follows the RISC design philosophy, it uses a load/store architecture. This means that data processing instructions can only operate on data in registers, and any data in memory must first be loaded into a register before it can be processed. Similarly, results from data processing operations must be stored back to memory if they need to be preserved. The following table summarizes the load and store instructions in the ARM Cortex-M4 architecture.
+Since the ARM Cortex-M4 follows the RISC design philosophy, it uses a load/store architecture.
+This means that arithmetic and logical instructions operate only on registers.
+Any data in memory must first be loaded into a register before processing, and results must be stored back to memory if they need to be preserved.
 
 \begin{table}[H]
 \centering
@@ -197,26 +209,12 @@ LDRD / STRD     & \texttt{LDRD/STRD Rt, Rt2, [Rn, \#off]} & Load/store a 64-bit 
 \vspace{2pt}
 \end{table}
 
-\begin{itemize}[nosep]
-  \item \texttt{LDR Rt, =label} is a \emph{pseudo-instruction}. The assembler replaces it with code to load the \textbf{address} of \texttt{label} into \texttt{Rt}.
-  \item \texttt{LDR Rt, label} (without \texttt{=}) loads the \textbf{contents stored at} \texttt{label}.
-\end{itemize}
-\newpage
+
 \begin{lstlisting}[caption={Examples of Load and Store Instructions}]
-        AREA    MYDATA, DATA, READONLY
-XVAL    DCD     0x12345678        ; word in memory
-YPTR    DCD     YVAL              ; contains the address of YVAL
-
-        AREA    MYDATA2, DATA, READWRITE
-YVAL    DCD     0
-
-        AREA    MYCODE, CODE, READONLY
-        ENTRY
-        EXPORT  Reset_Handler
-
 Reset_Handler
         LDR     R0, =XVAL         ; R0 = &XVAL (address of XVAL)
         LDR     R1, [R0]          ; R1 = 0x12345678 (load word from memory)
+        ADR     R5, XVAL          ; R5 = PC-relative address of XVAL (if in range)
 
         LDRB    R2, [R0]          ; R2 = 0x78 (lowest byte of XVAL)
         LDRH    R3, [R0]          ; R3 = 0x5678 (lowest halfword of XVAL)
@@ -226,19 +224,57 @@ Reset_Handler
         STRB    R4, [R0]          ; store 0xFF into YVAL (low byte only)
 
 STOP    B       STOP
+
+        AREA    MYDATA, DATA, READONLY
+XVAL    DCD     0x12345678        ; word in memory
+YPTR    DCD     YVAL              ; contains the address of YVAL
+
+        AREA    MYDATA2, DATA, READWRITE
+YVAL    DCD     0
+
         END
 \end{lstlisting}
-\paragraph{Note:}  
+\subsubsection{Loading Addresses and Values: \texttt{LDR}, \texttt{LDR =}, and \texttt{ADR}}
+
+In ARM assembly, it is important to distinguish between loading a \emph{value} from memory and loading the \emph{address} of a label.  
+Although these instructions look similar, their behavior and purpose differ depending on how the assembler interprets them.
 \begin{itemize}[nosep]
-    \item The line \texttt{YPTR DCD YVAL} allocates a 32-bit word at the label \texttt{YPTR} and initializes it with the address of \texttt{YVAL}.  
-    \item Executing \texttt{LDR R0, YPTR} loads the contents of \texttt{YPTR} (the address of \texttt{YVAL}) into \texttt{R0}, making \texttt{R0} a pointer to \texttt{YVAL}.  
-    \item By contrast, \texttt{LDR R0, =YVAL} directly loads the address of \texttt{YVAL} into \texttt{R0} without going through memory.  
+    \item \textbf{\texttt{LDR Rn, label}}  
+    Loads the 32-bit \emph{value} stored at the memory address identified by \texttt{label} into register \texttt{Rn}.  
+    The CPU performs a direct memory read:
+    \[
+      \texttt{Rn} \leftarrow [\texttt{label}]
+    \]
+    Example: \texttt{LDR R0, XVAL} loads the contents of \texttt{XVAL} (e.g., \texttt{0x12345678}) into \texttt{R0}.
+    
+    \item \textbf{\texttt{LDR Rn, =label}}  
+    Loads the \emph{address} of \texttt{label} into \texttt{Rn}, rather than the data stored at that address.  
+    The assembler generates this by either constructing the address using \texttt{MOVW/MOVT} instructions or placing it in a nearby \emph{literal pool} for PC-relative loading.\footnote{For more details, see ARM Developer Documentation, “Literal pools and \texttt{LDR =const}”. \url{https://developer.arm.com/documentation/dui0473/m/dom1359731147760}}  
+    \[
+      \texttt{Rn} \leftarrow \texttt{\&label}
+    \]
+    Example: \texttt{LDR R0, =XVAL} places the address of \texttt{XVAL} in \texttt{R0}.
+    
+    \item \textbf{\texttt{ADR Rn, label}}  
+    Loads the \emph{address} of \texttt{label} into \texttt{Rn} by computing it relative to the current program counter.  
+    This method requires no literal pool or memory access but only works for nearby addresses (about $\pm$4~KB in Thumb mode):  
+    \[
+      \texttt{Rn} \leftarrow \texttt{PC} + \texttt{offset(label)}
+    \]
 \end{itemize}
+
+
+
+\subsubsection{Understanding Pointer Declarations}
+The directive \texttt{YPTR DCD YVAL} reserves a 32-bit word at the label \texttt{YPTR} and initializes it with the address of \texttt{YVAL}.  
+In other words, \texttt{YPTR} acts as a \emph{pointer variable} that holds the address of another variable (\texttt{YVAL}).  
+Executing \texttt{LDR Rn, YPTR} loads the 32-bit contents stored at \texttt{YPTR}—that is, the address of \texttt{YVAL}—into \texttt{Rn}, making \texttt{Rn} a pointer to \texttt{YVAL}.
+
 
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
-Address & Label & Contents \\
+\textbf{Address} & \textbf{Label} & \textbf{Contents} \\
 \hline
 0x2000 & XVAL & 0x12345678 \\
 0x2004 & YPTR & 0x2008 (address of YVAL) \\
@@ -246,54 +282,34 @@ Address & Label & Contents \\
 \hline
 \end{tabular}
 \end{center}
+\subsubsection{Declaring Arrays and Strings}
 
-\subsection{Branch Instructions and Condition Codes}
-Branch instructions change the flow of execution by jumping to a different part of the program. They can be unconditional or conditional based on the status flags in the xPSR. The following table summarizes the branch instructions in the ARM Cortex-M4 architecture.
-\begin{table}[H]
-\centering
-\caption{Branch Instructions}
-\small
-\begin{tabularx}{\linewidth}{@{}l l X@{}}
-\toprule
-\textbf{Instr.} & \textbf{Syntax Example} & \textbf{Description} \\
-\midrule
-B    & \texttt{B label} & Unconditional branch to \texttt{label}. \\
-B<cond> & \texttt{B<cond> label} & Conditional branch based on condition flags. \\
-BL   & \texttt{BL label} & Branch with link (calls subroutine, saves return address in LR). \\
-BX   & \texttt{BX Rm} & Branch to address in register \texttt{Rm} (LR is usually used here). \\
-\bottomrule
-\end{tabularx}
-\vspace{2pt}
-\end{table}
+Data in assembly is defined using \emph{assembler directives} that reserve and optionally initialize memory.  
+Common directives include \texttt{DCD}, \texttt{DCW}, and \texttt{DCB}, which define words, halfwords, and bytes, respectively.  
+These are typically placed within a \texttt{DATA} area to create arrays, lookup tables, buffers, or strings.
 
-\begin{table}[H]
-\centering
-\caption{Condition Codes}
-\small
-\begin{tabularx}{\linewidth}{@{}l l X@{}}
-\toprule
-\textbf{Cond.} & \textbf{Meaning} & \textbf{Description} \\
-\midrule
-EQ  & Equal          & Z set (zero result) \\
-NE  & Not equal      & Z clear (non-zero result) \\
-CS/HS & Carry set / Unsigned higher or same & C set \\
-CC/LO & Carry clear / Unsigned lower & C clear \\
-MI  & Minus / Negative & N set (negative result) \\
-PL  & Plus / Positive or zero & N clear \\
-VS  & Overflow set   & V set \\
-VC  & Overflow clear & V clear \\
-HI  & Unsigned higher & C set and Z clear \\
-LS  & Unsigned lower or same & C clear or Z set \\
-GE  & Signed greater than or equal & N == V \\
-LT  & Signed less than & N != V \\
-GT  & Signed greater than & Z clear and N == V \\
-LE  & Signed less than or equal & Z set or N != V \\
-AL  & Always         & (unconditional) \\
-NV  & Never          & (not used) \\
-\bottomrule
-\end{tabularx}
-\vspace{2pt}
-\end{table}
+\begin{itemize}[nosep]
+    \item \texttt{DCD} — Define Constant Word (32 bits per element)
+    \item \texttt{DCW} — Define Constant Halfword (16 bits per element)
+    \item \texttt{DCB} — Define Constant Byte (8 bits per element)
+    \item \texttt{SPACE} — Reserve uninitialized memory (in bytes)
+    \item \texttt{FILL} — Fill memory with a specified value for a given length
+\end{itemize}
+
+\begin{lstlisting}[caption={Declaring arrays and strings in memory}]
+            AREA    MYDATA, DATA, READONLY
+NUMBERS     DCD     10, 20, 30, 40        ; array of 32-bit integers
+BYTES       DCB     1, 2, 3, 4            ; array of bytes
+TEXT        DCB     "HELLO",0             ; null-terminated ASCII string
+BUFFER      SPACE   64                    ; reserve 64 bytes (uninitialized)
+PATTERN     FILL    0xFF, 64              ; fill 64 bytes with 0xFF
+\end{lstlisting}
+
+Each label (e.g., \texttt{NUMBERS}, \texttt{TEXT}) marks the starting address of a data object in memory.  
+You can load these addresses into registers using \texttt{LDR R0, =NUMBERS} or \texttt{ADR R0, TEXT}, then access individual elements through the appropriate addressing modes.
+
+\noindent\textit{Note: Strings are stored as consecutive ASCII characters in memory. A terminating zero (\texttt{0x00}) is typically appended to indicate the end of the string, similar to C-style strings.}
+
 \subsection{Addressing Modes}
 
 Addressing modes define how the effective address or operand value is obtained by an instruction. 
@@ -318,7 +334,6 @@ Post-indexed   & \texttt{LDR R0, [R1], \#4}     & Memory access first, then base
 \end{tabularx}
 \vspace{2pt}
 \end{table}
-\newpage
 \begin{lstlisting}[caption={Examples of Offset, Pre-indexed, and Post-indexed Addressing Modes}]
 ; Immediate Offset
     LDR     R0, [R1, #4]     ; R0 = word at memory[R1 + 4]
@@ -335,58 +350,36 @@ Post-indexed   & \texttt{LDR R0, [R1], \#4}     & Memory access first, then base
 
 \subsection{Examples}
 
-\subsubsection{Example 1 --- Arithmetic and Bitwise Operations}
-This example demonstrates basic arithmetic and bitwise operations in ARM assembly, showing how to set, clear, and flip bits.
-
+\subsubsection{Example 1 --- Data Processing Instructions}
+This example demonstrates various arithmetic and bitwise operations on registers.
 \lstinputlisting[caption={Arithmetic and bitwise operations example}]{snippets/assembly/exp2/example1.asm}
 \newpage
-\subsubsection{Example 2 --- Status Flags and Logical Tests}
-This example demonstrates the use of status flags and logical tests in ARM assembly, including conditional execution based on comparison results.
-
-\lstinputlisting[caption={Status flags and logical tests example}]{snippets/assembly/exp2/example2.asm}
-\newpage
-\subsubsection{Example 3 --- Load/Store with Different Addressing Modes}
+\subsubsection{Example 2 --- Load/Store with Different Addressing Modes}
 This example demonstrates load and store instructions using various addressing modes.
 \lstinputlisting[caption={Load/store with different addressing modes example}]{snippets/assembly/exp2/example3.asm}
-\subsection{Tasks}
 
+\subsection{Tasks}
 \subsubsection{Task 1 --- Bitwise Register Manipulation}
-Start with \texttt{R0 = 0x12345678}. Perform the following operations and observe the results in the debugger:
+Start with \texttt{R0 = 0x12345678}. Perform the following operations and observe the results in the debugger (verify in hex and binary):
 \begin{itemize}[nosep]
     \item Clear bits 4--7 (second hex nibble).
-    \item Set bits 8--11 (force nibble to \texttt{F}).
+    \item Set bits 8--11 (force that nibble to \texttt{F}).
     \item Toggle bits 28--31 (highest nibble).
 \end{itemize}
-\emph{Hint:} Use \texttt{BIC}, \texttt{ORR}, and \texttt{EOR} with appropriate masks.
+\emph{Hint:} Use \texttt{BIC}, \texttt{ORR}, and \texttt{EOR} with appropriate masks.  
 
-\subsubsection{Task 2 --- Arithmetic and Status Flags}
-Assume initial values:
-\[
-\texttt{R0 = 25}, \quad \texttt{R1 = 10}
-\]
-
-\begin{itemize}[nosep]
-    \item Add \texttt{R0 + R1}, store the result in \texttt{R2}.
-    \item Subtract \texttt{R1} from \texttt{R0}, store the result in \texttt{R3}.
-    \item Multiply \texttt{R0} and \texttt{R1}, store the result in \texttt{R4}.
-    \item Compare \texttt{R0} and \texttt{R1} using \texttt{CMP}.
-          If greater, set \texttt{R5 = 1}; otherwise, set \texttt{R5 = 0}.
-\end{itemize}
-\paragraph{Explain:} The status flag change after the \texttt{CMP} instruction and how it affects the conditional execution of setting \texttt{R5}.
-
-\subsubsection{Task 3 --- Addressing Modes with an Array}
-Given the following array:
+\subsubsection{Task 2 --- Addressing Modes with an Array}
+Given:
 \begin{lstlisting}
 ARRAY   DCD  0x11, 0x22, 0x33, 0x44
+OUT     SPACE 16
 \end{lstlisting}
 
-Perform the following loads using different addressing modes:
+Load each element using a different addressing mode, then store to \texttt{OUT}:
 \begin{itemize}[nosep]
-    \item Load the first element (\texttt{0x11}) using \emph{immediate offset}.
-    \item Load the second element (\texttt{0x22}) using \emph{pre-indexed} addressing.
-    \item Load the third element (\texttt{0x33}) using \emph{post-indexed} addressing.
-    \item Load the fourth element (\texttt{0x44}) using a \emph{register offset} (offset in another register).
+    \item 0x11 via \emph{immediate offset}
+    \item 0x22 via \emph{pre-indexed}       
+    \item 0x33 via \emph{post-indexed}       
+    \item 0x44 via \emph{register offset}   
 \end{itemize}
-
-Store each result into an output buffer \texttt{OUT} and verify the results in memory.
-
+\emph{Hint:} Put \texttt{ARRAY}'s base in \texttt{R1} (e.g., \texttt{LDR R1, =ARRAY}). Verify \texttt{OUT} in memory after execution.
