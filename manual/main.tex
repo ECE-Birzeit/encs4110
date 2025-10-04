@@ -1,20 +1,54 @@
-\documentclass[11pt,a4paper,oneside]{scrreprt} % or scrartcl
+\documentclass[11pt,a4paper,twoside]{scrreprt}
+\KOMAoptions{open=right, cleardoublepage=empty}
 
 \input{preamble}
+\providecommand{\allcaps}[1]{\MakeUppercase{#1}}
 
-\title{Computer Design Laboratory Manual}
-\author{Department of Electrical \& Computer Engineering}
+
+
+
+\providecommand{\LOGONAME}{birzeit-logo} % base name, no extension
+\providecommand{\DEPARTMENT}{Department of Electrical \& Computer Engineering}
+\providecommand{\COURSENUM}{ENCS4110}
+\providecommand{\COURSENAME}{Computer Design Laboratory}
+\title{Laboratory Manual}
+\renewcommand{\ManualSubtitle}{ARM Cortex-M4 (TM4C123) — Assembly}
+\renewcommand{\ManualVersionMajor}{1}
+\renewcommand{\ManualVersionMinor}{0}
+\renewcommand{\ManualVersionPatch}{0}
+
 \date{\today}
 
 \begin{document}
-\clearpage
 
-% Draft one chapter fast by uncommenting a single \input
-% \input{experiments/exp03}
-\setcounter{chapter}{1}
+\KOMAoptions{twoside=false}\recalctypearea
+\maketechnicaltitlepage
+\KOMAoptions{twoside=true}\recalctypearea
+% Global ToC: chapters only
+\cleardoublepage
+\begingroup
+\setcounter{tocdepth}{0} % parts and chapters only
+\tableofcontents
+\endgroup
+\cleardoublepage
+
+\toconlypart{ARM Cortex-M4 Assembly Programming}
+\input{chapters/exp01}
 \input{chapters/exp02}
+\input{chapters/exp03}
+\toconlypart{EK-TM4C123GXL Board and Peripherals}
+\input{chapters/exp04}
+\input{chapters/exp05}
+\input{chapters/exp06}
+\input{chapters/exp07}
+\input{chapters/exp08}
+\input{chapters/exp09}
 
-
-% \bibliographystyle{ieeetr}
-% \bibliography{refs}
+\clearpage
+\ifodd\value{page}
+  % already odd: do nothing
+\else
+  \thispagestyle{empty}\null\newpage
+\fi
 \end{document}
+

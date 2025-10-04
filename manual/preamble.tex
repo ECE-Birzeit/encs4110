@@ -142,3 +142,109 @@
 \usepackage{tcolorbox}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,decorations.pathreplacing}
+\usepackage{tikz}
+\usepackage{subcaption} % or subfig if you prefer
+% ---------- Chapter-level ToCs ----------
+
+% ---------- Tables of contents ----------
+\usepackage{etoc}  % local ToCs that inherit the same style as \tableofcontents
+\usepackage{titletoc}  % for \titlecontents command
+% ---------- Cover page config ----------
+% If you use an SVG logo, keep this. If you prefer PNG/PDF, you may omit.
+\usepackage{svg} % requires --shell-escape or inkscape; else convert logo to PDF/PNG
+
+% Editable cover fields
+
+% ---- Technical manual title page helpers ----
+% Logo is expected at assets/<name>.svg; adjust if needed.
+\svgpath{{resources/}} % where the logo lives
+
+\providecommand{\LOGONAME}{birzeit-logo} % base name, no extension
+\providecommand{\DEPARTMENT}{Department of Electrical \& Computer Engineering}
+\providecommand{\COURSENUM}{ENCS4110}
+\providecommand{\COURSENAME}{Computer Design Laboratory}
+% ---- Cover defaults (override as needed) ----
+\providecommand{\ManualSubtitle}{Laboratory Manual}
+
+% Semantic version pieces (or set \ManualVersion directly)
+\providecommand{\ManualVersionMajor}{1}
+\providecommand{\ManualVersionMinor}{0}
+\providecommand{\ManualVersionPatch}{0}
+\providecommand{\ManualVersion}{v\ManualVersionMajor.\ManualVersionMinor.\ManualVersionPatch}
+\newcommand{\MonthYear}{%
+  \ifcase\month
+  \or January\or February\or March\or April\or May\or June%
+  \or July\or August\or September\or October\or November\or December
+  \fi~\the\year
+}
+% Local ToC etc. can stay as-is. Ensure svg path is set:
+\makeatletter
+\newcommand{\maketechnicaltitlepage}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+
+    % --- Top: logo + department + course ---
+    \vspace*{1.2cm}
+    \begin{center}
+      \IfFileExists{assets/\LOGONAME.pdf}
+        {\includegraphics[width=.80\textwidth]{assets/\LOGONAME.pdf}}
+        {\includesvg[width=.80\textwidth,inkscapelatex=false]{\LOGONAME}}
+
+      \vspace{0.3cm}
+      {\large \DEPARTMENT\par}
+      {\large \COURSENUM\;--\;\COURSENAME\par}
+    \end{center}
+
+    % --- Middle: centered Title + Subtitle ONLY ---
+    \vspace{1.5cm}
+    \begin{center}
+      {\Huge\bfseries \@title\par}
+      \vspace{0.35cm}
+      {\Large \ManualSubtitle\par}
+    \end{center}
+    \vfill
+
+    % --- Bottom-left: Version + Date ---
+    \begin{flushleft}
+      {\large \textbf{Version:} \ManualVersion}\\[0.2cm]
+        {\large \textbf{Date:} \MonthYear}
+    \end{flushleft}
+  \end{titlepage}%
+}
+\makeatother
+
+% ---- titletoc formatting: Tufte-ish, robust ----
+\usepackage{titletoc}
+
+\titlecontents{part}%
+  [0pt]% distance from left margin
+  {\addvspace{0.25\baselineskip}}% above (global formatting of entry)
+  {\allcaps{Part~\thecontentslabel}\quad}% before w/ label (label = ``Part I'')
+  {\allcaps{Part~\thecontentslabel}\allcaps}% before w/o label
+  {}% filler and page (leaders and page num)
+  [\vspace*{0.5\baselineskip}]% after
+
+\titlecontents{chapter}%
+    [4em]% distance from left margin
+    {}% above (global formatting of entry)
+    {\contentslabel{2em}\textit}% before w/ label (label = ``Chapter 1'')
+    {\hspace{0em}\textit}% before w/o label
+    {\qquad\thecontentspage}% filler and page (leaders and page num)
+    [\vspace*{0.5\baselineskip}]% after
+%%%% End additional code by Kevin Godby
+
+
+% Silent part: adds a numbered Part entry to the ToC, prints nothing
+% --- ToC-only “Part” entry (no heading printed, no hyperlink in ToC) ---
+\makeatletter
+\newcommand{\toconlypart}[1]{%
+  \clearpage                 % keep if you want a clean break; remove if not
+  \refstepcounter{part}%     % step the Part counter (I, II, …)
+  % Write a plain (non-hyperlinked) contents line: 4th arg = link target -> empty
+  \addtocontents{toc}{%
+    \protect\contentsline{part}{\protect\numberline{\thepart}#1}{\thepage}{}%
+  }%
+  % Optional: set header marks if you use \leftmark/\rightmark
+  \markboth{Part \thepart\quad #1}{}%
+}
+\makeatother
