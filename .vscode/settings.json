@@ -1,6 +1,28 @@
 {
-    "files.associations": {
-        "latexmkrc": "cpp"
-    }
+  // Use this recipe by default (or pick it from the Command Palette)
+  "latex-workshop.latex.recipe.default": "latexmk (pdf, shell-escape)",
 
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (pdf, shell-escape)",
+      "tools": ["latexmk-pdf-shellescape"]
+    }
+  ],
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-pdf-shellescape",
+      "command": "latexmk",
+      "args": [
+        "-pdf",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-synctex=1",
+        "-halt-on-error",
+        // Pass --shell-escape to pdflatex via latexmk:
+        "-pdflatex=pdflatex -interaction=nonstopmode -synctex=1 -shell-escape %O %S",
+        "-outdir=build",
+        "%DOC%"
+      ]
+    }
+  ]
 }
