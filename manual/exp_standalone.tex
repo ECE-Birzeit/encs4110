@@ -1,0 +1,88 @@
+% exp-standalone.tex
+\documentclass[11pt,a4paper,oneside]{scrreprt}
+
+% --- Use your existing style ---
+\input{preamble}
+
+% --- Defaults (override on the command line if you like) ---
+% Expect: \def\EXPNUM{<1..9>} passed from CLI.
+\providecommand{\EXPNUM}{1}
+
+% University meta (fall back to your usual defaults if not already defined)
+\providecommand{\LOGONAME}{birzeit-logo} % base name, no extension
+\providecommand{\DEPARTMENT}{Department of Electrical \& Computer Engineering}
+\providecommand{\COURSENUM}{ENCS4110}
+\providecommand{\COURSENAME}{Computer Design Laboratory}
+
+% Month–Year for the cover bottom-left
+\providecommand{\MonthYear}{%
+  \ifcase\month\or January\or February\or March\or April\or May\or June%
+  \or July\or August\or September\or October\or November\or December\fi~\the\year
+}
+
+% --- Compute 2-digit string and chapter include path ---
+\makeatletter
+% 2-digit experiment code: 01..09
+\edef\ExpTwoDigit{\ifnum\EXPNUM<10 0\fi\EXPNUM}
+% The chapter file to include, e.g. chapters/exp01
+\edef\ExpInputPath{chapters/exp\ExpTwoDigit}
+
+% Define chapter titles manually for the cover page
+\def\ExpTitle{%
+  \ifcase\EXPNUM
+    \or ARM Cortex-M4 Assembly Fundamentals%
+    \or ARM Cortex-M4 Instructions and Addressing Modes%
+    \or ARM Cortex-M4 Flow Control, Procedures, and Stack%
+    \or General-Purpose Input/Output and Peripheral Interfacing%
+    \or Interrupt Handling and the Nested Vectored Interrupt Controller%
+    \or System Timers and General-Purpose Timer Modules%
+    \or Character Display Interfacing with LCD Modules%
+    \or Analog Signal Acquisition and Digital Conversion%
+    \or Serial Communication with UART Protocol%
+  \fi
+}
+\makeatother
+
+% --- Simple cover page: logo + dept/course + Chapter Title ---
+\newcommand{\makeexptitlepage}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \vspace*{1.2cm}
+    \begin{center}
+      % Prefer prebuilt PDF logo in assets/, else load SVG by name (svgpath set in preamble)
+      \IfFileExists{assets/\LOGONAME.pdf}
+        {\includegraphics[width=.80\textwidth]{assets/\LOGONAME.pdf}}
+        {\includesvg[width=.80\textwidth,inkscapelatex=false]{\LOGONAME}}
+
+      \vspace{0.4cm}
+      {\large \DEPARTMENT\par}
+      {\large \COURSENUM\;--\;\COURSENAME\par}
+
+      \vspace{2cm}
+      {\Large\bfseries Experiment \ExpTwoDigit\par}
+      \vspace{0.8cm}
+      {\Huge\bfseries \ExpTitle\par}
+      \vfill
+    \end{center}
+
+    \begin{flushleft}
+      {\large \textbf{Date:} \MonthYear}
+    \end{flushleft}
+  \end{titlepage}%
+}
+
+\begin{document}
+\dominitoc  % Initialize minitoc support
+\makeexptitlepage
+
+% Fix the chapter number so the chapter printed inside the exp file is correct.
+\setcounter{chapter}{\numexpr\EXPNUM-1\relax}
+
+% If your expNN.tex doesn’t already drop a mini ToC after \chapter,
+% uncomment the next line to auto-insert one right after every \chapter:
+% \pretocmd{\chapter}{\minitoc}{}{}
+
+% Include the experiment chapter
+\input{\ExpInputPath}
+
+\end{document}
