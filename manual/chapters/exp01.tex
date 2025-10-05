@@ -99,8 +99,6 @@ where curly braces \texttt{\{\}} denote optional components, and:
 
 \begin{lstlisting}[caption={Instruction format example}]
 loop_start   ADDS   R0, R0, #1      ; R0 = R0 + 1, update flags (N,Z,C,V)
-             CMP    R0, #10         ; compare R0 with 10 (sets flags)
-             BLT    loop_start      ; branch if R0 < 10 (uses flags)
 \end{lstlisting}
 
 

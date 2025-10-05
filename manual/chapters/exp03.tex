@@ -313,10 +313,6 @@ InnerProc
         BX      LR              ; Return
 \end{lstlisting}
 
-\subsubsection{Stack Operations}
-
-The stack is a memory region used to hold return addresses, local variables, and saved registers.  
-On the Cortex-M4, the stack is implemented as a \emph{full descending stack}: it grows from high memory addresses to low addresses, and the stack pointer (\texttt{SP}) always points to the last stored value.
 
 \subsubsection{Stack Model (Full, Descending)}
 There are four common stack models based on two characteristics: whether the stack is full or empty, and whether it grows up (ascending) or down (descending). 

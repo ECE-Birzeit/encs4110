@@ -227,11 +227,11 @@ Reset_Handler
 
 STOP    B       STOP
 
-        AREA    MYDATA, DATA, READONLY
+        AREA    CONSTANTS, DATA, READONLY
 XVAL    DCD     0x12345678        ; word in memory
 YPTR    DCD     YVAL              ; contains the address of YVAL
 
-        AREA    MYDATA2, DATA, READWRITE
+        AREA    MYDATA, DATA, READWRITE
 YVAL    DCD     0
 
         END
@@ -254,10 +254,11 @@ These are typically placed within a \texttt{DATA} area to create arrays, lookup 
 \end{itemize}
 
 \begin{lstlisting}[caption={Declaring arrays and strings in memory}]
-            AREA    MYDATA, DATA, READONLY
+            AREA    CONSTANTS, DATA, READONLY
 NUMBERS     DCD     10, 20, 30, 40        ; array of 32-bit integers
 BYTES       DCB     1, 2, 3, 4            ; array of bytes
 TEXT        DCB     "HELLO",0             ; null-terminated ASCII string
+            AREA    MYDATA, DATA, READWRITE
 BUFFER      SPACE   64                    ; reserve 64 bytes (uninitialized)
 PATTERN     FILL    0xFF, 64              ; fill 64 bytes with 0xFF
 \end{lstlisting}
