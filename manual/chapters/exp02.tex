@@ -236,6 +236,55 @@ YVAL    DCD     0
 
         END
 \end{lstlisting}
+
+
+
+\subsubsection{Declaring Data in Memory}
+
+Data in assembly is defined using \emph{assembler directives} that reserve and optionally initialize memory.  
+Common directives include \texttt{DCD}, \texttt{DCW}, and \texttt{DCB}, which define words, halfwords, and bytes, respectively.  
+These are typically placed within a \texttt{DATA} area to create arrays, lookup tables, buffers, or strings.
+
+\begin{itemize}[nosep]
+    \item \texttt{DCD} — Define Constant Word (32 bits per element)
+    \item \texttt{DCW} — Define Constant Halfword (16 bits per element)
+    \item \texttt{DCB} — Define Constant Byte (8 bits per element)
+    \item \texttt{SPACE} — Reserve uninitialized memory (in bytes)
+    \item \texttt{FILL} — Fill memory with a specified value for a given length
+\end{itemize}
+
+\begin{lstlisting}[caption={Declaring arrays and strings in memory}]
+            AREA    MYDATA, DATA, READONLY
+NUMBERS     DCD     10, 20, 30, 40        ; array of 32-bit integers
+BYTES       DCB     1, 2, 3, 4            ; array of bytes
+TEXT        DCB     "HELLO",0             ; null-terminated ASCII string
+BUFFER      SPACE   64                    ; reserve 64 bytes (uninitialized)
+PATTERN     FILL    0xFF, 64              ; fill 64 bytes with 0xFF
+\end{lstlisting}
+
+Each label (e.g., \texttt{NUMBERS}, \texttt{TEXT}) marks the starting address of a data object in memory.  
+You can load these addresses into registers using \texttt{LDR R0, =NUMBERS} or \texttt{ADR R0, TEXT}, then access individual elements through the appropriate addressing modes.
+
+\noindent\textit{Note: Strings are stored as consecutive ASCII characters in memory. A terminating zero (\texttt{0x00}) is typically appended to indicate the end of the string, similar to C-style strings.}
+\subsubsection{Understanding Pointer Declarations}
+The directive \texttt{YPTR DCD YVAL} reserves a 32-bit word at the label \texttt{YPTR} and initializes it with the address of \texttt{YVAL}.  
+In other words, \texttt{YPTR} acts as a \emph{pointer variable} that holds the address of another variable (\texttt{YVAL}).  
+Executing \texttt{LDR Rn, YPTR} loads the 32-bit contents stored at \texttt{YPTR}—that is, the address of \texttt{YVAL}—into \texttt{Rn}, making \texttt{Rn} a pointer to \texttt{YVAL}.
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Address} & \textbf{Label} & \textbf{Contents} \\
+\hline
+0x2000 & XVAL & 0x12345678 \\
+0x2004 & YPTR & 0x2008 (address of YVAL) \\
+0x2008 & YVAL & 0x00000000 \\
+\hline
+\end{tabular}
+\end{center}
+
+
 \subsubsection{Loading Addresses and Values: \texttt{LDR}, \texttt{LDR =}, and \texttt{ADR}}
 
 In ARM assembly, it is important to distinguish between loading a \emph{value} from memory and loading the \emph{address} of a label.  
@@ -264,54 +313,6 @@ Although these instructions look similar, their behavior and purpose differ depe
       \texttt{Rn} \leftarrow \texttt{PC} + \texttt{offset(label)}
     \]
 \end{itemize}
-
-
-
-\subsubsection{Understanding Pointer Declarations}
-The directive \texttt{YPTR DCD YVAL} reserves a 32-bit word at the label \texttt{YPTR} and initializes it with the address of \texttt{YVAL}.  
-In other words, \texttt{YPTR} acts as a \emph{pointer variable} that holds the address of another variable (\texttt{YVAL}).  
-Executing \texttt{LDR Rn, YPTR} loads the 32-bit contents stored at \texttt{YPTR}—that is, the address of \texttt{YVAL}—into \texttt{Rn}, making \texttt{Rn} a pointer to \texttt{YVAL}.
-
-
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Address} & \textbf{Label} & \textbf{Contents} \\
-\hline
-0x2000 & XVAL & 0x12345678 \\
-0x2004 & YPTR & 0x2008 (address of YVAL) \\
-0x2008 & YVAL & 0x00000000 \\
-\hline
-\end{tabular}
-\end{center}
-\subsubsection{Declaring Arrays and Strings}
-
-Data in assembly is defined using \emph{assembler directives} that reserve and optionally initialize memory.  
-Common directives include \texttt{DCD}, \texttt{DCW}, and \texttt{DCB}, which define words, halfwords, and bytes, respectively.  
-These are typically placed within a \texttt{DATA} area to create arrays, lookup tables, buffers, or strings.
-
-\begin{itemize}[nosep]
-    \item \texttt{DCD} — Define Constant Word (32 bits per element)
-    \item \texttt{DCW} — Define Constant Halfword (16 bits per element)
-    \item \texttt{DCB} — Define Constant Byte (8 bits per element)
-    \item \texttt{SPACE} — Reserve uninitialized memory (in bytes)
-    \item \texttt{FILL} — Fill memory with a specified value for a given length
-\end{itemize}
-
-\begin{lstlisting}[caption={Declaring arrays and strings in memory}]
-            AREA    MYDATA, DATA, READONLY
-NUMBERS     DCD     10, 20, 30, 40        ; array of 32-bit integers
-BYTES       DCB     1, 2, 3, 4            ; array of bytes
-TEXT        DCB     "HELLO",0             ; null-terminated ASCII string
-BUFFER      SPACE   64                    ; reserve 64 bytes (uninitialized)
-PATTERN     FILL    0xFF, 64              ; fill 64 bytes with 0xFF
-\end{lstlisting}
-
-Each label (e.g., \texttt{NUMBERS}, \texttt{TEXT}) marks the starting address of a data object in memory.  
-You can load these addresses into registers using \texttt{LDR R0, =NUMBERS} or \texttt{ADR R0, TEXT}, then access individual elements through the appropriate addressing modes.
-
-\noindent\textit{Note: Strings are stored as consecutive ASCII characters in memory. A terminating zero (\texttt{0x00}) is typically appended to indicate the end of the string, similar to C-style strings.}
-
 \subsection{Addressing Modes}
 
 Addressing modes define how the effective address or operand value is obtained by an instruction. 
