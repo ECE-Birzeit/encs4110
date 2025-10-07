@@ -1,1 +1,518 @@
-\chapter{General-Purpose Input/Output and Peripheral Interfacing}
+\chapter{TM4C123 Microcontroller: Architecture and Digital Outputs}
+
+\section*{Learning Objectives}
+After completing this experiment, you will be able to:
+\begin{itemize}[nosep]
+  \item Identify the main components and subsystems of the TM4C123 microcontroller and understand their roles within an embedded system.
+  \item Recognize the organization of the ARM Cortex-M4 core, memory map, and peripheral buses.
+  \item Understand the role of core peripherals including NVIC, SysTick, and System Control Block (SCB).
+  \item Configure and control digital output pins using the General-Purpose Input/Output (GPIO) module.
+  \item Write Assembly programs to drive on-board LEDs through direct register access.
+  \item Relate register operations to physical hardware behavior and verify functionality through observation on the LaunchPad board.
+\end{itemize}
+
+\section*{Experiment Overview}
+This experiment introduces the architecture of the TM4C123 microcontroller and its most fundamental feature — the ability to interface with the outside world through digital I/O pins.
+
+\noindent You will first explore the internal structure of the device, including the ARM Cortex-M4 core, core peripherals (NVIC, SysTick, SCB), buses, memory regions, and peripheral interconnect. Then, you will apply this understanding by writing Assembly programs that toggle the on-board LEDs connected to \texttt{PORTF}.
+
+\noindent In this experiment, you will:
+\begin{itemize}[nosep]
+  \item Understand how peripheral registers are mapped into memory and accessed by the CPU.
+  \item Learn about Cortex-M4 core peripherals and their functions.
+  \item Learn the initialization sequence required to enable and configure GPIO ports.
+  \item Develop Assembly programs that control LEDs using software delays.
+  \item Form the foundation for subsequent experiments involving interrupts, timers, and analog peripherals.
+\end{itemize}
+
+By the end of this lab, you will understand the TM4C123 architecture, Cortex-M4 core peripherals, be able to configure GPIO ports for digital output, and control external hardware through register manipulation in Assembly.
+
+\newpage
+\etocsetnexttocdepth{subsubsection}
+\localtableofcontents
+\bigskip
+\newpage
+
+\section{Theoretical Background}
+
+\subsection{TM4C123 Microcontroller Architecture}
+
+The TM4C123GH6PM microcontroller is built around the ARM Cortex-M4F processor core, implementing the ARMv7-M architecture. It integrates the CPU core, memory, peripherals, and I/O interfaces on a single chip — a complete system-on-chip (SoC) solution for embedded applications.
+
+\subsubsection{Core Components}
+
+The TM4C123 contains the following major components:
+\begin{itemize}[nosep]
+  \item \textbf{ARM Cortex-M4F Processor Core}: 32-bit RISC processor with hardware Floating-Point Unit (FPU)
+  \item \textbf{Memory}: 256 KB Flash, 32 KB SRAM, 2 KB EEPROM
+  \item \textbf{System Buses}: Advanced High-Performance Bus (AHB) and Advanced Peripheral Bus (APB)
+  \item \textbf{Core Peripherals}: NVIC, SysTick Timer, Memory Protection Unit (MPU), System Control Block (SCB)
+  \item \textbf{General-Purpose Timers}: Six 16/32-bit and six 32/64-bit timers
+  \item \textbf{Communication Interfaces}: UART, I\textsuperscript{2}C, SSI (SPI), CAN
+  \item \textbf{Analog Peripherals}: 12-bit ADC with 12 channels, analog comparators
+  \item \textbf{GPIO Ports}: Six ports (A-F) with up to 43 programmable pins
+\end{itemize}
+
+\subsection{ARM Cortex-M4 Core Peripherals}
+
+The ARM Cortex-M4 processor includes several \textbf{core peripherals} that are common across all Cortex-M4-based microcontrollers.  
+They are tightly integrated with the CPU and provide essential system functions such as interrupt handling and timing.
+
+\subsubsection{Nested Vectored Interrupt Controller (NVIC)}
+
+The NVIC manages all interrupt and exception handling.  
+It supports up to 240 interrupt sources (138 on the TM4C123), hardware priority levels, and automatic context saving for efficient servicing.  
+Key features include nesting, tail-chaining, and late-arrival handling for minimal interrupt latency.
+
+\noindent Important NVIC registers (base address \texttt{0xE000E100}):
+\begin{itemize}[nosep]
+  \item \texttt{NVIC\_ENx} — Set-Enable  
+  \item \texttt{NVIC\_DISx} — Clear-Enable  
+  \item \texttt{NVIC\_PRIx} — Priority Configuration  
+  \item \texttt{NVIC\_ACTIVEx} — Active Status
+\end{itemize}
+
+\subsubsection{SysTick Timer}
+
+The SysTick timer is a simple 24-bit down-counter integrated in the core.  
+It provides a consistent time base for system delays or periodic tasks.  
+Many operating systems use it for time-keeping or scheduling.
+
+\noindent SysTick registers (base address \texttt{0xE000E010}):
+\begin{itemize}[nosep]
+  \item \texttt{STCTRL} — Control and Status  
+  \item \texttt{STRELOAD} — Reload Value  
+  \item \texttt{STCURRENT} — Current Counter Value
+\end{itemize}
+
+\noindent Other core peripherals such as the System Control Block (SCB) are present but not covered in this course.
+\bigskip
+
+\subsection{Memory Map}
+
+The Cortex-M4 processor uses a unified 4 GB address space for all code, data, and peripherals.  
+Every peripheral and memory region occupies a unique address range, allowing direct access through normal load and store instructions.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Region} & \textbf{Address Range} & \textbf{Description} \\
+\midrule
+Flash Memory & 0x00000000 - 0x0003FFFF & Program storage (256 KB) \\
+SRAM & 0x20000000 - 0x20007FFF & On-chip data memory (32 KB) \\
+Peripherals & 0x40000000 - 0x400FFFFF & Peripheral registers \\
+GPIO Ports & 0x40004000 - 0x40025FFF & GPIO A-F registers \\
+Core Peripherals & 0xE0000000 - 0xE00FFFFF & NVIC, SysTick, SCB, etc. \\
+\bottomrule
+\end{tabular}
+\caption{Simplified TM4C123 Memory Map}
+\end{table}
+
+\noindent
+Each peripheral's registers are \textbf{memory-mapped}, meaning they are accessed just like variables in memory.  
+For example, writing to address \texttt{0x400253FC} directly updates the GPIO Port F data register.
+
+
+\subsection{General-Purpose Input/Output (GPIO)}
+
+GPIO (General-Purpose Input/Output) ports form the primary interface between the microcontroller and external devices such as LEDs, switches, and sensors. Each pin can be configured as either an input or an output.
+
+When a pin is an \textbf{output}, software drives it high or low to control external hardware (e.g., turn an LED on/off).  
+When a pin is an \textbf{input}, software reads its logic level (e.g., a button press).
+
+\subsubsection{GPIO Ports Overview}
+
+The TM4C123GH6PM provides six GPIO ports (A-F), each with up to eight programmable pins. Not all pins are available on the LaunchPad, and some are reserved for debugging or special functions.
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{cll}
+\toprule
+\textbf{Port} & \textbf{Pins Available} & \textbf{Notes} \\
+\midrule
+Port A & PA0-PA7 & UART0 (PA0, PA1) shared with USB debug interface \\
+Port B & PB0-PB7 & I\textsuperscript{2}C0, SSI2, ADC channels \\
+Port C & PC0-PC7 & PC0-PC3 used for JTAG (avoid modification) \\
+Port D & PD0-PD7 & PD7 requires unlock for GPIO use \\
+Port E & PE0-PE5 & ADC and UART5 functionality available \\
+Port F & PF0-PF4 & On-board LEDs (PF1-PF3) and switches (PF0, PF4) \\
+\bottomrule
+\end{tabular}
+\caption{GPIO Port Summary — TM4C123GH6PM}
+\end{table}
+
+\noindent
+Each port exposes its own control and data registers, allowing independent configuration and operation.
+\bigskip
+
+\subsubsection{Memory-Mapped GPIO Registers}
+
+GPIO modules are accessed via \textbf{memory-mapped registers}: fixed addresses that the CPU reads/writes with standard \texttt{LDR}/\texttt{STR} instructions.
+
+\noindent
+Every port has a \textbf{base address}; key registers sit at fixed offsets from that base.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{cl}
+\toprule
+\textbf{Port} & \textbf{Base Address} \\
+\midrule
+Port A & 0x40004000 \\
+Port B & 0x40005000 \\
+Port C & 0x40006000 \\
+Port D & 0x40007000 \\
+Port E & 0x40024000 \\
+Port F & 0x40025000 \\
+\bottomrule
+\end{tabular}
+\caption{GPIO Port Base Addresses (TM4C123GH6PM)}
+\end{table}
+
+\noindent
+In this experiment we use Port~F, so:
+\[
+\texttt{GPIODIR} = \texttt{0x40025400},\quad
+\texttt{GPIODEN} = \texttt{0x4002551C},\quad
+\texttt{GPIODATA} = \texttt{0x400253FC}.
+\]
+\bigskip
+
+\subsubsection{Address Masking in \texttt{GPIODATA}}
+
+The \texttt{GPIODATA} register supports \textbf{address masking}: address bits [9:2] form a bit mask that selects which pins are affected.
+
+\begin{itemize}[nosep]
+  \item \textbf{Full access:} Base + \texttt{0x3FC} — all 8 pins.
+  \item \textbf{Masked access:} Base + (\texttt{mask} $\ll$ 2) — only the pins in \texttt{mask}.
+\end{itemize}
+
+\noindent
+Example (PF1 only):
+\[
+\texttt{0x40025000 + (0x02 << 2) = 0x40025008}.
+\]
+This is \textbf{address masking} (often confused with “bit-banding”); it enables fast, selective reads/writes to individual pins.
+\bigskip
+
+\subsubsection{Protected and Special-Function Pins}
+
+Some pins are locked or reserved at reset due to critical roles:
+
+\begin{itemize}[nosep]
+  \item \textbf{PF0} doubles as the Non-Maskable Interrupt (NMI) input and is locked. To use it as GPIO, write \texttt{0x4C4F434B} to \texttt{GPIO\_LOCK} and set the desired bits in \texttt{GPIO\_CR}.
+  \item \textbf{PC0-PC3} carry the JTAG debug interface and should not be reassigned in normal operation.
+\end{itemize}
+
+\noindent
+Always confirm pin availability in the datasheet before repurposing special-function pins.
+\bigskip
+
+\subsubsection{Port F on the LaunchPad}
+
+Port~F connects to the on-board RGB LEDs and user push buttons:
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{clll}
+\toprule
+\textbf{Pin} & \textbf{Function} & \textbf{Connected Component} & \textbf{Active Level} \\
+\midrule
+PF1 & Output & Red LED & Active High \\
+PF2 & Output & Blue LED & Active High \\
+PF3 & Output & Green LED & Active High \\
+PF0 & Input (locked) & SW2 (Push Button) & Active Low (enable pull-up) \\
+PF4 & Input & SW1 (Push Button) & Active Low (enable pull-up) \\
+\bottomrule
+\end{tabular}
+\caption{GPIO Port F Pin Assignments — TM4C123 LaunchPad}
+\end{table}
+
+\noindent
+LEDs are \textbf{active-high} (write 1 to turn on). Push buttons pull to ground when pressed, so inputs read \textbf{0 when pressed} and require internal pull-ups.
+\bigskip
+
+\subsubsection{GPIO Configuration Workflow}
+
+In practice, GPIO usage has two phases:
+
+\begin{itemize}[nosep]
+  \item \textbf{Initialization (setup, runs once):} enable the port clock, unlock protected pins (if needed), set direction, and enable digital function.
+  \item \textbf{Runtime (operation, repeats):} read inputs or write outputs by accessing \texttt{GPIODATA} in the main loop or in interrupt service routines (ISRs).
+\end{itemize}
+
+\noindent
+A typical structure is:
+
+\begin{lstlisting}[language=C,caption={Typical GPIO program structure (setup vs. runtime)}]
+InitGPIO();                // RCGCGPIO, optional LOCK/CR, DIR, DEN
+while (1) {                // Runtime phase
+    // Read buttons (inputs) and/or drive LEDs (outputs)
+    // Optionally, some I/O is handled inside ISRs
+}
+\end{lstlisting}
+
+\medskip
+\noindent
+The detailed register-level steps (clock enable, unlock, direction, digital enable, and data access) are demonstrated in the following subsections.
+
+\newpage
+\subsubsection*{Step 1 — Enable the GPIO Port Clock}
+
+\noindent\textbf{Register:} \texttt{RCGCGPIO} — Run Mode Clock Gating Control for GPIO (\texttt{0x400FE608})
+
+\noindent
+Before accessing any GPIO port, its clock must be enabled.  
+The \texttt{RCGCGPIO} register controls the clock to all GPIO modules.  
+Each bit corresponds to a single port (A-F). Writing a '1' to a bit enables the clock to that port, while '0' disables it.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=1.1em,bitheight=2.7ex,
+                  boxformatting={\centering\small},
+                  endianness=big, bitwidth=\widthof{\tiny~PF~}]{32}
+\bitheader{31,5,4,3,2,1,0}\\
+\bitbox{26}[bgcolor=gray!10]{\textit{Reserved}} &
+\bitbox{1}{\tiny{PF}} &
+\bitbox{1}{\tiny{PE}} &
+\bitbox{1}{\tiny{PD}} &
+\bitbox{1}{\tiny{PC}} &
+\bitbox{1}{\tiny{PB}} &
+\bitbox{1}{\tiny{PA}}
+\end{bytefield}
+\caption{RCGCGPIO Register (\texttt{0x400FE608}) — GPIO Clock Control}
+\end{figure}
+
+\noindent
+To activate Port~F, bit~5 must be set to~1 as shown below.
+
+\begin{lstlisting}[caption={Enable clock for Port F}]
+        LDR     R1, =0x400FE608     ; RCGCGPIO register
+        LDR     R0, [R1]
+        ORR     R0, R0, #0x20       ; Set bit 5 (Port F)
+        STR     R0, [R1]
+\end{lstlisting}
+\noindent
+Once the clock is enabled, a short delay or status polling ensures the peripheral is ready before further configuration.
+\bigskip
+
+
+\subsubsection*{Step 2 — Unlock Protected Pins}
+\noindent\textbf{Registers:} \texttt{GPIO\_LOCK} (\texttt{0x40025520}), \texttt{GPIO\_CR} (\texttt{0x40025524})
+
+\noindent
+Certain pins such as PF0 are protected because they share critical alternate functions (e.g., the NMI input).  
+To modify these pins, the port must be unlocked by writing the key value \texttt{0x4C4F434B} (“LOCK”) into the \texttt{GPIO\_LOCK} register.  
+The \texttt{GPIO\_CR} register (Commit Register) then determines which pins can be altered.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitheight=2.7ex,
+  boxformatting={\centering\small},endianness=big, bitwidth=\widthof{\tiny~PF~}]{32}
+\bitheader{31,8,7,0}\\
+\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
+\bitbox{8}{\tiny Commit Mask}
+\end{bytefield}
+\caption{GPIO\_CR Register — Commit Control}
+\end{figure}
+
+\noindent
+The following code unlocks Port~F and enables modification of all pins.
+
+\begin{lstlisting}[caption={Unlock Port F}]
+        LDR     R1, =0x40025520     ; GPIO_LOCK
+        LDR     R0, =0x4C4F434B     ; Unlock key
+        STR     R0, [R1]            
+        LDR     R1, =0x40025524     ; GPIO_CR
+        MOV     R0, #0xFF           ; Allow changes to all pins
+        STR     R0, [R1]
+\end{lstlisting}
+\noindent
+In this experiment, PF0 is not used, so unlocking is optional. After unlocking, configuration registers such as direction and digital enable can be safely modified.
+\bigskip
+
+
+\subsubsection*{Step 3 — Configure Pin Direction}
+\noindent\textbf{Register:} \texttt{GPIODIR} (\texttt{0x40025400}) — GPIO Direction Control (Port~F)
+
+\noindent
+The \texttt{GPIODIR} register determines whether each GPIO pin functions as an input or an output.  
+Writing '0' configures the pin as an input, while '1' configures it as an output.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=\widthof{\tiny~PF~},bitheight=2.7ex,
+  boxformatting={\centering\small},endianness=big]{32}
+\bitheader{31,8,7,6,5,4,3,2,1,0}\\
+\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
+\bitbox{1}{\tiny F7} &
+\bitbox{1}{\tiny F6} &
+\bitbox{1}{\tiny F5} &
+\bitbox{1}{\tiny F4} &
+\bitbox{1}{\tiny F3} &
+\bitbox{1}{\tiny F2} &
+\bitbox{1}{\tiny F1} &
+\bitbox{1}{\tiny F0}
+\end{bytefield}
+\caption{GPIODIR Register (Port F) — Direction Control}
+\end{figure}
+
+\noindent
+For the on-board RGB LED, PF1-PF3 must be configured as outputs.  
+Bits 1-3 are therefore set to '1'.
+
+\begin{lstlisting}[caption={Set PF1, PF2, PF3 as outputs}]
+        LDR     R1, =0x40025400     ; GPIODIR register (Port F)
+        LDR     R0, [R1]
+        ORR     R0, R0, #0x0E       ; Set PF1, PF2, PF3 as outputs
+        STR     R0, [R1]
+\end{lstlisting}
+\noindent
+Unmodified bits remain unchanged, allowing input pins (such as PF0 or PF4) to retain their default configuration.
+\bigskip
+
+
+\subsubsection*{Step 4 — Enable Digital Functionality}
+\noindent\textbf{Register:} \texttt{GPIODEN} (\texttt{0x4002551C}) — Digital Enable Register (Port~F)
+
+\noindent
+Each GPIO pin can serve analog or digital functions.  
+The \texttt{GPIODEN} register enables the digital circuitry for selected pins.  
+Pins configured as digital inputs or outputs must have their corresponding bits set to '1'.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=\widthof{\tiny~PF~},bitheight=2.7ex,
+  boxformatting={\centering\small},endianness=big]{32}
+\bitheader{31,8,7,6,5,4,3,2,1,0}\\
+\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
+\bitbox{1}{\tiny F7} &
+\bitbox{1}{\tiny F6} &
+\bitbox{1}{\tiny F5} &
+\bitbox{1}{\tiny F4} &
+\bitbox{1}{\tiny F3} &
+\bitbox{1}{\tiny F2} &
+\bitbox{1}{\tiny F1} &
+\bitbox{1}{\tiny F0}
+\end{bytefield}
+\caption{GPIODEN Register (Port F) — Digital Enable}
+\end{figure}
+
+\noindent
+Bits~1-3 are set to enable PF1-PF3 as digital outputs for the LED.
+
+\begin{lstlisting}[caption={Enable digital function for PF1-PF3}]
+        LDR     R1, =0x4002551C     ; GPIODEN register (Port F)
+        LDR     R0, [R1]
+        ORR     R0, R0, #0x0E       ; Enable PF1-PF3 as digital pins
+        STR     R0, [R1]
+\end{lstlisting}
+\noindent
+Failing to enable \texttt{GPIODEN} leaves the pins electrically inactive even if their direction is set.
+\bigskip
+
+
+\subsubsection*{Step 5 — Write to the Data Register}
+\noindent\textbf{Register:} \texttt{GPIODATA} (\texttt{0x400253FC}) — Data Input/Output Register (Port~F)
+
+\noindent
+The \texttt{GPIODATA} register reflects the current logic levels on all GPIO pins.  
+Writing to a bit drives the corresponding output high ('1') or low ('0').  
+Bits 1-3 correspond to the RGB LED pins on the LaunchPad:  
+PF1 = Red, PF2 = Blue, PF3 = Green.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=\widthof{\tiny ~PF~},bitheight=2.7ex,
+  boxformatting={\centering\small},endianness=big]{32}
+\bitheader{31,8,7,6,5,4,3,2,1,0}\\
+\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
+\bitbox{1}{\tiny F7} &
+\bitbox{1}{\tiny F6} &
+\bitbox{1}{\tiny F5} &
+\bitbox{1}{\tiny F4} &
+\bitbox{1}{\tiny F3} &
+\bitbox{1}{\tiny F2} &
+\bitbox{1}{\tiny F1} &
+\bitbox{1}{\tiny F0}
+\end{bytefield}
+\caption{GPIODATA Register (Port F) — Data Output/Input}
+\end{figure}
+
+\noindent
+The example below drives PF1 (Red) and PF3 (Green) simultaneously to produce a yellow color.
+
+\begin{lstlisting}[caption={Turn on Yellow LED (Red + Green = PF1 + PF3)}]
+    LDR     R1, =0x400253FC     ; GPIODATA register (Port F)
+    MOV     R0, #0x0A           ; Set PF1 (Red) and PF3 (Green) = Yellow
+    STR     R0, [R1]
+\end{lstlisting}
+\noindent
+By writing different bit combinations, various LED colors can be generated:
+\newcommand{\ledon}[1]{\tikz\fill[#1,draw=black] (0,0) circle (0.6ex);}
+\newcommand{\ledoff}{\tikz\draw[gray!70] (0,0) circle (0.6ex);}
+
+\begin{table}[H]
+\centering
+\small
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Color} & \textbf{Red (PF1)} & \textbf{Blue (PF2)} & \textbf{Green (PF3)} & \textbf{Hex} & \textbf{Combination} \\
+\midrule
+Red      & \ledon{red}    & \ledoff & \ledoff & 0x02 & Red only \\
+Blue     & \ledoff        & \ledon{blue} & \ledoff & 0x04 & Blue only \\
+Green    & \ledoff        & \ledoff & \ledon{green!70!black} & 0x08 & Green only \\
+Yellow   & \ledon{red}    & \ledoff & \ledon{green!70!black} & 0x0A & Red + Green \\
+Cyan     & \ledoff        & \ledon{blue} & \ledon{green!70!black} & 0x0C & Blue + Green \\
+Magenta  & \ledon{red}    & \ledon{blue} & \ledoff & 0x06 & Red + Blue \\
+White    & \ledon{red}    & \ledon{blue} & \ledon{green!70!black} & 0x0E & All on \\
+\bottomrule
+\end{tabular}
+\caption{LED Color Combinations on TM4C123 LaunchPad (PF1-PF3)}
+\label{tab:led-colors}
+\end{table}
+\newpage
+\section{Procedure}
+\subsection{Examples}
+The following examples illustrate the complete process of initializing Port~F and controlling the on-board LEDs using Assembly language.
+\subsubsection{Example 1 — Simple LED Blink}
+This example initializes Port~F and toggles the Red LED (PF1) on and off using address masking with a software delay.
+Address Masking for PF1:
+\[
+\texttt{0x40025000 + (0x02 << 2) = 0x40025008}
+\]
+\Needspace{37\baselineskip} % reserve space for the block; else start a new page
+\lstinputlisting[caption={Assembly code to blink the Red LED (PF1) on the TM4C123 LaunchPad}]{snippets/gpio/example1.asm}
+
+\subsubsection{Example 2 — Cycle Through RGB Colors}
+This example extends the previous one by cycling through RGB LED colors (Red, Green, Blue) using a software delay.
+Address Masking for PF1, PF2, PF3:
+\[
+\texttt{0x40025000 + ((0x02 | 0x04 | 0x08) << 2) = 0x40025038}
+\]
+\Needspace{55\baselineskip} % reserve space for the block; else start a new page
+\lstinputlisting[caption={Assembly code to cycle through RGB colors on the TM4C123 LaunchPad}]{snippets/gpio/example2.asm}
+\subsection{Tasks}
+
+\subsubsection{Task 1 — Adjust the Blink Rate}
+Modify the delay routine in \textbf{Example 1} to change the blinking speed of the Red LED.  
+Experiment with different delay values until the LED blinks at approximately \textbf{1 Hz} (about one second ON and one second OFF).
+
+\medskip
+
+\subsubsection{Task 2 — Cycle Through Multiple Colors}
+Expand \textbf{Example 2} to include additional colors by combining the Red, Green, and Blue LEDs.  
+Create a program that automatically cycles through all color combinations listed in Table~\ref{tab:led-colors}. \\
+
+\smallskip
+
+\noindent\textit{Hint:} Use a loop to step through the color sequence repeatedly instead of writing separate code for each color.

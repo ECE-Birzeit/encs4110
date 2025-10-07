@@ -123,6 +123,7 @@
   tabsize=2,
   keepspaces=true,
   columns=fullflexible,
+  % line breaking
   breaklines=true,
   breakatwhitespace=true,
   % frame: top & bottom only
@@ -247,3 +248,17 @@
   \markboth{Part \thepart\quad #1}{}%
 }
 \makeatother
+
+
+\usepackage{bytefield}
+\usepackage[table]{xcolor} % for light gray shading
+\usepackage{needspace}
+
+
+\usepackage{graphicx} % for \resizebox
+\usepackage{calc}     % for \widthof
+\usepackage{bytefield}
+
+% measure once
+\newlength{\pfbit}
+\settowidth{\pfbit}{\tiny PF0} % or {\scriptsize PF0} if you prefer

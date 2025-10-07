@@ -6,7 +6,7 @@
 // LCD pin definitions (connected to PORTB)
 #define RS         (1 << 0)  // PB0
 #define EN         (1 << 2)  // PB2
-#define DATA_MASK  0xF0      // PB4–PB7
+#define DATA_MASK  0xF0      // PB4-PB7
 
 // Function prototypes
 void LCD_Init(void);

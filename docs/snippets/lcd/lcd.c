@@ -40,7 +40,7 @@ void LCD_EnablePulse(void)
 
 void LCD_SendNibble(unsigned char nibble)
 {
-    // Send nibble to PB4–PB7
+    // Send nibble to PB4-PB7
     GPIOB->DATA = (GPIOB->DATA & ~DATA_MASK) | ((nibble << 4) & DATA_MASK);
     LCD_EnablePulse();
 }
@@ -53,7 +53,7 @@ void LCD_Init(void)
     while ((SYSCTL->PRGPIO & (1 << 1)) == 0)
         ;
 
-    // Configure PB0 (RS), PB1 (EN), PB4–PB7 (data) as output
+    // Configure PB0 (RS), PB1 (EN), PB4-PB7 (data) as output
     GPIOB->DIR |= RS | EN | DATA_MASK;
     GPIOB->DEN |= RS | EN | DATA_MASK;
     GPIOB->DATA &= ~(RS | EN | DATA_MASK);  // Clear all
