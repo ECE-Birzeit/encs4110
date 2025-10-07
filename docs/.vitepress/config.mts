@@ -103,27 +103,27 @@ export default defineConfig({
         collapsed: false, 
         items: [
           {
-            text: "4. GPIO (General Purpose Input/Output)",
+            text: "4. TM4C123 Architecture and Digital Outputs",
             link: "/experiments/4.md",
           },
           {
-            text: "5. External Interrupts (Hardware Interrupts)",
+            text: "5. GPIO Input and Interrupts",
             link: "/experiments/5.md",
           },
           {
-            text: "6. Software Interrupts (Timer Interrupts)",
+            text: "6. SysTick and General-Purpose Timers (GPTM)",
             link: "/experiments/6.md",
           },
           {
-            text: "7. Liquid Crystal Display (LCD) Interfacing",
+            text: "7. Liquid Crystal Display (LCD)",
             link: "/experiments/7.md",
           },
           {
-            text: "8. Analog-to-Digital Converter (ADC)",
+            text: "8. Analog-to-Digital Conversion (ADC)",
             link: "/experiments/8.md",
           },
           {
-            text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
+            text: "9. UART Serial Communication",
             link: "/experiments/9.md",
           },
         ],
