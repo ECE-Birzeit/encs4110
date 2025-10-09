@@ -275,17 +275,11 @@ Each bit corresponds to a single port (A-F). Writing a '1' to a bit enables the 
 
 \begin{figure}[H]
 \centering
-\begin{bytefield}[bitwidth=1.1em,bitheight=2.7ex,
-                  boxformatting={\centering\small},
-                  endianness=big, bitwidth=\widthof{\tiny~PF~}]{32}
-\bitheader{31,5,4,3,2,1,0}\\
-\bitbox{26}[bgcolor=gray!10]{\textit{Reserved}} &
-\bitbox{1}{\tiny{PF}} &
-\bitbox{1}{\tiny{PE}} &
-\bitbox{1}{\tiny{PD}} &
-\bitbox{1}{\tiny{PC}} &
-\bitbox{1}{\tiny{PB}} &
-\bitbox{1}{\tiny{PA}}
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~PA~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitheader{0-15} \\
+\bitbox{10}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF} & \bitbox{1}{PE} & \bitbox{1}{PD} & \bitbox{1}{PC} & \bitbox{1}{PB} & \bitbox{1}{PA}
 \end{bytefield}
 \caption{RCGCGPIO Register (\texttt{0x400FE608}) — GPIO Clock Control}
 \end{figure}
@@ -314,11 +308,11 @@ The \texttt{GPIO\_CR} register (Commit Register) then determines which pins can 
 
 \begin{figure}[H]
 \centering
-\begin{bytefield}[bitheight=2.7ex,
-  boxformatting={\centering\small},endianness=big, bitwidth=\widthof{\tiny~PF~}]{32}
-\bitheader{31,8,7,0}\\
-\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
-\bitbox{8}{\tiny Commit Mask}
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~PF3~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{8}{Commit Mask}
 \end{bytefield}
 \caption{GPIO\_CR Register — Commit Control}
 \end{figure}
@@ -348,18 +342,11 @@ Writing '0' configures the pin as an input, while '1' configures it as an output
 
 \begin{figure}[H]
 \centering
-\begin{bytefield}[bitwidth=\widthof{\tiny~PF~},bitheight=2.7ex,
-  boxformatting={\centering\small},endianness=big]{32}
-\bitheader{31,8,7,6,5,4,3,2,1,0}\\
-\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
-\bitbox{1}{\tiny F7} &
-\bitbox{1}{\tiny F6} &
-\bitbox{1}{\tiny F5} &
-\bitbox{1}{\tiny F4} &
-\bitbox{1}{\tiny F3} &
-\bitbox{1}{\tiny F2} &
-\bitbox{1}{\tiny F1} &
-\bitbox{1}{\tiny F0}
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIODIR Register (Port F) — Direction Control}
 \end{figure}
@@ -389,18 +376,11 @@ Pins configured as digital inputs or outputs must have their corresponding bits 
 
 \begin{figure}[H]
 \centering
-\begin{bytefield}[bitwidth=\widthof{\tiny~PF~},bitheight=2.7ex,
-  boxformatting={\centering\small},endianness=big]{32}
-\bitheader{31,8,7,6,5,4,3,2,1,0}\\
-\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
-\bitbox{1}{\tiny F7} &
-\bitbox{1}{\tiny F6} &
-\bitbox{1}{\tiny F5} &
-\bitbox{1}{\tiny F4} &
-\bitbox{1}{\tiny F3} &
-\bitbox{1}{\tiny F2} &
-\bitbox{1}{\tiny F1} &
-\bitbox{1}{\tiny F0}
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIODEN Register (Port F) — Digital Enable}
 \end{figure}
@@ -430,18 +410,11 @@ PF1 = Red, PF2 = Blue, PF3 = Green.
 
 \begin{figure}[H]
 \centering
-\begin{bytefield}[bitwidth=\widthof{\tiny ~PF~},bitheight=2.7ex,
-  boxformatting={\centering\small},endianness=big]{32}
-\bitheader{31,8,7,6,5,4,3,2,1,0}\\
-\bitbox{24}[bgcolor=gray!10]{\textit{Reserved}} &
-\bitbox{1}{\tiny F7} &
-\bitbox{1}{\tiny F6} &
-\bitbox{1}{\tiny F5} &
-\bitbox{1}{\tiny F4} &
-\bitbox{1}{\tiny F3} &
-\bitbox{1}{\tiny F2} &
-\bitbox{1}{\tiny F1} &
-\bitbox{1}{\tiny F0}
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIODATA Register (Port F) — Data Output/Input}
 \end{figure}
@@ -487,6 +460,7 @@ The following examples illustrate the complete process of initializing Port~F an
 \subsubsection{Example 1 — Simple LED Blink}
 This example initializes Port~F and toggles the Red LED (PF1) on and off using address masking with a software delay.
 Address Masking for PF1:
+
 \[
 \texttt{0x40025000 + (0x02 << 2) = 0x40025008}
 \]
