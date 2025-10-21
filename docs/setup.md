@@ -8,7 +8,7 @@ Keil uses "Device Family Packs" (DFPs) to support different microcontrollers. Yo
 
 ### Download the TM4C DFP
 
-- Click here to download the official pack:[Keil.TM4C_DFP.1.1.0.pack](https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack)
+- Click here to download the official pack:[Keil.TM4C_DFP.1.1.0.pack](https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack). Make sure Keil uVision5 is closed before proceeding.
 
 ### Install the Pack
 
@@ -36,7 +36,7 @@ Scroll down the page and download the **`MDK_Stellaris_ICDI_AddOn.exe`** file.
 C:\Users\{YOUR_USERNAME}\AppData\Local\Keil_v5
 ```
 
-Replace `{YOUR_USERNAME}` with your actual Windows username.
+You can right-click the Keil shortcut on your desktop and select "Open file location" to find the exact path. You might need to do this twice if the first location is a shortcut folder.
 
 3. Finish installation.
 
@@ -48,7 +48,7 @@ Replace `{YOUR_USERNAME}` with your actual Windows username.
 
 
 
-## Step 3: Install Stellaris ICDI USB Drivers
+## Step 3: Install Stellaris ICDI USB Drivers (Microncontroller Required)
 
 Windows needs the proper USB drivers to talk to the LaunchPad.
 
