@@ -1,5 +1,5 @@
 \documentclass[11pt,a4paper,twoside]{scrreprt}
-\KOMAoptions{open=right, cleardoublepage=empty}
+\KOMAoptions{cleardoublepage=empty}
 
 \input{preamble}
 \providecommand{\allcaps}[1]{\MakeUppercase{#1}}
@@ -23,7 +23,7 @@
 
 \KOMAoptions{twoside=false}\recalctypearea
 \maketechnicaltitlepage
-\KOMAoptions{twoside=true}\recalctypearea
+\KOMAoptions{twoside=false}\recalctypearea
 % Global ToC: chapters only
 \cleardoublepage
 \begingroup
@@ -46,7 +46,7 @@
 
 \clearpage
 \ifodd\value{page}
-  % already odd: do nothing
+  % already odd: do nothing 
 \else
   \thispagestyle{empty}\null\newpage
 \fi

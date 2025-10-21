@@ -1,4 +1,4 @@
-\chapter{GPIO Input and External Interrupts}
+\chapter{GPIO Input and Hardware Interrupts}
 
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
@@ -372,9 +372,9 @@ The \texttt{GPIOPUR} register enables the internal pull-up resistor for each GPI
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOPUR Register — Pull-Up Enable}
 \end{figure}
@@ -401,9 +401,9 @@ The \texttt{GPIOPDR} register enables the internal pull-down resistor for each G
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOPDR Register — Pull-Down Enable}
 \end{figure}
@@ -451,9 +451,9 @@ The \texttt{GPIOCR} register controls which pins can be reconfigured. After unlo
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOCR Register — Commit Control}
 \end{figure}
@@ -500,9 +500,9 @@ The \texttt{GPIOIS} register determines whether interrupts are triggered by sign
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOIS Register — Interrupt Sense}
 \end{figure}
@@ -526,9 +526,9 @@ When edge-sensitive mode is selected (bit cleared in \texttt{GPIOIS}), this regi
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOIBE Register — Interrupt Both Edges}
 \end{figure}
@@ -552,9 +552,9 @@ For single-edge interrupts (when the corresponding bit in \texttt{GPIOIBE} is 0)
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOIEV Register — Interrupt Event}
 \end{figure}
@@ -581,9 +581,9 @@ The \texttt{GPIOIM} register enables or disables (masks/unmasks) interrupt gener
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 
 \caption{GPIOIM Register — Interrupt Mask}
@@ -608,9 +608,9 @@ This read-only register shows which pins have pending interrupts after masking. 
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOMIS Register — Masked Interrupt Status (Read-Only)}
 \end{figure}
@@ -634,9 +634,9 @@ Writing '1' to a bit in this register clears the corresponding interrupt flag. T
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIOICR Register — Interrupt Clear}
 \end{figure}

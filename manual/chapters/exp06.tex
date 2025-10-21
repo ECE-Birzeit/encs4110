@@ -1,1 +1,785 @@
 \chapter{System Timers and General-Purpose Timer Modules}
+
+\section*{Learning Objectives}
+After completing this experiment, you will be able to:
+\begin{itemize}[nosep]
+  \item Understand the role and limitations of the SysTick timer in the ARM Cortex-M4 core.
+  \item Configure the SysTick timer for periodic interrupts and precise timing.
+  \item Understand the architecture and capabilities of General-Purpose Timer Modules (GPTM).
+  \item Configure GPTM in 16-bit and 32-bit modes for periodic and one-shot operation.
+  \item Calculate timer periods using prescalers and reload values.
+  \item Implement timer-based debouncing for mechanical switches.
+  \item Use multiple timers to control independent timing tasks.
+\end{itemize}
+
+\section*{Experiment Overview}
+Precise timing control is essential in embedded systems — whether blinking an LED, reading sensors at regular intervals, or creating accurate delays. The TM4C123 microcontroller provides two powerful timing mechanisms: the SysTick timer (built into the ARM Cortex-M4 core) and the General-Purpose Timer Module (GPTM) peripherals.
+
+\noindent The SysTick timer is a simple 24-bit down-counter designed to provide a consistent time base for operating systems and applications. It is ideal for creating system ticks (e.g., 1 ms intervals) and implementing basic delays.
+
+\noindent The GPTM peripherals offer much more flexibility: they support 16-bit and 32-bit operation, prescalers for extended periods, multiple operating modes (periodic, one-shot, PWM, input capture), and independent Timer A and Timer B channels within each module.
+
+\noindent In this experiment, you will:
+\begin{itemize}[nosep]
+  \item Configure the SysTick timer to generate periodic interrupts.
+  \item Use SysTick for millisecond timing and software debouncing.
+  \item Understand the GPTM architecture and register structure.
+  \item Configure GPTM in 16-bit and 32-bit periodic modes.
+  \item Calculate timer periods using prescalers and reload values.
+  \item Implement multiple independent timing tasks using different timers.
+\end{itemize}
+
+By the end of this lab, you will understand how to select the appropriate timer for different timing requirements, configure timers for precise intervals, and implement timer-based interrupt-driven applications.
+
+\newpage
+\etocsetnexttocdepth{subsubsection}
+\localtableofcontents
+\bigskip
+\newpage
+
+
+
+\section{Theoretical Background}
+\subsection{Clock Sources}
+
+Unless otherwise noted, we assume the \textbf{System Clock (SysClk) = 50\,MHz} for all calculations in this chapter.
+
+\subsubsection{Clock Setup in Keil µVision5}
+
+When you create a project in Keil µVision5 for the TM4C123, the \textbf{startup file} (\texttt{startup\_TM4C123.s}) and \textbf{system initialization code} (\texttt{system\_TM4C123.c}) automatically configure the system clock to 50\,MHz. This setup occurs before \texttt{main()} is called and:
+
+\begin{itemize}[nosep]
+  \item Enables the PLL (Phase-Locked Loop) to multiply the crystal oscillator frequency
+  \item Configures the system divider to achieve the target 50\,MHz frequency
+  \item Sets the \texttt{SystemCoreClock} variable to \texttt{50000000} for use in CMSIS functions like \texttt{SysTick\_Config()}
+\end{itemize}
+
+\noindent
+You can verify the clock configuration by checking the value of \texttt{SystemCoreClock} in your code or by examining the \texttt{SystemInit()} function in \texttt{system\_TM4C123.c}.
+
+\subsubsection{System Clock on TM4C123}
+
+The system clock can be derived from multiple sources:
+
+\begin{itemize}[nosep]
+  \item \textbf{MOSC}: Main oscillator (external crystal, typically 16\,MHz or 25\,MHz)
+  \item \textbf{PIOSC}: Precision internal oscillator (16\,MHz $\pm$ 1\%)
+  \item \textbf{PIOSC/4}: Internal oscillator divided by 4 ($\approx$ 4\,MHz)
+  \item \textbf{LFIOSC}: Low-frequency internal oscillator ($\sim$30\,kHz)
+  \item \textbf{PLL}: Phase-Locked Loop (can multiply oscillator frequency)
+\end{itemize}
+
+\noindent
+Peripherals, including GPTM, are clocked from the system clock (SysClk) once enabled in the \texttt{RCGCTIMER} register. The Keil startup file typically configures the PLL to generate 50\,MHz from a 16\,MHz crystal.
+
+\subsubsection{SysTick Clock Source}
+
+The SysTick timer can use one of two clock sources, selected via the \texttt{CLKSOURCE} bit in the \texttt{CTRL} register:
+
+\begin{itemize}[nosep]
+  \item \textbf{Processor clock} (bit = 1): Same as system clock (50\,MHz in our case)
+  \item \textbf{Reference clock} (bit = 0): Typically PIOSC/4 ($\approx$ 4\,MHz), useful for a stable timebase independent of PLL changes
+\end{itemize}
+
+\noindent
+For this lab, we use the processor clock (50\,MHz) for both SysTick and GPTM.
+
+\subsection{How Timers Work}
+
+Understanding the basic operation of timers will help you configure them correctly and debug timing issues.
+
+\subsubsection{Down-Counting Operation}
+
+Both SysTick and GPTM timers operate as \textbf{down-counters} in their most common configuration (periodic mode):
+
+\begin{enumerate}[nosep]
+  \item \textbf{Load}: A reload value is written to the timer's load register (\texttt{LOAD} for SysTick, \texttt{TAILR} for GPTM)
+  \item \textbf{Count}: The timer counts down from the reload value to zero, decrementing once per clock cycle (or prescaled cycle)
+  \item \textbf{Timeout}: When the counter reaches zero:
+    \begin{itemize}[nosep]
+      \item The timeout flag is set
+      \item An interrupt is generated (if enabled and unmasked)
+      \item The counter automatically reloads from the load register (periodic mode) or stops (one-shot mode)
+    \end{itemize}
+  \item \textbf{Clear}: The interrupt handler must clear the timeout flag by writing to the interrupt clear register
+\end{enumerate}
+
+\subsubsection{Timer Modes}
+
+Timers can operate in different modes depending on the application:
+
+\begin{itemize}[nosep]
+  \item \textbf{Periodic Mode}: The timer automatically reloads and continues counting. Ideal for fixed-rate tasks like LED blinking, sampling sensors, or OS ticks.
+  \item \textbf{One-Shot Mode}: The timer counts down once and stops. Useful for timeouts, delays, or single events.
+  \item \textbf{Capture Mode}: (GPTM only) Captures the counter value when an external event occurs on a GPIO pin. Used for measuring pulse widths or frequencies.
+  \item \textbf{PWM Mode}: (GPTM only) Generates pulse-width modulated output signals for motor control, dimming LEDs, etc.
+\end{itemize}
+
+\subsubsection{Prescaler (16-bit Mode Only)}
+
+In 16-bit mode, GPTM provides an 8-bit prescaler (\texttt{TAPR}) that extends the timer range by dividing the input clock:
+
+\[
+T = \frac{(\text{TAILR} + 1) \times (\text{TAPR} + 1)}{f_{\text{SysClk}}}
+\]
+
+\noindent
+The prescaler is ignored in 32-bit mode. For example, with \texttt{TAPR = 255} (divisor = 256), the effective clock frequency is reduced to $50\,\text{MHz} / 256 \approx 195.3\,\text{kHz}$.
+
+\subsubsection{Interrupt Handling}
+
+Proper interrupt handling is critical for timer-based applications:
+
+\begin{enumerate}[nosep]
+  \item \textbf{Enable the interrupt}: Set the appropriate bit in the timer's interrupt mask register (\texttt{IMR})
+  \item \textbf{Enable in NVIC}: Set the corresponding bit in the NVIC's \texttt{ISER} register
+  \item \textbf{Implement the ISR}: Write an interrupt service routine with the correct name (e.g., \texttt{SysTick\_Handler()}, \texttt{TIMER1A\_Handler()})
+  \item \textbf{Clear the flag}: Write 1 to the appropriate bit in the interrupt clear register (\texttt{ICR}) to acknowledge the interrupt
+\end{enumerate}
+
+\noindent
+\textbf{Best Practice}: Clear the interrupt flag early in the ISR to prevent missing subsequent interrupts:
+
+\begin{lstlisting}[language=C]
+void TIMER1A_Handler(void) {
+    TIMER1->ICR = (1 << 0);  // Clear TATOCINT flag immediately
+    // Perform minimal work: toggle GPIO, update counters, etc.
+}
+\end{lstlisting}
+\subsection{SysTick Timer}
+
+The SysTick timer is a 24-bit down-counter that is part of the ARM Cortex-M4 core. It is present in all Cortex-M processors and provides a standard, simple timing mechanism for operating systems and applications.
+
+\subsubsection{SysTick Features}
+
+The SysTick timer provides:
+\begin{itemize}[nosep]
+  \item \textbf{24-bit down-counter}: Counts from a reload value down to zero.
+  \item \textbf{Automatic reload}: When the counter reaches zero, it automatically reloads from the \texttt{LOAD} register.
+  \item \textbf{Optional interrupt}: Can generate an interrupt when the counter reaches zero.
+  \item \textbf{Clock source selection}: Can use the processor clock or an external reference clock.
+  \item \textbf{CMSIS support}: The CMSIS library provides a simple \texttt{SysTick\_Config()} function for easy setup.
+\end{itemize}
+
+\noindent
+The SysTick timer is ideal for creating system ticks (e.g., 1 ms intervals for RTOS scheduling), implementing delays, and measuring time intervals. However, its 24-bit width limits the maximum period at high clock frequencies.
+
+\subsubsection{SysTick Registers}
+
+The SysTick timer is controlled through three main registers:
+\bigskip
+
+\subsubsection*{SysTick Control and Status Register (STCTRL)}
+
+\noindent\textbf{Register:} \texttt{SysTick->CTRL} — SysTick Control and Status (\texttt{0xE000E010})
+
+\noindent
+The \texttt{CTRL} register controls the SysTick timer operation and provides status information.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{15}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{COUNT}} \\
+\bitheader{0-15} \\
+\bitbox{13}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{CLK\_SRC}} & \bitbox{1}{\miniscule{INTEN}} & \bitbox{1}{\miniscule{ENABLE}}
+\end{bytefield}
+\caption{SysTick CTRL Register}
+\end{figure}
+
+\noindent
+\textbf{Key Bits:}
+\begin{itemize}[nosep]
+  \item \textbf{Bit 0 (ENABLE)}: Enable/disable the SysTick timer
+    \begin{itemize}[nosep]
+      \item 0 = Timer disabled
+      \item 1 = Timer enabled
+    \end{itemize}
+  \item \textbf{Bit 1 (INTEN)}: Enable SysTick interrupt
+    \begin{itemize}[nosep]
+      \item 0 = No interrupt when counter reaches zero
+      \item 1 = Generate interrupt when counter reaches zero
+    \end{itemize}
+  \item \textbf{Bit 2 (CLK\_SRC)}: Clock source selection
+    \begin{itemize}[nosep]
+      \item 0 = External reference clock
+      \item 1 = Processor clock (typical)
+    \end{itemize}
+  \item \textbf{Bit 16 (COUNT)}: Counter reached zero since last read (read-only)
+    \begin{itemize}[nosep]
+      \item 0 = Has not counted to zero
+      \item 1 = Has counted to zero (cleared on read)
+    \end{itemize}
+\end{itemize}
+\bigskip
+
+\subsubsection*{SysTick Reload Value Register (STLOAD)}
+\textbf{Register:} \texttt{SysTick->LOAD} — SysTick Reload Value (\texttt{0xE000E014})
+
+\noindent
+The \texttt{LOAD} register holds the value that is loaded into the counter when it reaches zero or when the timer is enabled.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=0.7em]{32}
+\bitheader{31,24,23,0} \\
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{24}{RELOAD}
+\end{bytefield}
+\caption{SysTick LOAD Register — 24-bit Reload Value}
+\end{figure}
+
+\noindent
+\textbf{RELOAD Field (Bits 23:0):} The value to load into the counter. Valid range: \texttt{0x000001} to \texttt{0xFFFFFF}. Writing zero disables the counter.
+\bigskip
+\subsubsection*{SysTick Current Value Register (STCURRENT)}
+
+\noindent\textbf{Register:} \texttt{SysTick->VAL} — SysTick Current Value (\texttt{0xE000E018})
+
+\noindent
+The \texttt{VAL} register contains the current value of the SysTick counter.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=0.7em]{32}
+\bitheader{31,24,23,0} \\
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{24}{CURRENT}
+\end{bytefield}
+\caption{SysTick VAL Register — Current Counter Value}
+\end{figure}
+
+\noindent
+\textbf{CURRENT Field (Bits 23:0):} Current counter value. Writing any value clears the counter to zero and clears the \texttt{COUNTFLAG} in \texttt{CTRL}.
+
+\subsubsection{SysTick Timing Calculation}
+
+The SysTick timer counts down from the \texttt{LOAD} value to zero. The period is determined by:
+
+\[
+T = \frac{\text{LOAD} + 1}{f_{\text{clock}}}
+\]
+
+\noindent
+where $f_{\text{clock}}$ is the processor clock frequency (typically 50 MHz on the TM4C123).
+
+\noindent
+\textbf{Example:} To generate a 1 ms interrupt at 50 MHz:
+\[
+\text{LOAD} = \frac{T \times f_{\text{clock}}}{1} - 1 = \frac{0.001 \times 50{,}000{,}000}{1} - 1 = 49{,}999
+\]
+
+\noindent
+\textbf{Maximum Period:} With a 24-bit counter at 50 MHz:
+\[
+T_{\text{max}} = \frac{2^{24}}{50{,}000{,}000} = \frac{16{,}777{,}216}{50{,}000{,}000} \approx 0.335 \text{ seconds}
+\]
+
+\noindent
+For longer periods, accumulate ticks in software or use the GPTM.
+
+\subsubsection{SysTick Configuration with CMSIS}
+
+The CMSIS library provides a convenient function to configure the SysTick timer:
+
+\begin{lstlisting}[caption={SysTick configuration using CMSIS}, language=C]
+// Configure SysTick for 1 ms interrupts at SystemCoreClock
+SysTick_Config(SystemCoreClock / 1000);  // 50,000 ticks = 1 ms period
+\end{lstlisting}
+
+\noindent
+This function:
+\begin{itemize}[nosep]
+  \item Sets the \texttt{LOAD} register to the specified value minus 1
+  \item Clears the \texttt{VAL} register
+  \item Enables the SysTick interrupt in the NVIC
+  \item Enables the SysTick timer with the processor clock source
+\end{itemize}
+
+\noindent
+The SysTick interrupt handler is named \texttt{SysTick\_Handler()}:
+
+\begin{lstlisting}[language=C]
+void SysTick_Handler(void) {
+    // Called every 1 ms
+    // Increment global counter, toggle LED, etc.
+}
+\end{lstlisting}
+
+\subsection{General-Purpose Timer Module (GPTM)}
+
+The TM4C123 includes twelve General-Purpose Timer Modules (GPTM): six 16/32-bit timers (TIMER0-TIMER5) and six 32/64-bit wide timers (WTIMER0-WTIMER5). Each module can operate as two independent 16-bit timers or one 32-bit timer.
+
+\subsubsection{GPTM Features}
+
+GPTM modules provide:
+\begin{itemize}[nosep]
+  \item \textbf{16-bit or 32-bit operation}: Configurable timer width
+  \item \textbf{Two independent timers}: Timer A and Timer B in each module
+  \item \textbf{Multiple operating modes}:
+    \begin{itemize}[nosep]
+      \item One-Shot mode: Timer runs once and stops
+      \item Periodic mode: Timer reloads automatically
+      \item Real-Time Clock (RTC) mode: Precise time-keeping
+      \item PWM mode: Pulse Width Modulation output
+      \item Input Capture mode: Measure input signal timing
+    \end{itemize}
+  \item \textbf{Prescaler}: Extends timer range in 16-bit mode (8-bit prescaler for standard timers)
+  \item \textbf{Interrupt generation}: Timeout, match, and capture interrupts
+  \item \textbf{Trigger and synchronization}: Can trigger ADC conversions or synchronize with other timers
+\end{itemize}
+
+\subsubsection{GPTM Architecture}
+
+Each GPTM module contains:
+\begin{itemize}[nosep]
+  \item \textbf{Timer A}: Independent timer with its own registers
+  \item \textbf{Timer B}: Independent timer with its own registers
+  \item \textbf{Configuration Register (CFG)}: Selects 16-bit or 32-bit mode
+  \item \textbf{Mode Registers (TAMR, TBMR)}: Configure operating mode for each timer
+  \item \textbf{Load Registers (TAILR, TBILR)}: Set the reload/start value
+  \item \textbf{Prescaler Registers (TAPR, TBPR)}: Extend timer range (16-bit mode only)
+  \item \textbf{Control Register (CTL)}: Enable/disable timers and configure behavior
+  \item \textbf{Interrupt Registers (IMR, RIS, MIS, ICR)}: Manage interrupts
+\end{itemize}
+
+\noindent
+In 32-bit mode, Timer A operates as a full 32-bit timer, and Timer B is not available. In 16-bit mode, both Timer A and Timer B operate independently as 16-bit timers.
+
+\subsubsection{GPTM Configuration Registers}
+\bigskip
+\subsubsection*{GPTMCFG — Timer Configuration Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->CFG} — GPTM Configuration (\texttt{Base + 0x000})
+
+\noindent
+The \texttt{CFG} register selects the timer width (16-bit or 32-bit mode).
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{13}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{3}{GPTMCFG}
+\end{bytefield}
+\caption{GPTMCFG Register — Timer Width Configuration}
+\end{figure}
+
+\noindent
+\textbf{GPTMCFG Field (Bits 2:0):}
+\begin{itemize}[nosep]
+    \item \texttt{0x0}: For a 16/32-bit timer, this value selects the 32-bit timer configuration. For a 32/64-bit wide timer, this value selects the 64-bit timer configuration.
+    \item \texttt{0x1}: For a 16/32-bit timer, this value selects the 32-bit real-time clock (RTC) counter configuration. For a 32/64-bit wide timer, this value selects the 64-bit real-time clock (RTC) counter configuration.
+    \item \texttt{0x2-0x3}: Reserved
+    \item \texttt{0x4}: For a 16/32-bit timer, this value selects the 16-bit timer configuration. For a 32/64-bit wide timer, this value selects the 32-bit timer configuration. The function is controlled by bits 1:0 of \textbf{GPTMTAMR} and \textbf{GPTMTBMR}.
+    \item \texttt{0x5-0x7}: Reserved
+\end{itemize}
+\bigskip
+\subsubsection*{GPTMTAMR — Timer A Mode Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->TAMR} — GPTM Timer A Mode (\texttt{Base + 0x004})
+
+\noindent
+The \texttt{TAMR} register configures the operating mode for Timer A.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~TACMR~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{4}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{TAPLO}} & \bitbox{1}{\miniscule{TAMRSU}} & \bitbox{1}{\miniscule{TAPWMIE}} & 
+\bitbox{1}{\miniscule{TAILD}} & \bitbox{1}{\miniscule{TASNAPS}} & \bitbox{1}{\miniscule{TAWOT}} &
+\bitbox{1}{\miniscule{TAMIE}} & \bitbox{1}{\miniscule{TACDIR}} & \bitbox{1}{\miniscule{TAAMS}} & \bitbox{1}{\miniscule{TACMR}} & \bitbox{2}{\miniscule{TAMR}}
+\end{bytefield}
+\caption{GPTMTAMR Register — Timer A Mode Configuration}
+\end{figure}
+
+\noindent
+\textbf{Key Fields:}
+\begin{itemize}[nosep]
+  \item \textbf{Bits 1:0 (TAMR)}: Timer A Mode
+    \begin{itemize}[nosep]
+      \item \texttt{0x1}: One-Shot mode
+      \item \texttt{0x2}: Periodic mode
+      \item \texttt{0x3}: Capture mode
+    \end{itemize}
+    \item \textbf{Bit 4 (TACDIR)}: Timer A Count Direction (0 = down, 1 = up)
+\end{itemize}
+For this experiment, we will only be using One-Shot and Periodic modes. For more details on other fields, refer to the datasheet.
+\bigskip
+\subsubsection*{GPTMTAILR — Timer A Interval Load Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->TAILR} — GPTM Timer A Interval Load (\texttt{Base + 0x028})
+
+\noindent
+The \texttt{TAILR} register sets the start/reload value for Timer A.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~TACMR~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}{TAILR[31:16]} \\
+\bitheader{0-15} \\
+\bitbox{16}{TAILR[15:0]}
+\end{bytefield}
+\caption{GPTMTAILR Register — Timer A Interval Load Value}
+\end{figure}
+
+\noindent
+\textbf{TAILR Field:}
+\begin{itemize}[nosep]
+    \item \textbf{Count-down mode}: Specifies the starting count value loaded into the timer
+    \item \textbf{Count-up mode}: Sets the upper bound for the timeout event
+    \item \textbf{32-bit mode}: Full 32-bit register (upper 16 bits correspond to GPTMTBILR contents)
+    \item \textbf{16-bit mode}: Only bits [15:0] are used (upper 16 bits read as 0, no effect on GPTMTBILR)
+    \item \textbf{64-bit Wide Timer mode}: Contains bits [31:0] of the 64-bit count (GPTMTBILR contains bits [63:32])
+\end{itemize}
+
+\bigskip
+\subsubsection*{GPTMTAPR — Timer A Prescaler Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->TAPR} — GPTM Timer A Prescaler (\texttt{Base + 0x038})
+
+\noindent
+The \texttt{TAPR} register extends the timer range in 16-bit mode by providing an 8-bit prescaler.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~TAPSR~}}]{16}
+     
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{8}{TAPSR} \\
+\end{bytefield}
+\caption{GPTMTAPR Register — Timer A Prescaler (16-bit mode only)}
+\end{figure}
+
+\noindent
+\textbf{TAPSR Field (Bits 7:0):}
+\begin{itemize}[nosep]
+  \item Prescaler value: \texttt{0x00} to \texttt{0xFF} (0 to 255)
+  \item Only used in 16-bit mode; ignored in 32-bit mode
+  \item Effective divisor: \texttt{TAPSR + 1}
+\end{itemize}
+
+\bigskip
+\subsubsection*{GPTMCTL — Timer Control Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->CTL} — GPTM Control (\texttt{Base + 0x00C})
+
+\noindent
+The \texttt{CTL} register enables/disables timers and configures their behavior.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{1}[bgcolor=gray!10]{\tiny{reserved}} &
+\bitbox{1}{\miniscule{TBPWML}} &\bitbox{1}{\miniscule{TBOTE}} & \bitbox{1}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{2}{\miniscule{TBEVENT}} & \bitbox{1}{\miniscule{TBSTALL}} & \bitbox{1}{\miniscule{TBEN}} & \bitbox{1}[bgcolor=gray!10]{\tiny{reserved}} &
+\bitbox{1}{\miniscule{TAPWML}} & \bitbox{1}{\miniscule{TAOTE}} & \bitbox{1}{\miniscule{RTCEN}} & \bitbox{2}{\miniscule{TAEVENT}} & \bitbox{1}{\miniscule{TASTALL}} & \bitbox{1}{\miniscule{TAEN}}
+\end{bytefield}
+\caption{GPTMCTL Register — Timer Enable and Control}
+\end{figure}
+
+
+\noindent
+\textbf{Key Control Functions:}
+\begin{itemize}[nosep]
+    \item \textbf{Timer Enable Control}: TAEN (bit 0) and TBEN (bit 8) independently enable/disable Timer A and Timer B
+    \item \textbf{Output Trigger Control}: TAOTE (bit 5) and TBOTE (bit 13) enable timers to trigger external peripherals (ADC, other timers, etc.)
+    \item \textbf{Independent Operation}: Each timer can be controlled separately, allowing flexible dual-timer configurations
+\end{itemize}
+\bigskip
+\subsubsection*{GPTMIMR — Interrupt Mask Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->IMR} — GPTM Interrupt Mask (\texttt{Base + 0x018})
+
+\noindent
+The \texttt{IMR} register enables or disables (masks/unmasks) timer interrupts.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~CBEIM~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{4}[bgcolor=gray!10]{\tiny{reserved}} &
+\bitbox{1}{\miniscule{TBMIM}} & \bitbox{1}{\miniscule{CBEIM}} & \bitbox{1}{\miniscule{CBMIM}} & \bitbox{1}{\miniscule{TBTOIM}} & \bitbox{3}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{TAMIM}} & \bitbox{1}{\miniscule{RTCIM}} & \bitbox{1}{\miniscule{CAEIM}} &  \bitbox{1}{\miniscule{CAMIM}} & \bitbox{1}{\miniscule{TATOIM}}
+\end{bytefield}
+\caption{GPTMIMR Register — Interrupt Mask}
+\end{figure}
+
+\noindent
+\textbf{Key Bits:}
+\begin{itemize}[nosep]
+  \item \textbf{Bit 0 (TATOIM)}: Timer A Timeout Interrupt Mask (0 = masked, 1 = enabled)
+  \item \textbf{Bit 8 (TBTOIM)}: Timer B Timeout Interrupt Mask (0 = masked, 1 = enabled)
+\end{itemize}
+\bigskip
+
+\subsubsection*{GPTMICR — Interrupt Clear Register}
+
+\noindent\textbf{Register:} \texttt{TIMERx->ICR} — GPTM Interrupt Clear (\texttt{Base + 0x024})
+
+\noindent
+Writing '1' to a bit in this register clears the corresponding interrupt flag.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{15}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{WUECINT}} \\
+\bitheader{0-15} \\
+\bitbox{4}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{TBMCINT}} & \bitbox{1}{\miniscule{CBECINT}} & \bitbox{1}{\miniscule{CBMCINT}} & \bitbox{1}{\miniscule{TBTOCINT}} &
+\bitbox{3}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{TAMCINT}} & \bitbox{1}{\miniscule{RTCCINT}} & \bitbox{1}{\miniscule{CAECINT}} & \bitbox{1}{\miniscule{CAMCINT}} & \bitbox{1}{\miniscule{TATOCINT}}
+\end{bytefield}
+\caption{GPTMICR Register — Interrupt Clear}
+\end{figure}
+
+\subsubsection{GPTM Timing Calculations}
+
+The timer period depends on the operating mode and configuration:
+\bigskip
+\subsubsection*{32-bit Mode (No Prescaler)}
+
+In 32-bit mode, the period is:
+
+\[
+T = \frac{\text{TAILR} + 1}{f_{\text{clock}}}
+\]
+
+\noindent
+At 50 MHz, the maximum period is:
+\[
+T_{\text{max}} = \frac{2^{32}}{50{,}000{,}000} = \frac{4{,}294{,}967{,}296}{50{,}000{,}000} \approx 85.9 \text{ seconds}
+\]
+\bigskip
+\subsubsection*{16-bit Mode (With Prescaler)}
+
+In 16-bit mode, the prescaler extends the timer range:
+
+\[
+T = \frac{(\text{TAILR} + 1) \times (\text{TAPR} + 1)}{f_{\text{clock}}}
+\]
+
+\noindent
+At 50 MHz, with maximum values (\texttt{TAILR = 0xFFFF}, \texttt{TAPR = 0xFF}):
+\[
+T_{\text{max}} = \frac{65{,}536 \times 256}{50{,}000{,}000} = \frac{16{,}777{,}216}{50{,}000{,}000} \approx 0.335 \text{ seconds}
+\]
+
+\noindent
+\textbf{Example:} To generate a 500 ms interrupt in 16-bit mode at 50 MHz:
+\[
+\text{TAILR} \times \text{TAPR} = T \times f_{\text{clock}} = 0.5 \times 50{,}000{,}000 = 25{,}000{,}000
+\]
+
+\noindent
+Choose \texttt{TAPR = 255} (prescaler divisor = 256):
+\[
+\text{TAILR} = \frac{25{,}000{,}000}{256} - 1 = 97{,}656 - 1 = 97{,}655 \text{ (exceeds 16-bit range)}
+\]
+
+\noindent
+This period cannot be achieved in 16-bit mode. Use 32-bit mode instead:
+\[
+\text{TAILR} = 25{,}000{,}000 - 1 = 24{,}999{,}999
+\]
+
+\subsubsection{GPTM Interrupt Numbers}
+Each GPTM module has a unique interrupt number for Timer A and Timer B; you can find these in the TM4C123 datasheet or in the device headers. The CMSIS-compliant header \texttt{tm4c123gh6pm.h} defines these as \texttt{IRQn\_Type} enumerations (e.g., \texttt{TIMER1A\_IRQn}), which work directly with the NVIC helper functions.
+
+\subsubsection*{Enabling an interrupt (CMSIS).}
+Use \texttt{NVIC\_EnableIRQ(IRQn\_Type irqn)}; CMSIS handles the correct ISER register and bit index for you.
+\begin{lstlisting}[language=C]
+#include "TM4C123.h"
+
+// Enable TIMER1A interrupt:
+NVIC_EnableIRQ(TIMER1A_IRQn);
+
+// Enable multiple GPTM interrupts:
+NVIC_EnableIRQ(TIMER0A_IRQn);
+NVIC_EnableIRQ(TIMER1A_IRQn);
+NVIC_EnableIRQ(TIMER2A_IRQn);
+\end{lstlisting}
+
+\subsubsection*{Setting interrupt priority.}
+Use \texttt{NVIC\_SetPriority(IRQn\_Type irqn, uint32\_t priority)} before enabling the interrupt. 
+On Cortex-M4 (TM4C123), priorities are typically 0-7 (0 = highest urgency).
+\begin{lstlisting}[language=C]
+// Assign priorities (lower number = higher priority)
+NVIC_SetPriority(TIMER0A_IRQn, 3);
+NVIC_SetPriority(TIMER1A_IRQn, 4);
+NVIC_SetPriority(TIMER2A_IRQn, 5);
+
+// Then enable them
+NVIC_EnableIRQ(TIMER0A_IRQn);
+NVIC_EnableIRQ(TIMER1A_IRQn);
+NVIC_EnableIRQ(TIMER2A_IRQn);
+\end{lstlisting}
+
+
+
+
+\subsection{Configuration Workflow}
+
+\subsubsection{SysTick Configuration Steps}
+
+To configure the SysTick timer:
+
+\begin{enumerate}[nosep]
+  \item Calculate the reload value: \texttt{LOAD = (Period x SystemCoreClock) - 1}
+  \item Load the value into \texttt{SysTick->LOAD}
+  \item Clear the current value: \texttt{SysTick->VAL = 0}
+  \item Configure \texttt{SysTick->CTRL}:
+    \begin{itemize}[nosep]
+      \item Set bit 0 (ENABLE) to enable the timer
+      \item Set bit 1 (TICKINT) to enable interrupts
+      \item Set bit 2 (CLKSOURCE) to use processor clock
+    \end{itemize}
+  \item Implement \texttt{SysTick\_Handler()} to handle interrupts
+\end{enumerate}
+
+\noindent
+Or use the CMSIS function:
+\begin{lstlisting}[language=C]
+SysTick_Config(SystemCoreClock / 1000);  // 1 ms period
+\end{lstlisting}
+
+\subsubsection{GPTM Configuration Steps (Periodic Mode)}
+
+To configure a GPTM timer in periodic mode:
+
+\begin{enumerate}[nosep]
+  \item Enable the timer clock in \texttt{SYSCTL->RCGCTIMER}
+  \item Wait for clock stabilization (3 NOP instructions or check ready bit)
+  \item Disable the timer: \texttt{TIMERx->CTL = 0}
+  \item Select timer width: \texttt{TIMERx->CFG} (\texttt{0x00} for 32-bit, \texttt{0x04} for 16-bit)
+  \item Configure mode: \texttt{TIMERx->TAMR = 0x02} (periodic mode, count down)
+  \item Set prescaler (16-bit mode only): \texttt{TIMERx->TAPR = value}
+  \item Set reload value: \texttt{TIMERx->TAILR = value}
+  \item Clear interrupt flag: \texttt{TIMERx->ICR = 0x01}
+  \item Enable timeout interrupt: \texttt{TIMERx->IMR |= 0x01}
+  \item Enable interrupt in NVIC: \texttt{NVIC->ISER[n] |= (1 << bit)}
+  \item Enable the timer: \texttt{TIMERx->CTL |= 0x01}
+  \item Implement the ISR (e.g., \texttt{TIMER1A\_Handler()})
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{0.98\linewidth}{>{\ttfamily}l X >{\ttfamily}l}
+\toprule
+\textnormal{\textbf{Register}} & \textnormal{\textbf{Purpose}} & \textnormal{\textbf{Typical Value}} \\
+\midrule
+RCGCTIMER      & Enable timer clock                                       & Set bit for TIMERx \\
+TIMERx->CFG    & Select width (16-bit vs 32-bit)                           & 0x00 (32-bit) or 0x04 (16-bit) \\
+TIMERx->TAMR   & Set mode                                                  & 0x02 (periodic, count down) \\
+TIMERx->TAILR  & Set reload value                                          & From desired period \\
+TIMERx->TAPR   & Prescaler (extends range in 16-bit mode)                  & 0-255 (16-bit only) \\
+TIMERx->CTL    & Enable timer                                              & TAEN = 1 (bit 0) \\
+TIMERx->IMR    & Unmask interrupt                                          & TATOIM = 1 (bit 0) \\
+TIMERx->ICR    & Clear interrupt flag (write-1-to-clear)                   & TATOCINT = 1 (bit 0) \\
+\bottomrule
+\end{tabularx}
+\caption{GPTM Configuration Register Summary}
+\end{table}
+
+
+\newpage
+\section{Procedure}
+
+\subsection{Examples}
+
+The following examples demonstrate SysTick and GPTM configuration and usage.
+
+\subsubsection{Example 1 — Millisecond Counter with SysTick Timer}
+
+This example configures the SysTick timer to generate interrupts every 100 ms and toggles the green LED (PF3) in the interrupt handler.
+
+\lstinputlisting[language=C, caption={SysTick timer example — LED blink every 100ms}]{snippets/timers/systick.c}
+
+\noindent
+\textbf{Explanation:}
+\begin{itemize}[nosep]
+  \item \texttt{SysTick->LOAD = 5000000 - 1;} sets the reload value for 100 ms at 50 MHz.
+  \item \texttt{SysTick->VAL = 0;} clears the current counter value.
+  \item \texttt{SysTick->CTRL = 0x07;} enables the timer with processor clock and interrupt.
+  \item \texttt{SysTick\_Handler()} is called every 100 ms and toggles the LED.
+  \item \texttt{systick\_counter} tracks the number of interrupts (can be used for longer timing).
+\end{itemize}
+
+\newpage
+\subsubsection{Example 2 — Maximum 16-bit Delay with GPTM}
+
+This example configures TIMER1 in 16-bit periodic mode with maximum prescaler to achieve the longest possible delay and toggles the blue LED (PF2).
+
+\lstinputlisting[language=C, caption={GPTM Timer1A example — 16-bit mode with prescaler}]{snippets/timers/timers.c}
+
+\noindent
+\textbf{Explanation:}
+\begin{itemize}[nosep]
+  \item \texttt{SYSCTL->RCGCTIMER |= (1<<1);} enables clock to TIMER1.
+  \item \texttt{TIMER1->CFG = 0x4;} selects 16-bit mode.
+  \item \texttt{TIMER1->TAMR = 0x02;} configures periodic mode (count down).
+  \item \texttt{TIMER1->TAPR = 256 - 1;} sets prescaler to maximum (divisor = 256).
+  \item \texttt{TIMER1->TAILR = 65536 - 1;} sets interval load to maximum (65536).
+  \item Period: $T = \frac{65536 \times 256}{50{,}000{,}000} \approx 0.335$ seconds.
+  \item \texttt{NVIC->ISER[0] |= (1<<21);} enables TIMER1A interrupt (IRQ 21).
+  \item \texttt{TIMER1A\_Handler()} toggles the blue LED and clears the interrupt flag.
+\end{itemize}
+
+\newpage
+\subsection{Tasks}
+
+\subsubsection{Task 1 — Debouncing a Push Button with SysTick}
+
+Modify the SysTick example so that the RED LED (PF1) toggles only when SW1 (PF4) is pressed and properly debounced using the SysTick timer.
+
+\paragraph{Requirements:}
+\begin{itemize}[nosep]
+  \item Use \texttt{SysTick\_Config(SystemCoreClock/1000)} to generate a 1 ms tick.
+  \item Implement interrupt-driven GPIO input for SW1 (PF4) as in Experiment 5.
+  \item In the GPIO ISR, use a global millisecond counter to implement 30 ms debouncing.
+  \item Only toggle the RED LED if at least 30 ms have elapsed since the last press.
+\end{itemize}
+
+\paragraph{Hint:}
+Declare global variables:
+\begin{lstlisting}[language=C]
+volatile uint32_t global_ms = 0;
+volatile uint32_t last_press_ms = 0;
+\end{lstlisting}
+
+\noindent
+In \texttt{SysTick\_Handler()}, increment \texttt{global\_ms}. In \texttt{GPIOF\_Handler()}, check:
+\begin{lstlisting}[language=C]
+if ((global_ms - last_press_ms) >= 30) {
+    GPIOF->DATA ^= (1 << 1);  // Toggle RED LED
+    last_press_ms = global_ms;
+}
+\end{lstlisting}
+
+\subsubsection{Task 2 — Multiple Blinking LEDs with GPTM}
+
+Use three GPTM timers (TIMER0A, TIMER1A, TIMER2A) to blink the three LEDs at different rates:
+
+\begin{itemize}[nosep]
+  \item \textbf{RED LED (PF1)}: Blink every 250 ms (use TIMER0A)
+  \item \textbf{BLUE LED (PF2)}: Blink every 500 ms (use TIMER1A)
+  \item \textbf{GREEN LED (PF3)}: Blink every 1000 ms (use TIMER2A)
+\end{itemize}
+
+\paragraph{Requirements:}
+\begin{itemize}[nosep]
+  \item Configure each timer in 32-bit periodic mode.
+  \item Calculate the \texttt{TAILR} values for each period at 50 MHz.
+  \item Enable interrupts for each timer in the NVIC.
+  \item Implement separate ISRs (\texttt{TIMER0A\_Handler()}, \texttt{TIMER1A\_Handler()}, \texttt{TIMER2A\_Handler()}).
+  \item Each ISR should toggle its corresponding LED and clear the interrupt flag.
+\end{itemize}

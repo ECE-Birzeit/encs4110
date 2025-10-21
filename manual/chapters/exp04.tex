@@ -1,4 +1,4 @@
-\chapter{TM4C123 Microcontroller: Architecture and Digital Outputs}
+\chapter{TM4C123 Architecture and Digital I/O}
 
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
@@ -277,9 +277,9 @@ Each bit corresponds to a single port (A-F). Writing a '1' to a bit enables the 
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PA~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{10}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF} & \bitbox{1}{PE} & \bitbox{1}{PD} & \bitbox{1}{PC} & \bitbox{1}{PB} & \bitbox{1}{PA}
+\bitbox{10}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF} & \bitbox{1}{PE} & \bitbox{1}{PD} & \bitbox{1}{PC} & \bitbox{1}{PB} & \bitbox{1}{PA}
 \end{bytefield}
 \caption{RCGCGPIO Register (\texttt{0x400FE608}) — GPIO Clock Control}
 \end{figure}
@@ -310,9 +310,9 @@ The \texttt{GPIO\_CR} register (Commit Register) then determines which pins can 
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF3~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{8}{Commit Mask}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{8}{Commit Mask}
 \end{bytefield}
 \caption{GPIO\_CR Register — Commit Control}
 \end{figure}
@@ -344,9 +344,9 @@ Writing '0' configures the pin as an input, while '1' configures it as an output
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIODIR Register (Port F) — Direction Control}
 \end{figure}
@@ -378,9 +378,9 @@ Pins configured as digital inputs or outputs must have their corresponding bits 
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIODEN Register (Port F) — Digital Enable}
 \end{figure}
@@ -412,9 +412,9 @@ PF1 = Red, PF2 = Blue, PF3 = Green.
 \centering
 \begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
 \bitheader[lsb=16]{16-31} \\
-\bitbox{16}[bgcolor=gray!10]{Reserved} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
 \bitheader{0-15} \\
-\bitbox{8}[bgcolor=gray!10]{Reserved} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{PF7} & \bitbox{1}{PF6} & \bitbox{1}{PF5} & \bitbox{1}{PF4} & \bitbox{1}{PF3} & \bitbox{1}{PF2} & \bitbox{1}{PF1} & \bitbox{1}{PF0}
 \end{bytefield}
 \caption{GPIODATA Register (Port F) — Data Output/Input}
 \end{figure}
