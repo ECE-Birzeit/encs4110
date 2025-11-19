@@ -89,6 +89,13 @@ UMULL & \texttt{UMULL RdLo, RdHi, Rn, Rm}
 SMULL & \texttt{SMULL RdLo, RdHi, Rn, Rm}
       & $\{RdHi,RdLo\} \leftarrow Rn \times Rm$
       & Signed 32$\times$32 $\rightarrow$ 64-bit product. \\
+UDIV & \texttt{UDIV Rd, Rn, Rm}
+      & $Rd \leftarrow Rn \div Rm$
+      & Unsigned division. \\
+SDIV & \texttt{SDIV Rd, Rn, Rm}
+        & $Rd \leftarrow Rn \div Rm$
+        & Signed division. \\
+
 \bottomrule
 \end{tabularx}
 
