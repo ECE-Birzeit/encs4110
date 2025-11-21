@@ -1,4 +1,4 @@
-\chapter{System Timers and General-Purpose Timer Modules}
+\chapter{Hardware Timers and Timing Control}
 
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
@@ -13,23 +13,7 @@ After completing this experiment, you will be able to:
 \end{itemize}
 
 \section*{Experiment Overview}
-Precise timing control is essential in embedded systems — whether blinking an LED, reading sensors at regular intervals, or creating accurate delays. The TM4C123 microcontroller provides two powerful timing mechanisms: the SysTick timer (built into the ARM Cortex-M4 core) and the General-Purpose Timer Module (GPTM) peripherals.
-
-\noindent The SysTick timer is a simple 24-bit down-counter designed to provide a consistent time base for operating systems and applications. It is ideal for creating system ticks (e.g., 1 ms intervals) and implementing basic delays.
-
-\noindent The GPTM peripherals offer much more flexibility: they support 16-bit and 32-bit operation, prescalers for extended periods, multiple operating modes (periodic, one-shot, PWM, input capture), and independent Timer A and Timer B channels within each module.
-
-\noindent In this experiment, you will:
-\begin{itemize}[nosep]
-  \item Configure the SysTick timer to generate periodic interrupts.
-  \item Use SysTick for millisecond timing and software debouncing.
-  \item Understand the GPTM architecture and register structure.
-  \item Configure GPTM in 16-bit and 32-bit periodic modes.
-  \item Calculate timer periods using prescalers and reload values.
-  \item Implement multiple independent timing tasks using different timers.
-\end{itemize}
-
-By the end of this lab, you will understand how to select the appropriate timer for different timing requirements, configure timers for precise intervals, and implement timer-based interrupt-driven applications.
+This experiment introduces precise timing control using the TM4C123's SysTick timer and General-Purpose Timer Modules (GPTM). You will configure SysTick for periodic interrupts and millisecond timing, explore GPTM's 16-bit and 32-bit modes with prescalers, and implement multiple independent timing tasks. By the end of this lab, you will understand how to select and configure timers for different timing requirements and implement timer-based interrupt-driven applications.
 
 \newpage
 \etocsetnexttocdepth{subsubsection}

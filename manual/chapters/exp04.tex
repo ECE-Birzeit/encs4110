@@ -1,4 +1,4 @@
-\chapter{TM4C123 Architecture and Digital I/O}
+\chapter{Microcontroller Architecture and GPIO Output}
 
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
@@ -12,20 +12,7 @@ After completing this experiment, you will be able to:
 \end{itemize}
 
 \section*{Experiment Overview}
-This experiment introduces the architecture of the TM4C123 microcontroller and its most fundamental feature — the ability to interface with the outside world through digital I/O pins.
-
-\noindent You will first explore the internal structure of the device, including the ARM Cortex-M4 core, core peripherals (NVIC, SysTick, SCB), buses, memory regions, and peripheral interconnect. Then, you will apply this understanding by writing Assembly programs that toggle the on-board LEDs connected to \texttt{PORTF}.
-
-\noindent In this experiment, you will:
-\begin{itemize}[nosep]
-  \item Understand how peripheral registers are mapped into memory and accessed by the CPU.
-  \item Learn about Cortex-M4 core peripherals and their functions.
-  \item Learn the initialization sequence required to enable and configure GPIO ports.
-  \item Develop Assembly programs that control LEDs using software delays.
-  \item Form the foundation for subsequent experiments involving interrupts, timers, and analog peripherals.
-\end{itemize}
-
-By the end of this lab, you will understand the TM4C123 architecture, Cortex-M4 core peripherals, be able to configure GPIO ports for digital output, and control external hardware through register manipulation in Assembly.
+This experiment introduces the TM4C123 microcontroller architecture and digital I/O interfacing through GPIO ports. You will explore the internal structure including the ARM Cortex-M4 core, memory regions, and peripheral interconnect, then write Assembly programs to control the on-board LEDs connected to PORTF. By the end of this lab, you will understand how peripheral registers are memory-mapped, be able to initialize and configure GPIO ports, and control external hardware through register manipulation—forming the foundation for subsequent experiments with interrupts, timers, and analog peripherals.
 
 \newpage
 \etocsetnexttocdepth{subsubsection}

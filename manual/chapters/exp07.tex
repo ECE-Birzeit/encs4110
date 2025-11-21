@@ -1,4 +1,4 @@
-\chapter{LCD Interfacing and Display Control}
+\chapter{Character LCD Display Interface}
 
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
@@ -14,21 +14,7 @@ After completing this experiment, you will be able to:
 \end{itemize}
 
 \section*{Experiment Overview}
-Liquid Crystal Displays (LCDs) are essential output devices in embedded systems, providing a simple and effective way to present information to users. The 16x2 character LCD module, based on the HD44780 controller, is one of the most widely used displays in embedded applications. It can display 16 characters per line across 2 lines, making it ideal for status messages, sensor readings, and user interfaces.
-
-\noindent Unlike more complex graphical displays, character LCDs are straightforward to interface with microcontrollers, requiring only a few GPIO pins and simple command sequences to achieve full control. The HD44780 controller supports both 8-bit and 4-bit communication modes — the 4-bit mode is particularly popular as it reduces the required number of GPIO pins from 11 to 7 (3 control pins + 4 data pins).
-
-\noindent In this experiment, you will:
-\begin{itemize}[nosep]
-  \item Learn the internal architecture of the HD44780 LCD controller and its register structure.
-  \item Understand the difference between 8-bit and 4-bit communication modes.
-  \item Implement the complete 4-bit initialization sequence with proper timing requirements.
-  \item Create a reusable LCD driver library with functions for initialization, command transmission, data display, and cursor control.
-  \item Display static and dynamic text on the LCD.
-  \item Implement scrolling effects and button-controlled display manipulation.
-\end{itemize}
-
-By the end of this lab, you will be able to interface a 16x2 LCD module with the TM4C123 microcontroller, implement a complete LCD driver in C, and create interactive display applications combining LCD output with GPIO input and interrupts.
+This experiment introduces LCD interfacing using the HD44780-based 16x2 character display module. You will learn the controller's architecture, implement 4-bit communication mode to minimize GPIO usage, and create a reusable LCD driver library with functions for initialization, command transmission, and data display. By the end of this lab, you will be able to interface an LCD with the TM4C123 microcontroller and create interactive display applications combining LCD output with GPIO input and interrupts.
 
 \newpage
 \etocsetnexttocdepth{subsubsection}

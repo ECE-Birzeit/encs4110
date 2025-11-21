@@ -1,4 +1,4 @@
-\chapter{GPIO Input and Hardware Interrupts}
+\chapter{GPIO Inputs and Interrupt Handling}
 
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
@@ -12,21 +12,7 @@ After completing this experiment, you will be able to:
 
 
 \section*{Experiment Overview}
-This experiment extends GPIO functionality from outputs to inputs and introduces interrupt-driven programming on the TM4C123 microcontroller.
-
-\noindent Building on the previous experiment's knowledge of GPIO outputs, you will now configure GPIO pins as inputs to read the state of mechanical switches. You will explore two approaches: polling (continuously checking the input state) and interrupts (responding immediately to input changes). You will also address the practical challenge of switch bouncing through software debouncing techniques.
-
-\noindent In this experiment, you will:
-\begin{itemize}[nosep]
-  \item Configure GPIO pins as inputs with pull-up resistors for reading switch states.
-  \item Implement polling-based programs that continuously monitor button presses.
-  \item Configure GPIO edge-triggered interrupts to respond to button events.
-  \item Write interrupt service routines to handle switch presses and toggle LEDs.
-  \item Enable GPIO interrupts in the NVIC and manage interrupt priorities.
-  \item Unlock protected GPIO pins (such as PF0) for use as general-purpose inputs.
-\end{itemize}
-
-By the end of this lab, you will understand how to read digital inputs, implement both polling and interrupt-driven input handling, and write responsive embedded applications that react to external events in real time.
+This experiment extends GPIO functionality to inputs and introduces interrupt-driven programming. You will configure GPIO pins to read mechanical switches using both polling and interrupt approaches, implement software debouncing techniques, write interrupt service routines, and enable GPIO interrupts in the NVIC. By the end of this lab, you will understand how to implement both polling and interrupt-driven input handling, and write responsive embedded applications that react to external events in real time.
 
 \newpage
 \etocsetnexttocdepth{subsubsection}

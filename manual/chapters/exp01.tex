@@ -1,4 +1,4 @@
-\chapter{Introduction to ARM Cortex-M4 Assembly}
+\chapter{Assembly Basics and Program Structure}
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
 \begin{itemize}[nosep]
@@ -10,18 +10,7 @@ After completing this experiment, you will be able to:
 \end{itemize}
 
 \section*{Experiment Overview}
-This experiment introduces the fundamentals of ARM Cortex-M4 assembly programming and the structure of a minimal embedded program. 
-You will explore the processor's register set, status flags, and memory map, and learn how to write and debug low-level code that manipulates data and controls program flow.
-
-\noindent In this experiment, you will:
-\begin{itemize}[nosep]
-  \item Examine the Cortex-M4 register architecture and understand how flags in the xPSR reflect instruction results.
-  \item Build and assemble a minimal startup image with a vector table and \texttt{Reset\_Handler}.
-  \item Practice data-processing and control-flow instructions, observing how they affect registers and flags.
-  \item Use the \keil\ debugger to single-step through instructions and inspect register and memory changes.
-\end{itemize}
-
-By the end of this lab, you will understand the core building blocks of ARM assembly programming, from program structure and instruction execution to debugging at the register level.
+This experiment introduces ARM Cortex-M4 assembly programming fundamentals, including register architecture, status flags, and memory organization. You will build minimal startup code with a vector table and Reset\_Handler, practice data-processing and control-flow instructions, and use the Keil µVision5 debugger to single-step through code while inspecting registers and memory. By the end of this lab, you will understand the core building blocks of ARM assembly programming and be able to write, assemble, and debug low-level embedded code.
 
 \newpage
 \etocsetnexttocdepth{subsubsection}
