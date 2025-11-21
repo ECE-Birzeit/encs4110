@@ -7,19 +7,19 @@ Welcome to the Experiment Navigator! This document serves as a guide to the vari
 ### ARM Cortex-M4 Assembly Language Basics
 | Experiment                                  | Description                                                                                  |
 |---------------------------------------------|----------------------------------------------------------------------------------------------|
-|  [**Experiment 1: ARM Cortex-M4 Assembly Fundamentals**](/experiments/1)           | Learn ARM Cortex-M4 architecture, registers, memory mapping, instruction formats, and assembly programming fundamentals. |
-|  [**Experiment 2: ARM Cortex-M4 Instructions and Addressing Modes**](/experiments/2) | Master data-processing instructions (arithmetic, logical, barrel shifter), load/store operations, memory addressing modes, and assembler directives for data declaration. |
-|  [**Experiment 3: ARM Cortex-M4 Flow Control, Procedures, and Stack**](/experiments/3)     | Implement branching, conditional execution, loop structures (for/while), procedure calls with AAPCS, stack operations (PUSH/POP), and nested procedures.      |
+|  [**Experiment 1: Assembly Basics and Program Structure**](/experiments/1)           | Learn ARM Cortex-M4 architecture, registers, memory mapping, instruction formats, and assembly programming fundamentals. |
+|  [**Experiment 2: Data Processing and Memory Operations**](/experiments/2) | Master data-processing instructions (arithmetic, logical, barrel shifter), load/store operations, memory addressing modes, and assembler directives for data declaration. |
+|  [**Experiment 3: Control Flow and Subroutines**](/experiments/3)     | Implement branching, conditional execution, loop structures (for/while), procedure calls with AAPCS, stack operations (PUSH/POP), and nested procedures.      |
 #### EK-TM4C123GXL Microcontroller
 Make sure to have the TM4C123G LaunchPad connected to your computer and the Keil uVision5 IDE is configured and set up for development. To set up the IDE, follow the instructions in the [Setup Guide](/setup.md).
 | Experiment                                  | Description                                                                                  |
 |---------------------------------------------|----------------------------------------------------------------------------------------------|
-| [**Experiment 4: TM4C123 Architecture and Digital Outputs**](/experiments/4) | Explore TM4C123 architecture, core peripherals (NVIC, SysTick), memory map, and GPIO configuration for controlling on-board LEDs. | 
-| [**Experiment 5: GPIO Input and Interrupts**](/experiments/5) | Configure GPIO pins as inputs, implement edge-triggered interrupts, handle button debouncing, and manage interrupt priorities using NVIC. | 
-| [**Experiment 6: SysTick and General-Purpose Timers (GPTM)**](/experiments/6) | Configure SysTick for periodic interrupts and delays, program GPTM modules in one-shot and periodic modes, and implement accurate timing for embedded applications. |
-| [**Experiment 7: Liquid Crystal Display (LCD)**](/experiments/7) | Interface with character LCD modules using GPIO, implement initialization sequences, and display text and custom characters. | 
-| [**Experiment 8: Analog-to-Digital Conversion (ADC)**](/experiments/8) | Configure 12-bit ADC channels, perform single and continuous sampling, read analog sensors, and implement software averaging. |
-| [**Experiment 9: UART Serial Communication**](/experiments/9) | Configure UART for serial communication, implement transmit and receive functions, handle interrupts, and interface with PC terminal applications. |
+| [**Experiment 4: Microcontroller Architecture and GPIO Output**](/experiments/4) | Explore TM4C123 architecture, core peripherals (NVIC, SysTick), memory map, and GPIO configuration for controlling on-board LEDs. | 
+| [**Experiment 5: GPIO Inputs and Interrupt Handling**](/experiments/5) | Configure GPIO pins as inputs, implement edge-triggered interrupts, handle button debouncing, and manage interrupt priorities using NVIC. | 
+| [**Experiment 6: Hardware Timers and Timing Control**](/experiments/6) | Configure SysTick for periodic interrupts and delays, program GPTM modules in one-shot and periodic modes, and implement accurate timing for embedded applications. |
+| [**Experiment 7: Character LCD Display Interface**](/experiments/7) | Interface with character LCD modules using GPIO, implement initialization sequences, and display text and custom characters. | 
+| [**Experiment 8: Analog-to-Digital Converter (ADC)**](/experiments/8) | Configure 12-bit ADC channels, perform single and continuous sampling, read analog sensors, and implement software averaging. |
+| [**Experiment 9: Universal Asynchronous Receiver-Transmitter (UART)**](/experiments/9) | Configure UART for serial communication, implement transmit and receive functions, handle interrupts, and interface with PC terminal applications. |
 
 ###  Additional Resources
 -  [Keil uVision5 IDE](https://www.keil.com/demo/eval/arm.htm) - Setup and development environment for ARM programming.

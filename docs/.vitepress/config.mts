@@ -85,15 +85,15 @@ export default defineConfig({
         collapsed: false,
         items: [
           {
-            text: "1. Assembly Fundamentals",
+            text: "1. Assembly Basics and Program Structure",
             link: "/experiments/1.md",
           },
           {
-            text: "2. Instructions and Addressing Modes",
+            text: "2. Data Processing and Memory Operations",
             link: "/experiments/2.md",
           },
           {
-            text: "3. Flow Control, Procedures, and Stack",
+            text: "3. Control Flow and Subroutines",
             link: "/experiments/3.md",
           },
         ],
@@ -103,27 +103,27 @@ export default defineConfig({
         collapsed: false, 
         items: [
           {
-            text: "4. TM4C123 Architecture and Digital Outputs",
+            text: "4. Microcontroller Architecture and GPIO Output",
             link: "/experiments/4.md",
           },
           {
-            text: "5. GPIO Input and Interrupts",
+            text: "5. GPIO Inputs and Interrupt Handling",
             link: "/experiments/5.md",
           },
           {
-            text: "6. SysTick and General-Purpose Timers (GPTM)",
+            text: "6. Hardware Timers and Timing Control",
             link: "/experiments/6.md",
           },
           {
-            text: "7. Liquid Crystal Display (LCD)",
+            text: "7. Character LCD Display Interface",
             link: "/experiments/7.md",
           },
           {
-            text: "8. Analog-to-Digital Conversion (ADC)",
+            text: "8. Analog-to-Digital Converter (ADC)",
             link: "/experiments/8.md",
           },
           {
-            text: "9. UART Serial Communication",
+            text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
             link: "/experiments/9.md",
           },
         ],
