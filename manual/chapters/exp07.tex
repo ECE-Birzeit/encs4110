@@ -84,7 +84,7 @@ The HD44780 interface consists of 16 pins (some modules have 18 pins with additi
 4 & RS & Register Select: 0 = Instruction (command), 1 = Data (character) \\
 5 & RW & Read/Write: 0 = Write to LCD, 1 = Read from LCD (usually grounded for write-only) \\
 6 & E & Enable: Falling edge latches data/command into LCD \\
-7-14 & D0-D7 & 8-bit data bus (D0-D3 unused in 4-bit mode) \\
+7\-14 & D0-D7 & 8-bit data bus (D0-D3 unused in 4-bit mode) \\
 15 & A & Backlight anode (+5V, typically with series resistor) \\
 16 & K & Backlight cathode (Ground) \\
 \bottomrule
@@ -299,7 +299,7 @@ A well-structured LCD driver separates concerns into distinct layers:
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{resources/lcd_connection.png}
-  \caption{LCD Connection Schematic – TM4C123 to 16×2 HD44780 LCD Module\protect\footnotemark}
+  \caption{LCD Connection Schematic - TM4C123 to 16×2 HD44780 LCD Module\protect\footnotemark}
 \end{figure}
 \footnotetext{Source: \url{https://microcontrollerslab.com/16x2-lcd-interfacing-with-tm4c123-tiva-launchpad-keil-uvision/}}
 

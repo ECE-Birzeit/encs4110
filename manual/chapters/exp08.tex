@@ -1,1 +1,507 @@
 \chapter{Analog-to-Digital Converter (ADC)}
+
+\section*{Learning Objectives}
+After completing this experiment, you will be able to:
+\begin{itemize}[nosep]
+    \item Understand the principles of analog-to-digital conversion.
+    \item Configure and use the ADC modules on the TM4C123 microcontroller.
+    \item Interface with analog sensors and interpret ADC readings.
+\end{itemize}
+
+\section*{Experiment Overview}
+
+\newpage
+\etocsetnexttocdepth{subsubsection}
+\localtableofcontents
+\bigskip
+\newpage
+
+\section{Theoretical Background}
+
+\subsection{Introduction to Analog-to-Digital Conversion}
+Analog-to-Digital Converters (ADCs) are essential components in embedded systems, enabling microcontrollers to interface with the analog world by converting continuous analog signals (such as voltage from sensors) into discrete digital values for processing. They are widely used in applications like temperature sensing, light intensity measurement, and audio signal processing.
+
+\subsubsection{ADC Resolution and Sampling}
+ADCs are characterized by their \textbf{resolution}, which indicates the number of discrete levels they can represent, typically expressed in bits. For instance, a 12-bit ADC can represent $2^{12} = 4096$ discrete levels. The resolution determines the smallest detectable change in the analog input, known as the \textbf{least significant bit (LSB)}. The voltage corresponding to one LSB is calculated as:
+\begin{equation}
+\text{LSB Voltage} = \frac{V_{\text{REFP}} - V_{\text{REFN}}}{2^{\text{Resolution}}}
+\end{equation}
+where $V_{\text{REFP}}$ is the positive reference voltage, $V_{\text{REFN}}$ is the negative reference voltage, and \text{Resolution} is the number of bits.
+
+\subsection{TM4C123 ADC Architecture}
+
+The TM4C123GH6PM microcontroller features \textbf{two identical 12-bit ADC modules} (ADC0 and ADC1) that share 12 analog input channels. These modules provide high-precision conversion of continuous analog voltages to discrete digital numbers.
+
+\subsubsection{Key Features}
+
+The ADC modules offer the following capabilities:
+
+\begin{itemize}[nosep]
+  \item \textbf{Resolution}: 12-bit precision (0 to 4095 discrete levels)
+  \item \textbf{Shared Input Channels}: 12 analog input channels (AIN0-AIN11) shared between both modules
+  \item \textbf{Internal Temperature Sensor}: On-chip temperature measurement capability
+  \item \textbf{Maximum Sample Rate}: 1 million samples per second (1 MSPS)
+  \item \textbf{Reference Voltage}: VDDA = 3.3V (separate analog power supply)
+  \item \textbf{Input Voltage Range}: 0V to 3.3V for single-ended inputs
+  \item \textbf{Sample Sequencers}: Four programmable sequencers per module (SS0-SS3) with depths of 8, 4, 4, and 1 samples
+  \item \textbf{Hardware Averaging}: Automatic averaging of up to 64 samples for noise reduction
+  \item \textbf{Digital Comparators}: Eight digital comparators per module for threshold detection
+  \item \textbf{DMA Support}: Dedicated $\mu$DMA channels for efficient data transfer with burst requests
+  \item \textbf{Isolated Power}: Separate analog power and ground pins for improved signal integrity
+\end{itemize}
+
+\subsubsection{ADC Input Channels}
+The TM4C123 provides 12 analog input channels (AIN0 to AIN11) that can be connected to various GPIO pins, shared between both ADC modules. The mapping is as follows:
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l*{12}{c}}
+\toprule
+Channel & AIN0 & AIN1 & AIN2 & AIN3 & AIN4 & AIN5 & AIN6 & AIN7 & AIN8 & AIN9 & AIN10 & AIN11 \\
+\midrule
+Pin     & PE3  & PE2  & PE1  & PE0  & PD3  & PD2  & PD1  & PD0  & PE5  & PE4  & PB4   & PB5  \\
+\bottomrule
+\end{tabular}
+\caption{ADC Input Channel Pin Mapping}
+\end{table}
+
+\subsubsection{Sample Sequencers}
+
+Each ADC module has \textbf{four independent sample sequencers} that manage sampling control and data capture autonomously. They differ only in the number of samples and FIFO depth.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\toprule
+\textbf{Sequencer} & \textbf{Number of Samples} & \textbf{FIFO Depth} & \textbf{Priority} \\
+\midrule
+SS0 & 8 & 8 entries & Highest \\
+SS1 & 4 & 4 entries & High \\
+SS2 & 4 & 4 entries & Low \\
+SS3 & 1 & 1 entry & Lowest \\
+\bottomrule
+\end{tabular}
+\caption{Sample Sequencer Capabilities and FIFO Depths}
+\end{table}
+
+\subsubsection{Trigger Sources}
+
+ADC conversions can be initiated by various trigger sources for flexibility:
+
+\begin{itemize}[nosep]
+  \item \textbf{Processor (Software)}: Manual trigger via ADCPSSI register
+  \item \textbf{Analog Comparators}: Trigger on comparator output events
+  \item \textbf{GPIO}: External signal on GPIO pins
+  \item \textbf{General-Purpose Timers}: Periodic sampling synchronized with timer events
+  \item \textbf{PWM Generators}: Synchronize sampling with PWM signals for motor control
+  \item \textbf{Continuous}: Free-running continuous sampling mode
+\end{itemize}
+
+Both ADC modules can use independent or shared triggers. When shared, a programmable phase shifter allows delaying sampling by a phase angle for time-interleaved sampling to achieve higher effective rates.
+
+\subsection{Internal Temperature Sensor}
+
+The internal temperature sensor can be sampled by setting the TSn bit in the ADCSSCTLn register. Temperature (TEMP in °C) is calculated from the ADC reading (ADCCODE, 0 to 4095) as:
+\begin{equation}
+\text{TEMP} = 147.5 - \left( \frac{75 \times (V_{\text{REFP}} - V_{\text{REFN}}) \times \text{ADCCODE}}{4096} \right)
+\end{equation}
+
+\textbf{Note}: This measures the microcontroller's die temperature, not ambient, and is useful for thermal management but may require calibration.
+
+\subsection{ADC Registers}
+
+The TM4C123 ADC modules are configured via registers. Refer to the datasheet for details. Key registers include:
+
+\bigskip
+\subsubsection*{RCGCADC — ADC Run Mode Clock Gating Control}
+Enables/disables clock for ADC modules. Bits correspond to modules (1 = enable, 0 = disable).
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{14}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\tiny{ADC1}} & \bitbox{1}{\tiny{ADC0}} \\
+\end{bytefield}
+\caption{RCGCADC Register — ADC Run Mode Clock Gating Control}
+\end{figure}
+
+\bigskip
+\subsubsection*{ADCACTSS — ADC Active Sample Sequencer}
+Enables/disables sample sequencers. Bits correspond to sequencers (1 = enable, 0 = disable). BUSY indicates ADC status (1 = busy, 0 = idle).
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{15}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\tiny{BUSY}} \\
+\bitheader{0-15} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\tiny{SS3}} & \bitbox{1}{\tiny{SS2}} & \bitbox{1}{\tiny{SS1}} & \bitbox{1}{\tiny{SS0}} \\
+\end{bytefield}
+\caption{ADCACTSS Register — ADC Active Sample Sequencer}
+\end{figure}
+
+\bigskip
+\subsubsection*{ADCSSMUXn — ADC Sample Sequence Input Multiplexer Select}
+Selects input channels for each sample in a sequencer. Each 4-bit field (MUX0-MUX7) specifies the channel (0-11 for AIN0-AIN11).
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{4}{MUX7} & \bitbox{4}{MUX6} & \bitbox{4}{MUX5} & \bitbox{4}{MUX4} \\
+\bitheader{0-15} \\
+\bitbox{4}{MUX3} & \bitbox{4}{MUX2} & \bitbox{4}{MUX1} & \bitbox{4}{MUX0} \\
+\end{bytefield}
+\caption{ADCSSMUXn Register — ADC Sample Sequence Input Multiplexer Select}
+\end{figure}
+
+\bigskip
+\subsubsection*{ADCSSCTLn — ADC Sample Sequence Control}
+Configures each sample in a sequence. The END bit must be set for the final sample. This 32-bit register handles up to eight samples.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{1}{\tiny{TS7}} & \bitbox{1}{\tiny{IE7}} & \bitbox{1}{\tiny{END7}} & \bitbox{1}{\tiny{D7}} & \bitbox{1}{\tiny{TS6}} & \bitbox{1}{\tiny{IE6}} & \bitbox{1}{\tiny{END6}} & \bitbox{1}{\tiny{D6}} & \bitbox{1}{\tiny{TS5}} & \bitbox{1}{\tiny{IE5}} & \bitbox{1}{\tiny{END5}} & \bitbox{1}{\tiny{D5}} & \bitbox{1}{\tiny{TS4}} & \bitbox{1}{\tiny{IE4}} & \bitbox{1}{\tiny{END4}} & \bitbox{1}{\tiny{D4}} \\
+\bitheader{0-15} \\
+\bitbox{1}{\tiny{TS3}} & \bitbox{1}{\tiny{IE3}} & \bitbox{1}{\tiny{END3}} & \bitbox{1}{\tiny{D3}} & \bitbox{1}{\tiny{TS2}} & \bitbox{1}{\tiny{IE2}} & \bitbox{1}{\tiny{END2}} & \bitbox{1}{\tiny{D2}} & \bitbox{1}{\tiny{TS1}} & \bitbox{1}{\tiny{IE1}} & \bitbox{1}{\tiny{END1}} & \bitbox{1}{\tiny{D1}} & \bitbox{1}{\tiny{TS0}} & \bitbox{1}{\tiny{IE0}} & \bitbox{1}{\tiny{END0}} & \bitbox{1}{\tiny{D0}} \\
+\end{bytefield}
+\caption{ADCSSCTLn Register — ADC Sample Sequence Control}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+  \item TSx: Temperature sensor select (1 = sample temperature sensor)
+  \item IEx: Interrupt enable (1 = enable interrupt on sample completion)
+  \item ENDx: End of sequence (1 = last sample in sequence)
+  \item Dx: Differential select (1 = differential input, 0 = single-ended)
+  \item x: Sample index (0-7)
+\end{itemize}
+
+\bigskip
+\subsubsection*{ADCEMUX — ADC Event Multiplexer Select}
+Selects trigger source for each sample sequencer. Each 4-bit field (EM0-EM3) specifies the trigger source.
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{4}{EM3} & \bitbox{4}{EM2} & \bitbox{4}{EM1} & \bitbox{4}{EM0} \\
+\end{bytefield}
+\caption{ADCEMUX Register — ADC Event Multiplexer Select}
+\end{figure}
+The EMx field specifies the trigger source for sample sequencer x:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{cl}
+\toprule
+\textbf{Value} & \textbf{Trigger Source} \\
+\midrule
+0x0 & Processor (software trigger via ADCPSSI register) \\
+0x1 & Analog Comparator 0 \\
+0x2 & Analog Comparator 1 \\
+0x3 & Reserved \\
+0x4 & External GPIO (connected to GPIO interrupt) \\
+0x5 & Timer (requires TnOTE bit set in GPTMCTL register) \\
+0x6 & PWM Generator 0 \\
+0x7 & PWM Generator 1 \\
+0x8 & PWM Generator 2 \\
+0x9 & PWM Generator 3 \\
+0xA--0xE & Reserved \\
+0xF & Continuous (always sampling) \\
+\bottomrule
+\end{tabular}
+\caption{ADC Event Multiplexer Trigger Sources}
+\end{table}
+
+\bigskip
+\subsubsection*{ADCPSSI — ADC Processor Sample Sequence Initiate}
+Initiates sampling for the specified sample sequencer when triggered by the processor.
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{1}{\tiny{GSYNC}} & \bitbox{3}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{SYNCWAIT}} & \bitbox{11}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\tiny{SS3}} & \bitbox{1}{\tiny{SS2}} & \bitbox{1}{\tiny{SS1}} & \bitbox{1}{\tiny{SS0}} \\
+\end{bytefield}
+\caption{ADCPSSI Register — ADC Processor Sample Sequence Initiate}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+    \item \textbf{SSx}: Sample Sequencer x Initiate (write 1 to trigger conversion, self-clearing)
+    \item \textbf{SYNCWAIT}: Synchronize Wait (1 = wait for synchronization signal before initiating)
+    \item \textbf{GSYNC}: Global Synchronize (1 = generate synchronization signal for multiple ADC modules)
+\end{itemize}
+
+\textbf{Note}: The SSx bits are write-only and automatically clear after initiating the conversion. For synchronized sampling across modules, set GSYNC in one module to trigger all modules with SYNCWAIT enabled.
+
+\bigskip
+\subsubsection*{ADCSSFIFOn — ADC Sample Sequence FIFO}
+Holds the conversion results for the specified sample sequencer. Each read retrieves the next sample from the FIFO.
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{4}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{12}{\tiny{DATA}} \\
+\end{bytefield}
+\caption{ADCSSFIFOn Register — ADC Sample Sequence FIFO}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+  \item DATA: 12-bit conversion result (0 to 4095)
+  \item reserved: Unused bits
+\end{itemize}
+
+You can read from the ADCSSFIFOn register to retrieve conversion results. Each read operation removes the oldest sample from the FIFO. Ensure that the FIFO is not empty before reading to avoid invalid data. You can check the FIFO status using the ADCSSSTAT register (refer to the datasheet for details).
+
+
+\bigskip
+\subsubsection*{ADCRIS — ADC Raw Interrupt Status}
+Holds the raw interrupt status for each sample sequencer.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{15}[bgcolor=gray!10]{\tiny{reserved}}  & \bitbox{1}{\tiny{INRDC}}\\
+\bitheader{0-15} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}} &
+    \bitbox{1}{\tiny{SS3}} & \bitbox{1}{\tiny{SS2}} & \bitbox{1}{\tiny{SS1}} & \bitbox{1}{\tiny{SS0}} \\
+\end{bytefield}
+\caption{ADCRIS Register — ADC Raw Interrupt Status}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+  \item SSx: Sample Sequencer x Interrupt Status (1 = interrupt pending, 0 = no interrupt)
+  \item INRDC: Digital Comparator Raw Interrupt Status
+  \item reserved: Unused bits
+\end{itemize}
+\bigskip
+\subsubsection*{ADCIM — ADC Interrupt Mask}
+Masks/unmasks interrupts for each sample sequencer.
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}}  & \bitbox{1}{\miniscule{DCONSS3}} & \bitbox{1}{\miniscule{DCONSS2}} & \bitbox{1}{\miniscule{DCONSS1}} & \bitbox{1}{\miniscule{DCONSS0}} \\
+\bitheader{0-15} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}} &
+    \bitbox{1}{\tiny{MASK3}} & \bitbox{1}{\tiny{MASK2}} & \bitbox{1}{\tiny{MASK1}} & \bitbox{1}{\tiny{MASK0}} \\
+\end{bytefield}
+\caption{ADCIM Register — ADC Interrupt Mask}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+  \item MASKx: Sample Sequencer x Interrupt Mask (1 = unmask interrupt, 0 = mask interrupt)
+  \item DCONSSx: Digital Comparator Interrupt Mask for Sample Sequencer x (1 = unmask comparator interrupt, 0 = mask comparator interrupt)
+  \item x: Sample sequencer index (0-3)
+  \item reserved: Unused bits
+\end{itemize}
+
+
+\bigskip
+\subsubsection*{ADCISC — ADC Interrupt Status and Clear}
+Holds and clears the interrupt status for each sample sequencer.
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{\tiny{~ENABL~}}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\miniscule{DCINSS3}} & \bitbox{1}{\miniscule{DCINSS2}} & \bitbox{1}{\miniscule{DCINSS1}} & \bitbox{1}{\miniscule{DCINSS0}} \\
+\bitheader{0-15} \\
+\bitbox{12}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{\tiny{IN3}} & \bitbox{1}{\tiny{IN2}} & \bitbox{1}{\tiny{IN1}} & \bitbox{1}{\tiny{IN0}} \\
+\end{bytefield}
+\caption{ADCISC Register — ADC Interrupt Status and Clear}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+  \item SSx: Sample Sequencer x Interrupt Clear (write 1 to clear interrupt)
+  \item DCINSSx: Digital Comparator Interrupt Clear for Sample Sequencer x (write 1 to clear comparator interrupt)
+  \item reserved: Unused bits
+\end{itemize}
+
+\subsection{GPIO Registers}
+To configure GPIO pins for ADC input, you will need to set the appropriate GPIO registers. Below are the key registers involved in configuring GPIO pins for analog input:
+
+\bigskip
+\subsubsection*{GPIODEN — GPIO Digital Enable}
+Enables/disables digital functionality for GPIO pins. To use a pin as an analog input, its corresponding bit in this register must be cleared (0 = disable digital function).
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~PF7~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{Px7} & \bitbox{1}{Px6} & \bitbox{1}{Px5} & \bitbox{1}{Px4} & \bitbox{1}{Px3} & \bitbox{1}{Px2} & \bitbox{1}{Px1} & \bitbox{1}{Px0}
+\end{bytefield}
+\caption{GPIODEN Register (Port x) — Digital Enable}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+    \item Pxn: Digital Enable for Pin n of Port x (1 = enable digital function, 0 = disable digital function)
+    \item reserved: Unused bits
+    \item x: Port letter (A-F)
+    \item n: Pin number (0-7)
+\end{itemize}
+Note: To configure a pin for analog input, clear its corresponding bit in the GPIODEN register.
+
+\bigskip
+\subsubsection*{GPIOAFSEL — GPIO Alternate Function Select}
+Selects alternate functions for GPIO pins. To use a pin for ADC input, its corresponding bit in this register must be set (1 = alternate function enabled).
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~
+PF7~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{Px7} & \bitbox{1}{Px6} & \bitbox{1}{Px5} & \bitbox{1}{Px4} & \bitbox{1}{Px3} & \bitbox{1}{Px2} & \bitbox{1}{Px1} & \bitbox{1}{Px0}
+\end{bytefield}
+\caption{GPIOAFSEL Register (Port x) — Alternate Function Select}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+    \item Pxn: Alternate Function Select for Pin n of Port x (1 = enable alternate function, 0 = GPIO function)
+    \item reserved: Unused bits
+    \item x: Port letter (A-F)
+    \item n: Pin number (0-7)
+\end{itemize}
+Note: To configure a pin for ADC input, set its corresponding bit in the GPIOAFSEL register.
+
+\bigskip
+\subsubsection*{GPIOAMSEL — GPIO Analog Mode Select}
+Enables/disables analog functionality for GPIO pins. To use a pin as an analog input, its corresponding bit in this register must be set (1 = enable analog function).
+\begin{figure}[H]
+\centering
+\begin{bytefield}[endianness=big,bitwidth=\widthof{~
+PF7~}]{16}
+\bitheader[lsb=16]{16-31} \\
+\bitbox{16}[bgcolor=gray!10]{\tiny{reserved}} \\
+\bitheader{0-15} \\
+\bitbox{8}[bgcolor=gray!10]{\tiny{reserved}} & \bitbox{1}{Px7} & \bitbox{1}{Px6} & \bitbox{1}{Px5} & \bitbox{1}{Px4} & \bitbox{1}{Px3} & \bitbox{1}{Px2} & \bitbox{1}{Px1} & \bitbox{1}{Px0}
+\end{bytefield}
+\caption{GPIOAMSEL Register (Port x) — Analog Mode Select}
+\end{figure}
+
+Where:
+\begin{itemize}[nosep]
+    \item Pxn: Analog Mode Select for Pin n of Port x (1 = enable analog function, 0 = disable analog function)
+    \item reserved: Unused bits
+    \item x: Port letter (A-F)
+    \item n: Pin number (0-7)
+\end{itemize}
+Note: To configure a pin for ADC input, set its corresponding bit in the GPIOAMSEL register.
+
+
+\subsection{Configuration Steps}
+
+Configuring a GPIO pin for ADC input on the TM4C123 microcontroller involves three  stages:
+
+
+\subsubsection{GPIO Pin Configuration}
+
+To prepare a GPIO pin for analog input:
+
+\begin{enumerate}[nosep]
+\item Enable the clock for the corresponding GPIO port by setting the appropriate bit in the \texttt{RCGCGPIO} register.
+\item Enable the pin's alternate function using the \texttt{GPIOAFSEL} register.
+\item Disable its digital function by clearing the pin's bit in the \texttt{GPIODEN} register.
+\item Enable the analog function by setting the pin's bit in the \texttt{GPIOAMSEL} register.
+\item Set the pin direction as input by clearing its bit in the \texttt{GPIODIR} register.
+\end{enumerate}
+
+\subsubsection{ADC Sampling Sequencer Setup}
+
+After the pin is configured, the ADC module and sampling sequencer must be set up:
+
+\begin{enumerate}[nosep]
+\item Enable the ADC clock by setting the correct bit in the \texttt{RCGCADC} register.
+\item Disable the chosen sample sequencer by clearing its bit in the \texttt{ADCACTSS} register.
+\item Select the input channel(s) by configuring the \texttt{ADCSSMUXn} register.
+\item Set the control options for each sample (e.g., END, IE) in the \texttt{ADCSSCTLn} register, ensuring the END bit is set for the final sample.
+\item Choose the trigger source by configuring the \texttt{ADCEMUX} register.
+\item Re-enable the sequencer by setting its bit in \texttt{ADCACTSS}.
+\item If processor-triggered sampling is used, start a conversion using the \texttt{ADCPSSI} register.
+\end{enumerate}
+
+\subsubsection{Interrupt Configuration}
+
+If interrupts are required:
+
+\begin{enumerate}[nosep]
+\item Enable interrupts for the selected sequencer by setting its bit in the \texttt{ADCIM} register.
+\item Enable the corresponding interrupt in the NVIC by setting the appropriate bit in the \texttt{NVIC\_ISER} register.
+\item In the ISR, read the conversion result from the \texttt{ADCSSFIFO} register.
+\item Clear the interrupt flag by writing to the appropriate bit in the \texttt{ADCISC} register.
+\end{enumerate}
+
+\newpage
+\section{Procedure}
+
+This section demonstrates how to configure and use the ADC module on the TM4C123 microcontroller using both polling and interrupt-driven sampling methods. A potentiometer is used as a controllable analog input source by wiring its terminals to 3.3 V and ground, with the adjustable rotor connected to an ADC input such as AIN0 (PE3). Rotating the potentiometer varies the rotor voltage between 0 V and 3.3 V, allowing you to generate different analog levels and observe the corresponding ADC conversion results.
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[american voltages, thick]
+  % Endpoints of the potentiometer
+  \coordinate (L) at (0,0);   % left terminal (3.3V)
+  \coordinate (R) at (2,0);   % right terminal (GND)
+
+  % Potentiometer
+  \draw (L) to[american potentiometer, n=mypot] (R);
+
+  % Wiper → ADC pin
+  \draw (mypot.wiper) -- ++(2,0) node[right]{PE3 / AIN0};
+
+  % 3.3V label
+  \draw (L) -- ++(0,0.7) node[above]{3.3\,V};
+
+  % Proper ground symbol
+  \draw (R) -- ++(0,-0.7) node[ground]{};
+\end{circuitikz}
+\caption{Potentiometer Voltage Divider for ADC Input}
+\end{figure}
+
+
+
+\newpage
+\subsection{Example 1: Single ADC Channel Reading (Polling Method)}
+In this example, you will configure the ADC to read a single analog input channel (AIN0) using sample sequencer 3 (SS3) and turn on an LED if the voltage exceeds a certain threshold. \\
+\lstinputlisting[language=C, caption=Single ADC Channel Reading Example]{snippets/adc/example1.c}
+\newpage
+\subsection{Example 2: Reading Internal Temperature Sensor}
+In this example, you will configure the ADC to read the internal temperature sensor using sample sequencer 3 (SS3) and display the temperature value on the debugger using the Watch window. \\
+\begin{enumerate}[nosep]
+    \item \textbf{Start a debug session:} After building the program successfully, start a debug session in Keil uVision IDE (Ctrl + F5).
+    \item \textbf{Add variables to the Watch window:} by selecting the variable name in the code, right-clicking, and choosing "Add to Watch" or manually entering the variable name in the Watch window.
+    \item \textbf{Run the program:} Use the "Run" button (F5) to execute the program. The Watch window will update with the current values of the monitored variables. \\
+\end{enumerate}
+
+
+
+
+\pagestyle{empty} % hide page numbers (and headers/footers if any)
+\lstinputlisting[language=C, caption=Single ADC Channel Reading with Interrupts Example]{snippets/adc/example2.c}
+\pagestyle{plain} % hide page numbers (and headers/footers if any)
+
+\newpage
+\subsection{Tasks}
+\subsection{Tasks}
+
+\subsubsection{Task 1: Timer-Based Temperature Measurement}
+Modify Example 2 so that the ADC sampling is triggered by a timer every second, instead of using continuous sampling mode. Connect an analog temperature sensor (e.g., TMP36) to an ADC input channel (such as AIN0 on PE3). Configure the ADC to read the sensor voltage on each timer trigger and calculate the corresponding temperature. Monitor the temperature values in real time by adding the variable \texttt{temp} to the Watch window in the debugger.
+
+\subsubsection{Task 2: Comparing Two ADC Channels}
+Extend Example 2 to read two different analog inputs using separate ADC channels (e.g., AIN0 on PE3 and AIN1 on PE2) with sample sequencer 3 (SS3). Configure the ADC to use interrupts so that each conversion triggers an ISR. In the ISR, compare the two ADC values and use the result to control LEDs on GPIOF: for example, turn on the green LED if the first channel has a higher voltage, or turn on the red LED if the second channel is higher. Display both ADC values in the debugger Watch window to observe the comparison in real time.
