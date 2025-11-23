@@ -3,12 +3,19 @@
 \section*{Learning Objectives}
 After completing this experiment, you will be able to:
 \begin{itemize}[nosep]
-    \item Understand the principles of analog-to-digital conversion.
-    \item Configure and use the ADC modules on the TM4C123 microcontroller.
-    \item Interface with analog sensors and interpret ADC readings.
+  \item Understand analog-to-digital conversion principles including sampling, quantization, and resolution.
+  \item Recognize the architecture of the TM4C123 ADC modules including dual 12-bit converters and shared input channels.
+  \item Configure ADC sample sequencers (SS0-SS3) with different depths and trigger sources.
+  \item Configure GPIO pins for analog input using AFSEL, AMSEL, and DEN registers.
+  \item Implement software-triggered and hardware-triggered ADC conversions.
+  \item Read and interpret ADC conversion results from FIFO registers.
+  \item Convert digital ADC values to physical quantities such as voltage and temperature.
+  \item Implement both polling and interrupt-driven ADC operation modes.
+  \item Utilize hardware averaging and multi-channel sampling for improved measurement accuracy.
 \end{itemize}
 
 \section*{Experiment Overview}
+This experiment introduces analog-to-digital conversion using the TM4C123's dual 12-bit ADC modules. You will configure sample sequencers for automatic multi-channel data acquisition, implement both polling and interrupt-driven sampling modes, and interface with analog sensors such as potentiometers and the internal temperature sensor. By the end of this lab, you will understand how to convert continuous analog signals to discrete digital values, configure trigger sources for periodic sampling, and implement sensor interfacing applications that bridge the analog and digital domains.
 
 \newpage
 \etocsetnexttocdepth{subsubsection}
@@ -497,7 +504,6 @@ In this example, you will configure the ADC to read the internal temperature sen
 \pagestyle{plain} % hide page numbers (and headers/footers if any)
 
 \newpage
-\subsection{Tasks}
 \subsection{Tasks}
 
 \subsubsection{Task 1: Timer-Based Temperature Measurement}

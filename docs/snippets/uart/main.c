@@ -10,7 +10,7 @@ int main(void) {
 		char buff[16];
 		UART0_ReadString(buff, 16);
 		
-		UART0_WriteString("Recived: ");
+		UART0_WriteString("Received: ");
 		UART0_WriteString(buff);
 		UART0_WriteString("\r\n");
     }
