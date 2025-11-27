@@ -16,7 +16,7 @@ int main(void)
 	GPIOF->DEN |= GREEN_LED;			// Enable digital function for green LED
 	
 
-	SysTick->LOAD = 5000000 - 1;			// Set reload value for 1ms
+	SysTick->LOAD = 5000000 - 1;			// Set reload value for 100ms
 	SysTick->VAL = 0;						// Clear current value
 	SysTick->CTRL = 0x07;					// Enable SysTick with processor clock and interrupt
 	
@@ -27,6 +27,6 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-	systick_counter++;					// Increment counter every 1ms
-	GPIOF->DATA ^= GREEN_LED;			// Toggle green LED
+	systick_counter+=100;					// add 100ms
+	GPIOF->DATA ^= GREEN_LED;				// Toggle green LED
 }
