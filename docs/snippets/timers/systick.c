@@ -27,6 +27,6 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-	systick_counter+=100;					// add 100ms
-	GPIOF->DATA ^= GREEN_LED;				// Toggle green LED
+	systick_counter+=100;				// Increment counter by 100ms
+	GPIOF->DATA ^= GREEN_LED;			// Toggle green LED
 }
