@@ -129,6 +129,16 @@ export default defineConfig({
         ],
       },
       {
+        text: "Extra TM4C123 Examples",
+        collapsed: true,
+        items: [
+          {
+            text: "Quadrature Encoder Interface (QEI)",
+            link: "/examples/qei-encoder",
+          },
+        ],
+      },
+      {
         text: "Resources",
         items: [
           {
