@@ -1,7 +1,7 @@
 ---
 outline: deep
 lastUpdated: true
-next: false
+next: true
 ---
 # PWM Signal Generation Using Timers
 
