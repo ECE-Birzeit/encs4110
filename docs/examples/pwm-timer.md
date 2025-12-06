@@ -52,18 +52,6 @@ In PWM mode, the timer:
 3. **Outputs HIGH** when counter > TAMATCHR (match value)
 4. **Outputs LOW** when counter ≤ TAMATCHR
 
-```
-Counter Value
-    ↑
-TAILR├─┐     ┌─────────┐     ┌─────
-      │ │     │         │     │
-MATCH ├─┼─────┘         └─────┘
-      │ │
-    0 └─┴─────────────────────────→ Time
-
-PWM Out:  ████░░░░░░░████░░░░░░░█
-          |--Ton--|  |--Ton--|
-```
 
 **Key Registers:**
 - **TAILR**: Load value (sets PWM period)
