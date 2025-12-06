@@ -133,6 +133,10 @@ export default defineConfig({
         collapsed: true,
         items: [
           {
+            text: "PWM Signal Generation Using Timers",
+            link: "/examples/pwm-timer",
+          },
+          {
             text: "Quadrature Encoder Interface (QEI)",
             link: "/examples/qei-encoder",
           },
