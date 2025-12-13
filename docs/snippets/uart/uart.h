@@ -3,8 +3,10 @@
 
 #include "TM4C123.h"  // Or your MCU's main header
 
-#define U0_TX 2
-#define U0_RX 1
+#define U0_TX ( 1 << 1 )
+#define U0_RX ( 1 << 0 )
+
+#define MAX_STR_LEN 50
 
 void UART0_WriteChar(char c);
 void UART0_WriteString(char *str);
