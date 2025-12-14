@@ -1,5 +1,6 @@
 \documentclass[11pt,a4paper,twoside]{scrreprt}
 \KOMAoptions{cleardoublepage=empty}
+\KOMAoptions{twoside=false}
 
 \input{preamble}
 \providecommand{\allcaps}[1]{\MakeUppercase{#1}}
@@ -21,22 +22,20 @@
 
 \begin{document}
 
-\KOMAoptions{twoside=false}\recalctypearea
 \maketechnicaltitlepage
-\KOMAoptions{twoside=false}\recalctypearea
-% Global ToC: chapters only
+% Global ToC: all experiments with main sections
 \cleardoublepage
 \begingroup
-\setcounter{tocdepth}{0} % parts and chapters only
+\setcounter{tocdepth}{3} % show chapters and sections only
 \tableofcontents
 \endgroup
 \cleardoublepage
 
-\toconlypart{Assembly Programming Fundamentals}
+\toconlypart{ARM Assembly Language Programming}
 \input{chapters/exp01}
 \input{chapters/exp02}
 \input{chapters/exp03}
-\toconlypart{Embedded System Peripherals}
+\toconlypart{Microcontroller Peripherals and Interfacing}
 \input{chapters/exp04}
 \input{chapters/exp05}
 \input{chapters/exp06}

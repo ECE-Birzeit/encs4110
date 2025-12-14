@@ -18,7 +18,8 @@
   colorlinks=true,
   linkcolor=blue!60!black,
   urlcolor=blue!60!black,
-  citecolor=blue!60!black
+  citecolor=blue!60!black,
+  bookmarksnumbered=true  % add numbers to PDF bookmarks
 }
 
 % ---------- Lists, tables, floats ----------
@@ -43,7 +44,7 @@
 % ---------- Numbering & ToC ----------
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}             % show down to subsubsection in ToC
-\renewcommand\thesection{\arabic{section}}
+\renewcommand\thesection{\thechapter.\arabic{section}}
 \renewcommand\thesubsection{\thesection.\arabic{subsection}}
 \renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
 
@@ -216,22 +217,7 @@
 % ---- titletoc formatting: Tufte-ish, robust ----
 \usepackage{titletoc}
 
-\titlecontents{part}%
-  [0pt]% distance from left margin
-  {\addvspace{0.25\baselineskip}}% above (global formatting of entry)
-  {\allcaps{Part~\thecontentslabel}\quad}% before w/ label (label = ``Part I'')
-  {\allcaps{Part~\thecontentslabel}\allcaps}% before w/o label
-  {}% filler and page (leaders and page num)
-  [\vspace*{0.5\baselineskip}]% after
 
-\titlecontents{chapter}%
-    [4em]% distance from left margin
-    {}% above (global formatting of entry)
-    {\contentslabel{2em}\textit}% before w/ label (label = ``Chapter 1'')
-    {\hspace{0em}\textit}% before w/o label
-    {\qquad\thecontentspage}% filler and page (leaders and page num)
-    [\vspace*{0.5\baselineskip}]% after
-%%%% End additional code by Kevin Godby
 
 
 % Silent part: adds a numbered Part entry to the ToC, prints nothing
