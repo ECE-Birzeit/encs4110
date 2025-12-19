@@ -130,7 +130,7 @@ export default defineConfig({
       },
       {
         text: "Extra TM4C123 Examples",
-        collapsed: true,
+        collapsed: false,
         items: [
           {
             text: "PWM Signal Generation Using Timers",

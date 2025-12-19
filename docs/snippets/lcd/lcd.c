@@ -54,9 +54,9 @@ void LCD_Init(void)
         ;
 
     // Configure PB0 (RS), PB1 (EN), PB4-PB7 (data) as output
-    GPIOB->DIR |= RS | EN | DATA_MASK;
-    GPIOB->DEN |= RS | EN | DATA_MASK;
-    GPIOB->DATA &= ~(RS | EN | DATA_MASK);  // Clear all
+    GPIOB->DIR |= RS | RW | EN | DATA_MASK;
+    GPIOB->DEN |= RS | RW | EN | DATA_MASK;
+    GPIOB->DATA &= ~(RS | RW | EN | DATA_MASK);  // Clear all
 
     SysTick_Init();
 
