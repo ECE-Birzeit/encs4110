@@ -1,8 +1,9 @@
 import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+import { withPwa } from '@vite-pwa/vitepress'
 
 
-export default defineConfig({
+export default withPwa(defineConfig({
   markdown: {
     config(md) {
       md.use(groupIconMdPlugin)
@@ -171,4 +172,27 @@ export default defineConfig({
       provider: "local",
     },
   },
-});
+  pwa: {
+    manifest: {
+      name: "Computer Design Laboratory",
+      short_name: "ENCS 4110",
+      description: "A comprehensive guide and resource for ARM assembly language experiments.",
+      theme_color: "#646cff",
+      icons: [
+        {
+          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>💻</text></svg>",
+          sizes: "192x192",
+          type: "image/svg+xml",
+        },
+        {
+          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>💻</text></svg>",
+          sizes: "512x512",
+          type: "image/svg+xml",
+        },
+      ],
+    },
+    workbox: {
+      globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2}"],
+    },
+  },
+}));

@@ -12,6 +12,7 @@
     "docs:preview": "vitepress preview docs --port 8080"
   },
   "devDependencies": {
+    "@vite-pwa/vitepress": "^1.1.0",
     "markdown-it-mathjax3": "latest",
     "vitepress": "latest"
   },
