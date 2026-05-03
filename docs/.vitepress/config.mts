@@ -229,6 +229,7 @@ export default withPwa(defineConfig({
     },
     workbox: {
       globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2,pdf}"],
+      maximumFileSizeToCacheInBytes: 5000000,
     },
   },
 }));

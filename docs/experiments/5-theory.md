@@ -11,7 +11,7 @@ next:
 # Experiment 5: GPIO Inputs and Interrupt Handling
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_5.pdf" target="_blank">Download Experiment 5 PDF</a>
+ <a href="/manual/encs4110_5.pdf" target="_blank">Download Experiment 5 PDF</a>
 :::
 
 ## Learning Objectives

@@ -11,7 +11,7 @@ next:
 # Experiment 4: Microcontroller Architecture and GPIO Output
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_4.pdf" target="_blank">Download Experiment 4 PDF</a>
+ <a href="/manual/encs4110_4.pdf" target="_blank">Download Experiment 4 PDF</a>
 :::
 
 ## Learning Objectives

@@ -11,7 +11,7 @@ next:
 # Experiment 3: Control Flow and Subroutines
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_3.pdf" target="_blank">Download Experiment 3 PDF</a>
+ <a href="/manual/encs4110_3.pdf" target="_blank">Download Experiment 3 PDF</a>
 :::
 
 

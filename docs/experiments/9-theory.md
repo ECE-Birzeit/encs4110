@@ -13,7 +13,7 @@ next:
 
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_9.pdf" target="_blank">Download Experiment 9 PDF</a>
+ <a href="/manual/encs4110_9.pdf" target="_blank">Download Experiment 9 PDF</a>
 :::
 ## Learning Objectives
 

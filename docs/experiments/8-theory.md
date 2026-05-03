@@ -12,7 +12,7 @@ next:
 # Experiment 8: Analog-to-Digital Converter (ADC)
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_8.pdf" target="_blank">Download Experiment 8 PDF</a>
+ <a href="/manual/encs4110_8.pdf" target="_blank">Download Experiment 8 PDF</a>
 :::
 
 ## Learning Objectives

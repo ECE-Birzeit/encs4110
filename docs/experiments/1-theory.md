@@ -10,7 +10,7 @@ next:
 # Experiment 1: Assembly Basics and Program Structure
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_1.pdf" target="_blank">Download Experiment 1 PDF</a>
+ <a href="/manual/encs4110_1.pdf" target="_blank">Download Experiment 1 PDF</a>
 :::
 ## Learning Objectives
 

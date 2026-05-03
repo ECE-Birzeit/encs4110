@@ -12,7 +12,7 @@ next:
 # Experiment 7: Character LCD Display Interface
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- <a href="../manual/encs4110_7.pdf" target="_blank">Download Experiment 7 PDF</a>
+ <a href="/manual/encs4110_7.pdf" target="_blank">Download Experiment 7 PDF</a>
 :::
 
 ## Learning Objectives
