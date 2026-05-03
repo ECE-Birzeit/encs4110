@@ -1,12 +1,16 @@
 ---
 outline: deep
 lastUpdated: true
+prev: false
+next:
+  text: "1. Assembly Basics and Program Structure - Procedure"
+  link: /experiments/1-procedure
 ---
 
 # Experiment 1: Assembly Basics and Program Structure
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 1 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_01.pdf)
+ <a href="../manual/encs4110_1.pdf" target="_blank">Download Experiment 1 PDF</a>
 :::
 ## Learning Objectives
 

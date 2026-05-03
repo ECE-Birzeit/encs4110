@@ -1,11 +1,17 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "1. Assembly Basics and Program Structure - Procedure"
+  link: /experiments/1-procedure
+next:
+  text: "2. Data Processing and Memory Operations - Procedure"
+  link: /experiments/2-procedure
 ---
 # Experiment 2: Data Processing and Memory Operations
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 2 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_02.pdf)
+ <a href="../manual/encs4110_2.pdf" target="_blank">Download Experiment 2 PDF</a>
 :::
 
 ## Learning Objectives

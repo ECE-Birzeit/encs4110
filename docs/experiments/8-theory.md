@@ -1,12 +1,18 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "7. Character LCD Display Interface - Procedure"
+  link: /experiments/7-procedure
+next:
+  text: "8. Analog-to-Digital Converter (ADC) - Procedure"
+  link: /experiments/8-procedure
 ---
 
 # Experiment 8: Analog-to-Digital Converter (ADC)
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 8 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_08.pdf)
+ <a href="../manual/encs4110_8.pdf" target="_blank">Download Experiment 8 PDF</a>
 :::
 
 ## Learning Objectives

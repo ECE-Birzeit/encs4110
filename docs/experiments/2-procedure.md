@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "2. Data Processing and Memory Operations - Theory"
+  link: /experiments/2-theory
+next:
+  text: "3. Control Flow and Subroutines - Theory"
+  link: /experiments/3-theory
 ---
 
 # Data Processing and Memory Operations

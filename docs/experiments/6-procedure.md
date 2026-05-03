@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "6. Hardware Timers and Timing Control - Theory"
+  link: /experiments/6-theory
+next:
+  text: "7. Character LCD Display Interface - Theory"
+  link: /experiments/7-theory
 ---
 
 

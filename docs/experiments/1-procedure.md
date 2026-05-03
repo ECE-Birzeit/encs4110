@@ -1,7 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
-prev: false
+prev:
+  text: "1. Assembly Basics and Program Structure - Theory"
+  link: /experiments/1-theory
+next:
+  text: "2. Data Processing and Memory Operations - Theory"
+  link: /experiments/2-theory
 ---
 
 # Assembly Basics and Program Structure

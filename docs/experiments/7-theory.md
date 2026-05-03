@@ -1,12 +1,18 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "6. Hardware Timers and Timing Control - Procedure"
+  link: /experiments/6-procedure
+next:
+  text: "7. Character LCD Display Interface - Procedure"
+  link: /experiments/7-procedure
 ---
 
 # Experiment 7: Character LCD Display Interface
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 7 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_07.pdf)
+ <a href="../manual/encs4110_7.pdf" target="_blank">Download Experiment 7 PDF</a>
 :::
 
 ## Learning Objectives

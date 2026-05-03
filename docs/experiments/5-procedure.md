@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "5. GPIO Inputs and Interrupt Handling - Theory"
+  link: /experiments/5-theory
+next:
+  text: "6. Hardware Timers and Timing Control - Theory"
+  link: /experiments/6-theory
 ---
 
 

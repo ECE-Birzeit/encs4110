@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "4. Microcontroller Architecture and GPIO Output - Theory"
+  link: /experiments/4-theory
+next:
+  text: "5. GPIO Inputs and Interrupt Handling - Theory"
+  link: /experiments/5-theory
 ---
 
 # Microcontroller Architecture and GPIO Output

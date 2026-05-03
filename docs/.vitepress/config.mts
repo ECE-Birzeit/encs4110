@@ -89,24 +89,24 @@ export default withPwa(defineConfig({
             text: "1. Assembly Basics and Program Structure",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/1_theory" },
-              { text: "Procedure", link: "/experiments/1" },
+              { text: "Theory", link: "/experiments/1-theory" },
+              { text: "Procedure", link: "/experiments/1-procedure" },
             ],
           },
           {
             text: "2. Data Processing and Memory Operations",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/2_theory" },
-              { text: "Procedure", link: "/experiments/2" },
+              { text: "Theory", link: "/experiments/2-theory" },
+              { text: "Procedure", link: "/experiments/2-procedure" },
             ],
           },
           {
             text: "3. Control Flow and Subroutines",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/3_theory" },
-              { text: "Procedure", link: "/experiments/3" },
+              { text: "Theory", link: "/experiments/3-theory" },
+              { text: "Procedure", link: "/experiments/3-procedure" },
             ],
           },
         ],
@@ -119,48 +119,48 @@ export default withPwa(defineConfig({
             text: "4. Microcontroller Architecture and GPIO Output",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/4_theory" },
-              { text: "Procedure", link: "/experiments/4" },
+              { text: "Theory", link: "/experiments/4-theory" },
+              { text: "Procedure", link: "/experiments/4-procedure" },
             ],
           },
           {
             text: "5. GPIO Inputs and Interrupt Handling",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/5_theory" },
-              { text: "Procedure", link: "/experiments/5" },
+              { text: "Theory", link: "/experiments/5-theory" },
+              { text: "Procedure", link: "/experiments/5-procedure" },
             ],
           },
           {
             text: "6. Hardware Timers and Timing Control",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/6_theory" },
-              { text: "Procedure", link: "/experiments/6" },
+              { text: "Theory", link: "/experiments/6-theory" },
+              { text: "Procedure", link: "/experiments/6-procedure" },
             ],
           },
           {
             text: "7. Character LCD Display Interface",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/7_theory" },
-              { text: "Procedure", link: "/experiments/7" },
+              { text: "Theory", link: "/experiments/7-theory" },
+              { text: "Procedure", link: "/experiments/7-procedure" },
             ],
           },
           {
             text: "8. Analog-to-Digital Converter (ADC)",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/8_theory" },
-              { text: "Procedure", link: "/experiments/8" },
+              { text: "Theory", link: "/experiments/8-theory" },
+              { text: "Procedure", link: "/experiments/8-procedure" },
             ],
           },
           {
             text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/9_theory" },
-              { text: "Procedure", link: "/experiments/9" },
+              { text: "Theory", link: "/experiments/9-theory" },
+              { text: "Procedure", link: "/experiments/9-procedure" },
             ],
           },
         ],
@@ -228,7 +228,7 @@ export default withPwa(defineConfig({
       ],
     },
     workbox: {
-      globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2}"],
+      globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2,pdf}"],
     },
   },
 }));

@@ -1,13 +1,19 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "8. Analog-to-Digital Converter (ADC) - Procedure"
+  link: /experiments/8-procedure
+next:
+  text: "9. UART Serial Communication - Procedure"
+  link: /experiments/9-procedure
 ---
 
 # Experiment 9: Universal Asynchronous Receiver-Transmitter (UART)
 
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 9 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_09.pdf)
+ <a href="../manual/encs4110_9.pdf" target="_blank">Download Experiment 9 PDF</a>
 :::
 ## Learning Objectives
 

@@ -1,6 +1,10 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "9. UART Serial Communication - Theory"
+  link: /experiments/9-theory
+next: false
 ---
 
 # Universal Asynchronous Receiver-Transmitter (UART)

@@ -1,11 +1,17 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "3. Control Flow and Subroutines - Procedure"
+  link: /experiments/3-procedure
+next:
+  text: "4. Microcontroller Architecture and GPIO Output - Procedure"
+  link: /experiments/4-procedure
 ---
 # Experiment 4: Microcontroller Architecture and GPIO Output
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 4 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_04.pdf)
+ <a href="../manual/encs4110_4.pdf" target="_blank">Download Experiment 4 PDF</a>
 :::
 
 ## Learning Objectives

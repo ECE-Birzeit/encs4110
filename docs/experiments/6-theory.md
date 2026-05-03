@@ -1,12 +1,18 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "5. GPIO Inputs and Interrupt Handling - Procedure"
+  link: /experiments/5-procedure
+next:
+  text: "6. Hardware Timers and Timing Control - Procedure"
+  link: /experiments/6-procedure
 ---
 # Experiment 6: Hardware Timers and Timing Control
 
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 6 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_06.pdf)
+ <a href="../manual/encs4110_6.pdf" target="_blank">Download Experiment 6 PDF</a>
 :::
 
 ## Learning Objectives

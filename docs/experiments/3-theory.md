@@ -1,11 +1,17 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "2. Data Processing and Memory Operations - Procedure"
+  link: /experiments/2-procedure
+next:
+  text: "3. Control Flow and Subroutines - Procedure"
+  link: /experiments/3-procedure
 ---
 # Experiment 3: Control Flow and Subroutines
 ::: info Complete Lab Manual
 For the complete experiment including learning objectives, theoretical background, and detailed explanations, download the PDF manual:
- [**Download Experiment 3 PDF**](https://raw.githubusercontent.com/mabushelbaia/encs4110/main/manual/encs4110_03.pdf)
+ <a href="../manual/encs4110_3.pdf" target="_blank">Download Experiment 3 PDF</a>
 :::
 
 

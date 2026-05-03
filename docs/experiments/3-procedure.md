@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "3. Control Flow and Subroutines - Theory"
+  link: /experiments/3-theory
+next:
+  text: "4. Microcontroller Architecture and GPIO Output - Theory"
+  link: /experiments/4-theory
 ---
 
 

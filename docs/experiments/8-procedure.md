@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "8. Analog-to-Digital Converter (ADC) - Theory"
+  link: /experiments/8-theory
+next:
+  text: "9. UART Serial Communication - Theory"
+  link: /experiments/9-theory
 ---
 
 

@@ -1,6 +1,12 @@
 ---
 outline: deep
 lastUpdated: true
+prev:
+  text: "7. Character LCD Display Interface - Theory"
+  link: /experiments/7-theory
+next:
+  text: "8. Analog-to-Digital Converter (ADC) - Theory"
+  link: /experiments/8-theory
 ---
 
 
