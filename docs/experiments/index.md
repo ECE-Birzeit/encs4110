@@ -1,6 +1,7 @@
 ---
-outline: false
+outline: deep
 ---
+
 # Experiment Navigator
 
 Welcome to the Experiment Navigator! This document serves as a guide to the various experiments and resources available for ARM assembly language programming and embedded systems development using the TM4C123G LaunchPad.

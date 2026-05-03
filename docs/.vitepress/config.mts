@@ -87,15 +87,27 @@ export default withPwa(defineConfig({
         items: [
           {
             text: "1. Assembly Basics and Program Structure",
-            link: "/experiments/1.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/1_theory" },
+              { text: "Procedure", link: "/experiments/1" },
+            ],
           },
           {
             text: "2. Data Processing and Memory Operations",
-            link: "/experiments/2.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/2_theory" },
+              { text: "Procedure", link: "/experiments/2" },
+            ],
           },
           {
             text: "3. Control Flow and Subroutines",
-            link: "/experiments/3.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/3_theory" },
+              { text: "Procedure", link: "/experiments/3" },
+            ],
           },
         ],
       },
@@ -105,27 +117,51 @@ export default withPwa(defineConfig({
         items: [
           {
             text: "4. Microcontroller Architecture and GPIO Output",
-            link: "/experiments/4.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/4_theory" },
+              { text: "Procedure", link: "/experiments/4" },
+            ],
           },
           {
             text: "5. GPIO Inputs and Interrupt Handling",
-            link: "/experiments/5.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/5_theory" },
+              { text: "Procedure", link: "/experiments/5" },
+            ],
           },
           {
             text: "6. Hardware Timers and Timing Control",
-            link: "/experiments/6.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/6_theory" },
+              { text: "Procedure", link: "/experiments/6" },
+            ],
           },
           {
             text: "7. Character LCD Display Interface",
-            link: "/experiments/7.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/7_theory" },
+              { text: "Procedure", link: "/experiments/7" },
+            ],
           },
           {
             text: "8. Analog-to-Digital Converter (ADC)",
-            link: "/experiments/8.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/8_theory" },
+              { text: "Procedure", link: "/experiments/8" },
+            ],
           },
           {
             text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
-            link: "/experiments/9.md",
+            collapsed: true,
+            items: [
+              { text: "Theory", link: "/experiments/9_theory" },
+              { text: "Procedure", link: "/experiments/9" },
+            ],
           },
         ],
       },
