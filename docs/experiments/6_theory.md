@@ -29,65 +29,57 @@ This experiment introduces precise timing control using the TM4C123's SysTick ti
 
 ## Theoretical Background
 
-### Clock Sources
+### Introduction to Timers
 
-Unless otherwise noted, we assume the **System Clock (SysClk) = 50 MHz** for all calculations in this chapter.
+Hardware timers are specialized peripherals that count clock cycles and generate events at precise intervals. Unlike software-based delays (which block the CPU and waste power), hardware timers run independently in the background and generate interrupts when they reach a predetermined count.
 
-#### Clock Setup in Keil µVision5
+#### Why Use Hardware Timers?
 
-When you create a project in Keil µVision5 for the TM4C123, the **startup file** (`startup_TM4C123.s`) and **system initialization code** (`system_TM4C123.c`) automatically configure the system clock to 50 MHz. This setup occurs before `main()` is called and:
+- **Precise timing**: Timers operate at the system clock frequency (50 MHz), providing microsecond-level accuracy
+- **Non-blocking**: The CPU can perform other tasks while the timer runs independently
+- **Power efficient**: Timers can wake the MCU from sleep mode
+- **Multiple independent channels**: Several timers can run simultaneously with different periods
 
-- Enables the PLL (Phase-Locked Loop) to multiply the crystal oscillator frequency
-- Configures the system divider to achieve the target 50 MHz frequency
-- Sets the `SystemCoreClock` variable to `50000000` for use in CMSIS functions like `SysTick_Config()`
+#### When to Use Each Timer
 
-#### System Clock on TM4C123
+| Feature | SysTick | GPTM |
+|---------|---------|------|
+| **Bit width** | 24-bit | 16-bit or 32-bit |
+| **Max period @ 50MHz** | ~335 ms | 32-bit: ~86 seconds |
+| **Use case** | OS ticks, simple delays | Complex timing, PWM, capture |
+| **Availability** | Built into ARM Cortex-M core | 6-12 on TM4C123 |
 
-The system clock can be derived from multiple sources:
+For short delays (< 300 ms), SysTick is simpler. For longer delays or advanced features, use GPTM.
 
-- **MOSC**: Main oscillator (external crystal, typically 16 MHz or 25 MHz)
-- **PIOSC**: Precision internal oscillator (16 MHz ± 1%)
-- **PIOSC/4**: Internal oscillator divided by 4 (≈ 4 MHz)
-- **LFIOSC**: Low-frequency internal oscillator (~30 kHz)
-- **PLL**: Phase-Locked Loop (can multiply oscillator frequency)
 
-Peripherals, including GPTM, are clocked from the system clock (SysClk) once enabled in the `RCGCTIMER` register. The Keil startup file typically configures the PLL to generate 50 MHz from a 16 MHz crystal.
+### Timer Fundamentals
 
-#### SysTick Clock Source
+Understanding how timers work internally helps you configure them correctly and debug timing issues.
 
-The SysTick timer can use one of two clock sources, selected via the `CLKSOURCE` bit in the `CTRL` register:
+#### How Timers Operate
 
-- **Processor clock** (bit = 1): Same as system clock (50 MHz in our case)
-- **Reference clock** (bit = 0): Typically PIOSC/4 (~4 MHz), useful for a stable timebase independent of PLL changes
-
-For this lab, we use the processor clock (50 MHz) for both SysTick and GPTM.
-
-### How Timers Work
-
-Understanding the basic operation of timers will help you configure them correctly and debug timing issues.
-
-#### Down-Counting Operation
-
-Both SysTick and GPTM timers operate as **down-counters** in their most common configuration (periodic mode):
+Both SysTick and GPTM timers operate as **down-counters** in periodic mode:
 
 1. **Load**: A reload value is written to the timer's load register (`LOAD` for SysTick, `TAILR` for GPTM)
-2. **Count**: The timer counts down from the reload value to zero, decrementing once per clock cycle (or prescaled cycle)
+2. **Count**: The timer counts down from the reload value to zero, decrementing once per clock cycle
 3. **Timeout**: When the counter reaches zero:
    - The timeout flag is set
-   - An interrupt is generated (if enabled and unmasked)
+   - An interrupt is generated (if enabled)
    - The counter automatically reloads from the load register (periodic mode) or stops (one-shot mode)
-4. **Clear**: The interrupt handler must clear the timeout flag by writing to the interrupt clear register
+4. **Clear**: The interrupt handler must clear the timeout flag
+
 
 #### Timer Modes
 
 Timers can operate in different modes depending on the application:
 
-- **Periodic Mode**: The timer automatically reloads and continues counting. Ideal for fixed-rate tasks like LED blinking, sampling sensors, or OS ticks.
-- **One-Shot Mode**: The timer counts down once and stops. Useful for timeouts, delays, or single events.
+- **Periodic Mode**: The timer automatically reloads and continues counting. Ideal for fixed-rate tasks like LED blinking, sensor sampling, or OS ticks.
+- **One-Shot Mode**: The timer counts down once and stops. Useful for timeouts, single delays, or one-time events.
 - **Capture Mode**: (GPTM only) Captures the counter value when an external event occurs on a GPIO pin. Used for measuring pulse widths or frequencies.
 - **PWM Mode**: (GPTM only) Generates pulse-width modulated output signals for motor control, dimming LEDs, etc.
 
-#### Prescaler (16-bit Mode Only)
+
+#### Prescaler (16-bit GPTM Mode Only)
 
 In 16-bit mode, GPTM provides an 8-bit prescaler (`TAPR`) that extends the timer range by dividing the input clock:
 
@@ -96,6 +88,7 @@ T = (TAILR + 1) × (TAPR + 1) / f_SysClk
 ```
 
 The prescaler is ignored in 32-bit mode. For example, with `TAPR = 255` (divisor = 256), the effective clock frequency is reduced to 50 MHz / 256 ≈ 195.3 kHz.
+
 
 #### Interrupt Handling
 
@@ -114,6 +107,7 @@ void TIMER1A_Handler(void) {
     // Perform minimal work: toggle GPIO, update counters, etc.
 }
 ```
+
 
 ### SysTick Timer
 
@@ -135,7 +129,7 @@ The SysTick timer is ideal for creating system ticks (e.g., 1 ms intervals for R
 
 The SysTick timer is controlled through three main registers:
 
-#### SysTick Control and Status Register (STCTRL)
+##### SysTick Control and Status Register (STCTRL)
 
 **Register:** `SysTick->CTRL` — SysTick Control and Status (`0xE000E010`)
 
@@ -156,7 +150,7 @@ The `CTRL` register controls the SysTick timer operation and provides status inf
   - 0 = Has not counted to zero
   - 1 = Has counted to zero (cleared on read)
 
-#### SysTick Reload Value Register (STLOAD)
+##### SysTick Reload Value Register (STLOAD)
 
 **Register:** `SysTick->LOAD` — SysTick Reload Value (`0xE000E014`)
 
@@ -164,7 +158,7 @@ The `LOAD` register holds the value that is loaded into the counter when it reac
 
 **RELOAD Field (Bits 23:0):** The value to load into the counter. Valid range: `0x000001` to `0xFFFFFF`. Writing zero disables the counter.
 
-#### SysTick Current Value Register (STCURRENT)
+##### SysTick Current Value Register (STCURRENT)
 
 **Register:** `SysTick->VAL` — SysTick Current Value (`0xE000E018`)
 
@@ -181,11 +175,6 @@ T = (LOAD + 1) / f_clock
 ```
 
 where f_clock is the processor clock frequency (typically 50 MHz on the TM4C123).
-
-**Example:** To generate a 1 ms interrupt at 50 MHz:
-```
-LOAD = T × f_clock - 1 = 0.001 × 50,000,000 - 1 = 49,999
-```
 
 **Maximum Period:** With a 24-bit counter at 50 MHz:
 ```
@@ -218,6 +207,7 @@ void SysTick_Handler(void) {
     // Increment global counter, toggle LED, etc.
 }
 ```
+
 
 ### General-Purpose Timer Module (GPTM)
 
@@ -254,6 +244,7 @@ Each GPTM module contains:
 
 In 32-bit mode, Timer A operates as a full 32-bit timer, and Timer B is not available. In 16-bit mode, both Timer A and Timer B operate independently as 16-bit timers.
 
+
 ### GPTM Configuration Registers
 
 #### GPTMCFG — Timer Configuration Register
@@ -264,10 +255,10 @@ The `CFG` register selects the timer width (16-bit or 32-bit mode).
 
 **GPTMCFG Field (Bits 2:0):**
 
-- `0x0`: For a 16/32-bit timer, this value selects the 32-bit timer configuration. For a 32/64-bit wide timer, this value selects the 64-bit timer configuration.
-- `0x1`: For a 16/32-bit timer, this value selects the 32-bit real-time clock (RTC) counter configuration. For a 32/64-bit wide timer, this value selects the 64-bit real-time clock (RTC) counter configuration.
+- `0x0`: 32-bit timer configuration
+- `0x1`: 32-bit real-time clock (RTC) counter configuration
 - `0x2-0x3`: Reserved
-- `0x4`: For a 16/32-bit timer, this value selects the 16-bit timer configuration. For a 32/64-bit wide timer, this value selects the 32-bit timer configuration. The function is controlled by bits 1:0 of **GPTMTAMR** and **GPTMTBMR**.
+- `0x4`: 16-bit timer configuration (controlled by TAMR/TBMR bits 1:0)
 - `0x5-0x7`: Reserved
 
 #### GPTMTAMR — Timer A Mode Register
@@ -294,9 +285,8 @@ The `TAILR` register sets the start/reload value for Timer A.
 
 - **Count-down mode**: Specifies the starting count value loaded into the timer
 - **Count-up mode**: Sets the upper bound for the timeout event
-- **32-bit mode**: Full 32-bit register (upper 16 bits correspond to GPTMTBILR contents)
-- **16-bit mode**: Only bits [15:0] are used (upper 16 bits read as 0, no effect on GPTMTBILR)
-- **64-bit Wide Timer mode**: Contains bits [31:0] of the 64-bit count (GPTMTBILR contains bits [63:32])
+- **32-bit mode**: Full 32-bit register
+- **16-bit mode**: Only bits [15:0] are used
 
 #### GPTMTAPR — Timer A Prescaler Register
 
@@ -319,8 +309,7 @@ The `CTL` register enables/disables timers and configures their behavior.
 **Key Control Functions:**
 
 - **Timer Enable Control**: TAEN (bit 0) and TBEN (bit 8) independently enable/disable Timer A and Timer B
-- **Output Trigger Control**: TAOTE (bit 5) and TBOTE (bit 13) enable timers to trigger external peripherals (ADC, other timers, etc.)
-- **Independent Operation**: Each timer can be controlled separately, allowing flexible dual-timer configurations
+- **Output Trigger Control**: TAOTE (bit 5) and TBOTE (bit 13) enable timers to trigger external peripherals
 
 #### GPTMIMR — Interrupt Mask Register
 
@@ -331,13 +320,14 @@ The `IMR` register enables or disables (masks/unmasks) timer interrupts.
 **Key Bits:**
 
 - **Bit 0 (TATOIM)**: Timer A Timeout Interrupt Mask (0 = masked, 1 = enabled)
-- **Bit 8 (TBTOIM)**: Timer B Timeout Interrupt Mask (0 = masked, 1 = enabled)
+- **Bit 8 (TBTOIM)**: Timer B Timeout Interrupt Mask
 
 #### GPTMICR — Interrupt Clear Register
 
 **Register:** `TIMERx->ICR` — GPTM Interrupt Clear (`Base + 0x024`)
 
 Writing '1' to a bit in this register clears the corresponding interrupt flag.
+
 
 ### GPTM Timing Calculations
 
@@ -369,28 +359,13 @@ At 50 MHz, with maximum values (`TAILR = 0xFFFF`, `TAPR = 0xFF`):
 T_max = 65,536 × 256 / 50,000,000 = 16,777,216 / 50,000,000 ≈ 0.335 seconds
 ```
 
-**Example:** To generate a 500 ms interrupt in 16-bit mode at 50 MHz:
-```
-TAILR × TAPR = T × f_clock = 0.5 × 50,000,000 = 25,000,000
-```
+### GPTM Interrupt Configuration
 
-Choose `TAPR = 255` (prescaler divisor = 256):
-```
-TAILR = 25,000,000 / 256 - 1 = 97,656 - 1 = 97,655 (exceeds 16-bit range)
-```
-
-This period cannot be achieved in 16-bit mode. Use 32-bit mode instead:
-```
-TAILR = 25,000,000 - 1 = 24,999,999
-```
-
-### GPTM Interrupt Numbers
-
-Each GPTM module has a unique interrupt number for Timer A and Timer B; you can find these in the TM4C123 datasheet or in the device headers. The CMSIS-compliant header `tm4c123gh6pm.h` defines these as `IRQn_Type` enumerations (e.g., `TIMER1A_IRQn`), which work directly with the NVIC helper functions.
+Each GPTM module has a unique interrupt number for Timer A and Timer B. The CMSIS-compliant header `tm4c123gh6pm.h` defines these as `IRQn_Type` enumerations (e.g., `TIMER1A_IRQn`).
 
 #### Enabling an interrupt (CMSIS)
 
-Use `NVIC_EnableIRQ(IRQn_Type irqn)`; CMSIS handles the correct ISER register and bit index for you.
+Use `NVIC_EnableIRQ(IRQn_Type irqn)`:
 
 ```c
 #include "TM4C123.h"
@@ -411,7 +386,7 @@ Use `NVIC_SetPriority(IRQn_Type irqn, uint32_t priority)` before enabling the in
 ```c
 // Assign priorities (lower number = higher priority)
 NVIC_SetPriority(TIMER0A_IRQn, 3);
-NVIC_SetPriority(TIMER1_IRQn, 4);
+NVIC_SetPriority(TIMER1A_IRQn, 4);
 NVIC_SetPriority(TIMER2A_IRQn, 5);
 
 // Then enable them
@@ -419,6 +394,7 @@ NVIC_EnableIRQ(TIMER0A_IRQn);
 NVIC_EnableIRQ(TIMER1A_IRQn);
 NVIC_EnableIRQ(TIMER2A_IRQn);
 ```
+
 
 ### Configuration Workflow
 
@@ -457,7 +433,7 @@ To configure a GPTM timer in periodic mode:
 11. Enable the timer: `TIMERx->CTL |= 0x01`
 12. Implement the ISR (e.g., `TIMER1A_Handler()`)
 
-### GPTM Configuration Register Summary
+#### GPTM Configuration Register Summary
 
 | Register | Purpose | Typical Value |
 |----------|---------|---------------|

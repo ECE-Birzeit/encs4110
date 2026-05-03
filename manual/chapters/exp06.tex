@@ -21,51 +21,42 @@ This experiment introduces precise timing control using the TM4C123's SysTick ti
 
 
 \section{Theoretical Background}
-\subsection{Clock Sources}
 
-Unless otherwise noted, we assume the \textbf{System Clock (SysClk) = 50\,MHz} for all calculations in this chapter.
+\subsection{Introduction to Timers}
 
-\subsubsection{Clock Setup in Keil µVision5}
+Hardware timers are specialized peripherals that count clock cycles and generate events at precise intervals. Unlike software-based delays (which block the CPU and waste power), hardware timers run independently in the background and generate interrupts when they reach a predetermined count.
 
-When you create a project in Keil µVision5 for the TM4C123, the \textbf{startup file} (\texttt{startup\_TM4C123.s}) and \textbf{system initialization code} (\texttt{system\_TM4C123.c}) automatically configure the system clock to 50\,MHz. This setup occurs before \texttt{main()} is called and:
-
-\begin{itemize}[nosep]
-  \item Enables the PLL (Phase-Locked Loop) to multiply the crystal oscillator frequency
-  \item Configures the system divider to achieve the target 50\,MHz frequency
-  \item Sets the \texttt{SystemCoreClock} variable to \texttt{50000000} for use in CMSIS functions like \texttt{SysTick\_Config()}
-\end{itemize}
-
-\noindent
-You can verify the clock configuration by checking the value of \texttt{SystemCoreClock} in your code or by examining the \texttt{SystemInit()} function in \texttt{system\_TM4C123.c}.
-
-\subsubsection{System Clock on TM4C123}
-
-The system clock can be derived from multiple sources:
+\paragraph*{Why Use Hardware Timers?}
 
 \begin{itemize}[nosep]
-  \item \textbf{MOSC}: Main oscillator (external crystal, typically 16\,MHz or 25\,MHz)
-  \item \textbf{PIOSC}: Precision internal oscillator (16\,MHz $\pm$ 1\%)
-  \item \textbf{PIOSC/4}: Internal oscillator divided by 4 ($\approx$ 4\,MHz)
-  \item \textbf{LFIOSC}: Low-frequency internal oscillator ($\sim$30\,kHz)
-  \item \textbf{PLL}: Phase-Locked Loop (can multiply oscillator frequency)
+  \item \textbf{Precise timing}: Timers operate at the system clock frequency (50 MHz), providing microsecond-level accuracy
+  \item \textbf{Non-blocking}: The CPU can perform other tasks while the timer runs independently
+  \item \textbf{Power efficient}: Timers can wake the MCU from sleep mode
+  \item \textbf{Multiple independent channels}: Several timers can run simultaneously with different periods
 \end{itemize}
 
+\paragraph*{When to Use Each Timer}
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{Feature} & \textbf{SysTick} & \textbf{GPTM} \\
+    \midrule
+    Bit width & 24-bit & 16-bit or 32-bit \\
+    Max period @ 50MHz & ~335 ms & 32-bit: ~86 seconds \\
+    Use case & OS ticks, simple delays & Complex timing, PWM, capture \\
+    Availability & Built into ARM Cortex-M core & 6-12 on TM4C123 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Choosing Between SysTick and GPTM}
+\end{table}
+
 \noindent
-Peripherals, including GPTM, are clocked from the system clock (SysClk) once enabled in the \texttt{RCGCTIMER} register. The Keil startup file typically configures the PLL to generate 50\,MHz from a 16\,MHz crystal.
+For short delays (< 300 ms), SysTick is simpler. For longer delays or advanced features, use GPTM.
 
-\subsubsection{SysTick Clock Source}
-
-The SysTick timer can use one of two clock sources, selected via the \texttt{CLKSOURCE} bit in the \texttt{CTRL} register:
-
-\begin{itemize}[nosep]
-  \item \textbf{Processor clock} (bit = 1): Same as system clock (50\,MHz in our case)
-  \item \textbf{Reference clock} (bit = 0): Typically PIOSC/4 ($\approx$ 4\,MHz), useful for a stable timebase independent of PLL changes
-\end{itemize}
-
-\noindent
-For this lab, we use the processor clock (50\,MHz) for both SysTick and GPTM.
-
-\subsection{How Timers Work}
+\subsection{Timer Fundamentals}
 
 Understanding the basic operation of timers will help you configure them correctly and debug timing issues.
 
@@ -243,10 +234,7 @@ T = \frac{\text{LOAD} + 1}{f_{\text{clock}}}
 where $f_{\text{clock}}$ is the processor clock frequency (typically 50 MHz on the TM4C123).
 
 \noindent
-\textbf{Example:} To generate a 1 ms interrupt at 50 MHz:
-\[
-\text{LOAD} = \frac{T \times f_{\text{clock}}}{1} - 1 = \frac{0.001 \times 50{,}000{,}000}{1} - 1 = 49{,}999
-\]
+
 
 \noindent
 \textbf{Maximum Period:} With a 24-bit counter at 50 MHz:
@@ -553,22 +541,7 @@ T_{\text{max}} = \frac{65{,}536 \times 256}{50{,}000{,}000} = \frac{16{,}777{,}2
 \]
 
 \noindent
-\textbf{Example:} To generate a 500 ms interrupt in 16-bit mode at 50 MHz:
-\[
-\text{TAILR} \times \text{TAPR} = T \times f_{\text{clock}} = 0.5 \times 50{,}000{,}000 = 25{,}000{,}000
-\]
 
-\noindent
-Choose \texttt{TAPR = 255} (prescaler divisor = 256):
-\[
-\text{TAILR} = \frac{25{,}000{,}000}{256} - 1 = 97{,}656 - 1 = 97{,}655 \text{ (exceeds 16-bit range)}
-\]
-
-\noindent
-This period cannot be achieved in 16-bit mode. Use 32-bit mode instead:
-\[
-\text{TAILR} = 25{,}000{,}000 - 1 = 24{,}999{,}999
-\]
 
 \subsubsection{GPTM Interrupt Numbers}
 Each GPTM module has a unique interrupt number for Timer A and Timer B; you can find these in the TM4C123 datasheet or in the device headers. The CMSIS-compliant header \texttt{tm4c123gh6pm.h} defines these as \texttt{IRQn\_Type} enumerations (e.g., \texttt{TIMER1A\_IRQn}), which work directly with the NVIC helper functions.
@@ -726,8 +699,8 @@ Modify the SysTick example so that the RED LED (PF1) toggles only when SW1 (PF4)
 \begin{itemize}[nosep]
   \item Use \texttt{SysTick\_Config(SystemCoreClock/1000)} to generate a 1 ms tick.
   \item Implement interrupt-driven GPIO input for SW1 (PF4) as in Experiment 5.
-  \item In the GPIO ISR, use a global millisecond counter to implement 30 ms debouncing.
-  \item Only toggle the RED LED if at least 30 ms have elapsed since the last press.
+  \item In the GPIO ISR, use a global millisecond counter to implement 150 ms debouncing.
+  \item Only toggle the RED LED if at least 150 ms have elapsed since the last press.
 \end{itemize}
 
 \paragraph{Hint:}
@@ -740,7 +713,7 @@ volatile uint32_t last_press_ms = 0;
 \noindent
 In \texttt{SysTick\_Handler()}, increment \texttt{global\_ms}. In \texttt{GPIOF\_Handler()}, check:
 \begin{lstlisting}[language=C]
-if ((global_ms - last_press_ms) >= 30) {
+if ((global_ms - last_press_ms) >= 150) {
     GPIOF->DATA ^= (1 << 1);  // Toggle RED LED
     last_press_ms = global_ms;
 }
