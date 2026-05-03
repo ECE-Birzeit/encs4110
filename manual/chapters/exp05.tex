@@ -4,7 +4,7 @@
 After completing this experiment, you will be able to:
 \begin{itemize}[nosep]
   \item Configure GPIO inputs with digital enable and internal pull resistors.
-  \item Read switches via polling with software debouncing (typ. 20\,ms).
+  \item Read switches via polling with software debouncing.
   \item Configure edge-triggered GPIO interrupts and write minimal ISRs.
   \item Enable and manage interrupts in the NVIC (IRQ mapping, ISER).
   \item Unlock and configure protected pins (PF0/NMI) for general-purpose use.
@@ -795,7 +795,7 @@ Modify Example 1 to toggle the green LED (PF3) with each press of SW1 (PF4). The
 \paragraph{Requirements:}
 \begin{itemize}[nosep]
   \item Use polling to detect button presses.
-  \item Implement software debouncing by adding a delay after detecting a press.
+  \item Implement software debouncing by adding a 20\,ms delay after detecting a press.
   \item Toggle the LED state instead of simply turning it on or off.
   \item Ensure the LED changes state only once per button press.
 \end{itemize}

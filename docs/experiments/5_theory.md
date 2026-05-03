@@ -13,7 +13,7 @@ For the complete experiment including learning objectives, theoretical backgroun
 After completing this experiment, you will be able to:
 
 - Configure GPIO inputs with digital enable and internal pull resistors.
-- Read switches via polling with software debouncing (typ. 20 ms).
+- Read switches via polling with software debouncing.
 - Configure edge-triggered GPIO interrupts and write minimal ISRs.
 - Enable and manage interrupts in the NVIC (IRQ mapping, ISER).
 - Unlock and configure protected pins (PF0/NMI) for general-purpose use.
