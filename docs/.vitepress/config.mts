@@ -166,20 +166,6 @@ export default withPwa(defineConfig({
         ],
       },
       {
-        text: "Extra TM4C123 Examples",
-        collapsed: false,
-        items: [
-          {
-            text: "PWM Signal Generation Using Timers",
-            link: "/examples/pwm-timer",
-          },
-          {
-            text: "Quadrature Encoder Interface (QEI)",
-            link: "/examples/qei-encoder",
-          },
-        ],
-      },
-      {
         text: "Resources",
         items: [
           {

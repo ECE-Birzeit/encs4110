@@ -1,0 +1,4 @@
+[submodule "docs/public/manual"]
+	path = docs/public/manual
+	url = git@github.com:mabushelbaia/encs4110-manual.git
+	branch = pdf
