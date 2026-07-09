@@ -2,12 +2,17 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "9. UART Serial Communication - Theory"
-  link: /experiments/9-theory
+  text: "8. Analog-to-Digital Converter (ADC)"
+  link: /experiments/8-procedure
 next: false
 ---
 
 # Universal Asynchronous Receiver-Transmitter (UART)
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_9.pdf" target="_blank">Download Experiment 9 PDF</a>
+:::
 
 <Badge type="tip" text="TM4C123GH6PM" />
 

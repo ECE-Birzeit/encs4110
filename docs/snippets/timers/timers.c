@@ -1,5 +1,4 @@
 #include "TM4C123.h"
-
 #define BLUE_LED 0x04
 
 

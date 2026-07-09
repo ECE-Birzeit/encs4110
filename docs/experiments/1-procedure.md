@@ -1,15 +1,18 @@
 ---
 outline: deep
 lastUpdated: true
-prev:
-  text: "1. Assembly Basics and Program Structure - Theory"
-  link: /experiments/1-theory
+prev: false
 next:
-  text: "2. Data Processing and Memory Operations - Theory"
-  link: /experiments/2-theory
+  text: "2. Data Processing and Memory Operations"
+  link: /experiments/2-procedure
 ---
 
 # Assembly Basics and Program Structure
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_1.pdf" target="_blank">Download Experiment 1 PDF</a>
+:::
 
 
 ## Example 1: Simple Arithmetic Operations and Flag Manipulation

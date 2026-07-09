@@ -2,14 +2,19 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "4. Microcontroller Architecture and GPIO Output - Theory"
-  link: /experiments/4-theory
+  text: "3. Control Flow and Subroutines"
+  link: /experiments/3-procedure
 next:
-  text: "5. GPIO Inputs and Interrupt Handling - Theory"
-  link: /experiments/5-theory
+  text: "5. GPIO Inputs and Interrupt Handling"
+  link: /experiments/5-procedure
 ---
 
 # Microcontroller Architecture and GPIO Output
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_4.pdf" target="_blank">Download Experiment 4 PDF</a>
+:::
 
 <Badge type="tip" text="TM4C123GH6PM" />
 

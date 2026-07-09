@@ -18,18 +18,18 @@ not_upper
         MOV     R0, #0
         BX      LR
 CountUpperNested                    ; CountUpperNested(R0 = ptr) -> R0 = Upper Count
-        PUSH    {R4, LR}            ; save callee-saved + return address
-        MOV     R1, R0              ; R1 = ptr (keep pointer here)
+        PUSH    {R4, R5, LR}        ; save callee-saved regs + return address
+        MOV     R5, R0              ; R5 = ptr (callee-saved: must survive the BL below)
         MOV     R4, #0              ; R4 = count
 cu_next
-        LDRB    R0, [R1], #1        ; R0 = *ptr++; post-increment pointer in R1
+        LDRB    R0, [R5], #1        ; R0 = *ptr++; post-increment pointer in R5
         CBZ     R0, cu_done         ; if null terminator, finish
-        BL      IsUpper             ; R0 = 0/1 based on 'A'..'Z'
+        BL      IsUpper             ; R0 = 0/1 based on 'A'..'Z' (R0-R3 are caller-saved: may be clobbered)
         ADD     R4, R4, R0          ; count += result
         B       cu_next
 cu_done
         MOV     R0, R4              ; return count in R0
-        POP     {R4, PC}
+        POP     {R4, R5, PC}
 Reset_Handler
         LDR     R0, =mystring
         BL      CountUpperNested

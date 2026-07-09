@@ -35,12 +35,12 @@ int main(void)
 } 
 
 void GPIOF_Handler(void) {  
-    if (GPIOF->MIS & SW1) {                 // check if interrupt causes by PF4/SW1
+    if (GPIOF->MIS & SW1) {                 // check if interrupt caused by PF4/SW1
         GPIOF->DATA |= GREEN_LED;           // turn on green LED
         GPIOF->ICR |= SW1;                  // clear the interrupt flag
-    }  
-    else if (GPIOF->MIS & SW2) {            // check if interrupt causes by PF0/SW2
-        GPIOF->DATA &= ~GREEN_LED;          // turn off green LED
+    }
+    if (GPIOF->MIS & SW2) {                 // check if interrupt caused by PF0/SW2 (independent check:
+        GPIOF->DATA &= ~GREEN_LED;          // turn off green LED           both flags may be set at once)
         GPIOF->ICR |= SW2;                  // clear the interrupt flag
-    } 
+    }
 } 

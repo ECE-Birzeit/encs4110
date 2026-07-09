@@ -9,7 +9,8 @@ int main(void)
     GPIOE->AFSEL |= (1 << 3);  // enable alternate function
     GPIOE->DEN &= ~(1 << 3);   // disable digital function
     GPIOE->AMSEL |= (1 << 3);  // enable analog function
-    
+    GPIOE->DIR &= ~(1 << 3);   // clear direction bit (don't-care once AMSEL is set, but good practice)
+
     ADC0->ACTSS &= ~(1 << 3);            // disable SS3 during configuration
     ADC0->EMUX &= ~0xF000;                // Software Trigger
     ADC0->SSMUX3 = 0;                    // get input from channel 0

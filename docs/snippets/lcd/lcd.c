@@ -53,7 +53,7 @@ void LCD_Init(void)
     while ((SYSCTL->PRGPIO & (1 << 1)) == 0)
         ;
 
-    // Configure PB0 (RS), PB1 (EN), PB4-PB7 (data) as output
+    // Configure PB0 (RS), PB1 (RW), PB2 (EN), PB4-PB7 (data) as output
     GPIOB->DIR |= RS | RW | EN | DATA_MASK;
     GPIOB->DEN |= RS | RW | EN | DATA_MASK;
     GPIOB->DATA &= ~(RS | RW | EN | DATA_MASK);  // Clear all

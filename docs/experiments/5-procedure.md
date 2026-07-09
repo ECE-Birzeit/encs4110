@@ -2,15 +2,20 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "5. GPIO Inputs and Interrupt Handling - Theory"
-  link: /experiments/5-theory
+  text: "4. Microcontroller Architecture and GPIO Output"
+  link: /experiments/4-procedure
 next:
-  text: "6. Hardware Timers and Timing Control - Theory"
-  link: /experiments/6-theory
+  text: "6. Hardware Timers and Timing Control"
+  link: /experiments/6-procedure
 ---
 
 
 # GPIO Inputs and Interrupt Handling
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_5.pdf" target="_blank">Download Experiment 5 PDF</a>
+:::
 
 <Badge type="tip" text="TM4C123GH6PM" />
 

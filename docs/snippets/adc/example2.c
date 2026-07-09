@@ -18,6 +18,7 @@ int main(void)
     GPIOE->AFSEL |= (1 << 3);  // Enable alternate function on PE3
     GPIOE->DEN &= ~(1 << 3);   // Disable digital I/O on PE3
     GPIOE->AMSEL |= (1 << 3);  // Enable analog input on PE3
+    GPIOE->DIR &= ~(1 << 3);   // Clear direction bit (don't-care once AMSEL is set, but good practice)
 
     ADC0->ACTSS &= ~(1 << 3);            	// Disable SS3 during configuration
     ADC0->EMUX |= 0xF000;               	// Set SS3 to continuous sampling mode

@@ -2,15 +2,20 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "6. Hardware Timers and Timing Control - Theory"
-  link: /experiments/6-theory
+  text: "5. GPIO Inputs and Interrupt Handling"
+  link: /experiments/5-procedure
 next:
-  text: "7. Character LCD Display Interface - Theory"
-  link: /experiments/7-theory
+  text: "7. Character LCD Display Interface"
+  link: /experiments/7-procedure
 ---
 
 
 # Hardware Timers and Timing Control
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_6.pdf" target="_blank">Download Experiment 6 PDF</a>
+:::
 
 <Badge type="tip" text="TM4C123GH6PM" />
 

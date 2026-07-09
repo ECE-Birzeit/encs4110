@@ -2,14 +2,19 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "2. Data Processing and Memory Operations - Theory"
-  link: /experiments/2-theory
+  text: "1. Assembly Basics and Program Structure"
+  link: /experiments/1-procedure
 next:
-  text: "3. Control Flow and Subroutines - Theory"
-  link: /experiments/3-theory
+  text: "3. Control Flow and Subroutines"
+  link: /experiments/3-procedure
 ---
 
 # Data Processing and Memory Operations
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_2.pdf" target="_blank">Download Experiment 2 PDF</a>
+:::
 
 
 ## Examples

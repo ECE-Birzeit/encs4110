@@ -2,11 +2,11 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "3. Control Flow and Subroutines - Theory"
-  link: /experiments/3-theory
+  text: "2. Data Processing and Memory Operations"
+  link: /experiments/2-procedure
 next:
-  text: "4. Microcontroller Architecture and GPIO Output - Theory"
-  link: /experiments/4-theory
+  text: "4. Microcontroller Architecture and GPIO Output"
+  link: /experiments/4-procedure
 ---
 
 
@@ -14,6 +14,11 @@ next:
 
 
 # Control Flow and Subroutines
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_3.pdf" target="_blank">Download Experiment 3 PDF</a>
+:::
 
 
 ## Examples
@@ -33,7 +38,7 @@ This example demonstrates how to process a null-terminated string and count the 
 **Check:** Verify that the program correctly counts the uppercase letters and stores the result in `UPPERCOUNT`.
 
 ### Example 3: Nested Uppercase Counter with Stack
-This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-terminated string and calls `IsUpper(ch)` for each character. It shows saving/restoring `LR` and using a callee-saved register (`R4`) for the running count.
+This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-terminated string and calls `IsUpper(ch)` for each character. It shows saving/restoring `LR` and using callee-saved registers (`R4` for the running count, `R5` for the scan pointer) since both must survive the `BL IsUpper` call.
 
 <<< @/snippets/assembly/exp3/example3.asm
 

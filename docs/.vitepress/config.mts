@@ -89,24 +89,24 @@ export default withPwa(defineConfig({
             text: "1. Assembly Basics and Program Structure",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/1-theory" },
               { text: "Procedure", link: "/experiments/1-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_1.pdf" },
             ],
           },
           {
             text: "2. Data Processing and Memory Operations",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/2-theory" },
               { text: "Procedure", link: "/experiments/2-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_2.pdf" },
             ],
           },
           {
             text: "3. Control Flow and Subroutines",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/3-theory" },
               { text: "Procedure", link: "/experiments/3-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_3.pdf" },
             ],
           },
         ],
@@ -119,48 +119,48 @@ export default withPwa(defineConfig({
             text: "4. Microcontroller Architecture and GPIO Output",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/4-theory" },
               { text: "Procedure", link: "/experiments/4-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_4.pdf" },
             ],
           },
           {
             text: "5. GPIO Inputs and Interrupt Handling",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/5-theory" },
               { text: "Procedure", link: "/experiments/5-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_5.pdf" },
             ],
           },
           {
             text: "6. Hardware Timers and Timing Control",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/6-theory" },
               { text: "Procedure", link: "/experiments/6-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_6.pdf" },
             ],
           },
           {
             text: "7. Character LCD Display Interface",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/7-theory" },
               { text: "Procedure", link: "/experiments/7-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_7.pdf" },
             ],
           },
           {
             text: "8. Analog-to-Digital Converter (ADC)",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/8-theory" },
               { text: "Procedure", link: "/experiments/8-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_8.pdf" },
             ],
           },
           {
             text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
             collapsed: true,
             items: [
-              { text: "Theory", link: "/experiments/9-theory" },
               { text: "Procedure", link: "/experiments/9-procedure" },
+              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_9.pdf" },
             ],
           },
         ],

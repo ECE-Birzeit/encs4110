@@ -22,7 +22,7 @@ void UART0_Init() {
     UART0->CTL = 0; // Disable UART0 while configuring
     UART0->IBRD = 27; // Set integer baud rate divisor for 115200 baud @ 50MHz
     UART0->FBRD = 8; // Set fractional baud rate divisor
-    UART0->LCRH = 0x60; // 8 data bits, no parity, one stop bit, FIFOs enabled
+    UART0->LCRH = 0x70; // 8 data bits, no parity, one stop bit, FIFOs enabled (WLEN=0x60 | FEN=0x10)
     UART0->CC = 0; // Use system clock for UART
     UART0->CTL = (1 << 0) | (1 << 8) | (1 << 9); // Enable UART0, TX and RX
 }

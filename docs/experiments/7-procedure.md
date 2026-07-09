@@ -2,15 +2,20 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "7. Character LCD Display Interface - Theory"
-  link: /experiments/7-theory
+  text: "6. Hardware Timers and Timing Control"
+  link: /experiments/6-procedure
 next:
-  text: "8. Analog-to-Digital Converter (ADC) - Theory"
-  link: /experiments/8-theory
+  text: "8. Analog-to-Digital Converter (ADC)"
+  link: /experiments/8-procedure
 ---
 
 
 # Character LCD Display Interface
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_7.pdf" target="_blank">Download Experiment 7 PDF</a>
+:::
 
 <Badge type="tip" text="TM4C123GH6PM" />
 

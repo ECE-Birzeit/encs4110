@@ -1,5 +1,4 @@
 #include "TM4C123.h"
-
 #define GREEN_LED 0x08					// PF3 - Green LED
 
 volatile uint32_t systick_counter = 0;	// Global counter for SysTick interrupts

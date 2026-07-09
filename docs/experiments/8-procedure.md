@@ -2,15 +2,20 @@
 outline: deep
 lastUpdated: true
 prev:
-  text: "8. Analog-to-Digital Converter (ADC) - Theory"
-  link: /experiments/8-theory
+  text: "7. Character LCD Display Interface"
+  link: /experiments/7-procedure
 next:
-  text: "9. UART Serial Communication - Theory"
-  link: /experiments/9-theory
+  text: "9. Universal Asynchronous Receiver-Transmitter (UART)"
+  link: /experiments/9-procedure
 ---
 
 
 # Analog-to-Digital Converter (ADC)
+
+::: info Complete Lab Manual
+For learning objectives and theoretical background, see the PDF manual:
+ <a href="/manual/encs4110_8.pdf" target="_blank">Download Experiment 8 PDF</a>
+:::
 
 <Badge type="tip" text="TM4C123GH6PM" />
 
