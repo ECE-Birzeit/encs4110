@@ -90,7 +90,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/1-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_1.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_1.pdf" },
             ],
           },
           {
@@ -98,7 +98,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/2-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_2.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_2.pdf" },
             ],
           },
           {
@@ -106,7 +106,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/3-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_3.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_3.pdf" },
             ],
           },
         ],
@@ -120,7 +120,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/4-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_4.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_4.pdf" },
             ],
           },
           {
@@ -128,7 +128,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/5-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_5.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_5.pdf" },
             ],
           },
           {
@@ -136,7 +136,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/6-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_6.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_6.pdf" },
             ],
           },
           {
@@ -144,7 +144,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/7-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_7.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_7.pdf" },
             ],
           },
           {
@@ -152,7 +152,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/8-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_8.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_8.pdf" },
             ],
           },
           {
@@ -160,7 +160,7 @@ export default withPwa(defineConfig({
             collapsed: true,
             items: [
               { text: "Procedure", link: "/experiments/9-procedure" },
-              { text: "PDF (Theory + Procedure)", link: "/manual/encs4110_9.pdf" },
+              { text: "Lab Manual (PDF)", link: "/manual/encs4110_9.pdf" },
             ],
           },
         ],
