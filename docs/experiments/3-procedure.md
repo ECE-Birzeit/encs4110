@@ -51,7 +51,7 @@ Implement procedures to process strings with the following requirements:
 - Use nested procedure calls where `CountVowels` calls a helper procedure `IsVowel`.
 - Follow AAPCS conventions for parameter passing and register usage.
 
-#### Task 2: Factorial Calculation (Iterative)
+### Task 2: Factorial Calculation (Iterative)
 Implement a procedure to calculate the factorial of a non-negative integer:
 - Create a procedure `Factorial` that takes a non-negative integer in R0 and returns its factorial in R0.
 - Use an iterative approach with a loop to compute the factorial.
