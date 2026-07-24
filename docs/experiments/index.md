@@ -4,36 +4,34 @@ outline: deep
 
 # Experiment Navigator
 
-Welcome to the ENCS4110 Computer Design Laboratory. This page provides access to all 9 experiments covering ARM assembly programming and embedded systems with the TM4C123G LaunchPad.
+Explore the ENCS4110 Computer Design Laboratory experiments covering ARM assembly programming, embedded systems, and hardware interfacing using the **TM4C123GXL LaunchPad**.
 
-Learning objectives and theoretical background for every experiment live in the PDF manual — it's the single source of truth for theory. The in-browser Procedure pages are a quick reference for the worked code examples and tasks.
+Each experiment includes:
+- **Lab Manual PDF** — Complete theory, background, and detailed procedure (official reference)
+- **Online Procedure** — Quick access to code examples, steps, and implementation notes
 
-## Quick Links
 
-| # | Topic | Procedure | PDF (Theory + Procedure) |
-|---|-------|-----------|---------------------------|
-| 1 | Assembly Basics & Program Structure | [Link](./1-procedure) | <a href="/manual/encs4110_1.pdf" target="_blank">PDF</a> |
-| 2 | Data Processing & Memory Operations | [Link](./2-procedure) | <a href="/manual/encs4110_2.pdf" target="_blank">PDF</a> |
-| 3 | Control Flow & Subroutines | [Link](./3-procedure) | <a href="/manual/encs4110_3.pdf" target="_blank">PDF</a> |
-| 4 | Microcontroller Architecture & GPIO Output | [Link](./4-procedure) | <a href="/manual/encs4110_4.pdf" target="_blank">PDF</a> |
-| 5 | GPIO Inputs & Interrupt Handling | [Link](./5-procedure) | <a href="/manual/encs4110_5.pdf" target="_blank">PDF</a> |
-| 6 | Hardware Timers & Timing Control | [Link](./6-procedure) | <a href="/manual/encs4110_6.pdf" target="_blank">PDF</a> |
-| 7 | Character LCD Display Interface | [Link](./7-procedure) | <a href="/manual/encs4110_7.pdf" target="_blank">PDF</a> |
-| 8 | Analog-to-Digital Converter (ADC) | [Link](./8-procedure) | <a href="/manual/encs4110_8.pdf" target="_blank">PDF</a> |
-| 9 | UART Serial Communication | [Link](./9-procedure) | <a href="/manual/encs4110_9.pdf" target="_blank">PDF</a> |
+## Experiments
 
-<a href="/manual/encs4110_manual.pdf" target="_blank">Download Full Manual</a>
+Follow the experiments in order as they build from processor fundamentals to complete embedded applications.
 
-## Prerequisites
+| # | Experiment | Online Guide | Lab Manual |
+|---|------------|--------------|------------|
+| 01 | ARM Assembly Basics & Program Structure | [Open](./1) | <a href="/manual/encs4110_1.pdf" target="_blank">PDF</a> |
+| 02 | Data Processing & Memory Operations | [Open](./2) | <a href="/manual/encs4110_2.pdf" target="_blank">PDF</a> |
+| 03 | Control Flow & Subroutines | [Open](./3) | <a href="/manual/encs4110_3.pdf" target="_blank">PDF</a> |
+| 04 | TM4C123 Architecture & GPIO Output | [Open](./4) | <a href="/manual/encs4110_4.pdf" target="_blank">PDF</a> |
+| 05 | GPIO Inputs & External Interrupts | [Open](./5) | <a href="/manual/encs4110_5.pdf" target="_blank">PDF</a> |
+| 06 | Hardware Timers & Timing Control | [Open](./6) | <a href="/manual/encs4110_6.pdf" target="_blank">PDF</a> |
+| 07 | Character LCD Interface | [Open](./7) | <a href="/manual/encs4110_7.pdf" target="_blank">PDF</a> |
+| 08 | Analog-to-Digital Conversion (ADC) | [Open](./8) | <a href="/manual/encs4110_8.pdf" target="_blank">PDF</a> |
+| 09 | UART Serial Communication | [Open](./9) | <a href="/manual/encs4110_9.pdf" target="_blank">PDF</a> |
 
-Before starting the microcontroller experiments (4-9), ensure you have:
-1. TM4C123G LaunchPad connected to your computer
-2. Keil uVision5 IDE configured - see [Setup Guide](../setup)
 
-## Additional Resources
+::: tip Lab Manual
+The complete laboratory manual contains the theoretical background, hardware details, experiment objectives, and full procedures.
 
-| Resource | Link |
-|----------|------|
-| Keil uVision5 IDE | [Download](https://www.keil.com/demo/eval/arm.htm) |
-| ARM Architecture Documentation | [Link](https://developer.arm.com/documentation/dui0041/latest/) |
-| TM4C123GH6PM Datasheet | [Link](https://www.ti.com/lit/ds/symlink/tm4c123gh6pm.pdf) |
+<a href="/manual/encs4110_manual.pdf" target="_blank">**Download Complete Lab Manual**</a>
+:::
+
+

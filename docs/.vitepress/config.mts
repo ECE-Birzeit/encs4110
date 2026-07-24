@@ -1,6 +1,8 @@
 import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+
 import { withPwa } from '@vite-pwa/vitepress'
+import Icons from 'unplugin-icons/vite'
 
 
 export default withPwa(defineConfig({
@@ -16,7 +18,10 @@ export default withPwa(defineConfig({
         customIcon: {
           'c': 'https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/c-program-icon.svg',
         },
-      })
+      }),
+      Icons({
+        compiler: 'vue3',
+      }),
     ],
   },
 
@@ -40,13 +45,7 @@ export default withPwa(defineConfig({
       gtag('js', new Date());
       gtag('config', 'G-YVX3LGJEHB');`,
     ],
-    [
-      "link",
-      {
-        rel: "icon",
-        href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="90" font-size="90">💻</text></svg>',
-      },
-    ],
+
     [
       "meta",
       {
@@ -63,10 +62,17 @@ export default withPwa(defineConfig({
     ],
   ],
 
-  title: "Computer Design Laboratory",
+  title: "ENCS4110 Birzeit University",
   description:
-    "A comprehensive guide and resource for ARM assembly language experiments.",
+    "A hands-on ARM Cortex-M4 embedded systems laboratory covering assembly programming, GPIO, interrupts, timers, ADC, UART, and peripheral interfacing using the TM4C123 LaunchPad.",
   themeConfig: {
+
+    footer: {
+      message: 'ENCS4110 · Computer Design Laboratory',
+      copyright: 'Developed by <a href="https://mabushelbaia.com" target="_blank">Mohammad Abu-Shelbaia</a>'
+    }, 
+    siteTitle: "ENCS4110-BZU",
+    // logo: "icons/monitor.svg",
     nav: [
       { text: "Home", link: "/" },
       { text: "Experiments", link: "/experiments/" },
@@ -85,88 +91,25 @@ export default withPwa(defineConfig({
         text: "Part 1: ARM Assembly",
         collapsed: false,
         items: [
-          {
-            text: "1. Assembly Basics and Program Structure",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/1-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_1.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "2. Data Processing and Memory Operations",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/2-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_2.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "3. Control Flow and Subroutines",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/3-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_3.pdf", target: "_blank" },
-            ],
-          },
+          { text: "1. Assembly Basics and Program Structure", link: "/experiments/1" },
+          { text: "2. Data Processing and Memory Operations", link: "/experiments/2" },
+          { text: "3. Control Flow and Subroutines", link: "/experiments/3" },
         ],
       },
       {
         text: "Part 2: TM4C123 LaunchPad",
-        collapsed: false, 
+        collapsed: false,
         items: [
-          {
-            text: "4. Microcontroller Architecture and GPIO Output",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/4-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_4.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "5. GPIO Inputs and Interrupt Handling",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/5-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_5.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "6. Hardware Timers and Timing Control",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/6-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_6.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "7. Character LCD Display Interface",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/7-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_7.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "8. Analog-to-Digital Converter (ADC)",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/8-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_8.pdf", target: "_blank" },
-            ],
-          },
-          {
-            text: "9. Universal Asynchronous Receiver-Transmitter (UART)",
-            collapsed: true,
-            items: [
-              { text: "Procedure", link: "/experiments/9-procedure" },
-              { text: "Lab Manual (PDF)", link: "/manual/encs4110_9.pdf", target: "_blank" },
-            ],
-          },
+          { text: "4. Microcontroller Architecture and GPIO Output", link: "/experiments/4" },
+          { text: "5. GPIO Inputs and Interrupt Handling", link: "/experiments/5" },
+          { text: "6. Hardware Timers and Timing Control", link: "/experiments/6" },
+          { text: "7. Character LCD Display Interface", link: "/experiments/7" },
+          { text: "8. Analog-to-Digital Converter (ADC)", link: "/experiments/8" },
+          { text: "9. Universal Asynchronous Receiver-Transmitter (UART)", link: "/experiments/9" },
         ],
       },
       {
-        text: "Resources",
+        text: "Additional Resources",
         items: [
           {
             text: "Keil uVision5 IDE",
@@ -197,9 +140,13 @@ export default withPwa(defineConfig({
   pwa: {
     manifest: {
       name: "Computer Design Laboratory",
-      short_name: "ENCS 4110",
-      description: "A comprehensive guide and resource for ARM assembly language experiments.",
-      theme_color: "#646cff",
+      short_name: "ENCS4110",
+      description: "A comprehensive guide and resource for ARM assembly language experiments. and TM4C123 LaunchPad microcontroller interfacing.",
+      theme_color: "#181818",
+      background_color: "#ffffff",
+      display: "standalone",
+      scope: "/",
+      start_url: "/",
       icons: [
         {
           src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>💻</text></svg>",
@@ -216,6 +163,9 @@ export default withPwa(defineConfig({
     workbox: {
       globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2,pdf}"],
       maximumFileSizeToCacheInBytes: 5000000,
+    },
+    experimental: {
+      includeAllowlist: true,
     },
   },
 }));

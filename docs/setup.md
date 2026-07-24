@@ -20,7 +20,7 @@ Keil uses "Device Family Packs" (DFPs) to support different microcontrollers. Yo
 
 ## Step 2: Install Stellaris ICDI Debugger Support
 
-Keil does **not** include support for the Stellaris ICDI debugger by default — you have to install it manually.
+Keil does **not** include support for the Stellaris ICDI debugger by default - you have to install it manually.
 
 ### Download the Debugger Add-On
 

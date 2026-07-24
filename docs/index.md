@@ -6,10 +6,14 @@ hero:
   name: "ENCS4110"
   text: "Computer Design Laboratory"
   tagline: "Department of Electrical & Computer Engineering"
+
   actions:
     - theme: brand
-      text: "Start Experiments"
-      link: /experiments
+      text: "Explore Experiments"
+      link: /experiments/
+    - theme: alt
+      text: "Download Full Manual"
+      link: /manual/encs4110_manual.pdf
     - theme: alt
       text: "Setup Guide"
       link: /setup

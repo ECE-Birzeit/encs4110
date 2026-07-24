@@ -1,5 +1,16 @@
 // .vitepress/theme/index.ts
-import Theme from 'vitepress/theme'
+import { h } from 'vue'
+import DefaultTheme from 'vitepress/theme'
 import 'virtual:group-icons.css'
+import './custom.css'
 
-export default Theme
+import RegisterSW from './components/RegisterSW.vue'
+
+export default {
+  extends: DefaultTheme,
+  Layout() {
+    return h(DefaultTheme.Layout, null, {
+      'layout-bottom': () => h(RegisterSW),
+    })
+  },
+}
