@@ -38,9 +38,9 @@ The contrast potentiometer (typically 10kΩ) allows adjustment of the display vi
 The following code demonstrates a complete LCD driver in 4-bit mode with initialization, command/data transmission, and text display functions.
 
 ::: code-group
+<<< @/snippets/lcd/main.c
 <<< @/snippets/lcd/lcd.h
 <<< @/snippets/lcd/lcd.c
-<<< @/snippets/lcd/main.c
 ::: 
 
 ### Code Explanation
