@@ -134,12 +134,12 @@ export default withPwa(defineConfig({
       start_url: "/",
       icons: [
         {
-          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>💻</text></svg>",
+          src: "/icons/pwa-icon.svg",
           sizes: "192x192",
           type: "image/svg+xml",
         },
         {
-          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>💻</text></svg>",
+          src: "/icons/pwa-icon.svg",
           sizes: "512x512",
           type: "image/svg+xml",
         },
