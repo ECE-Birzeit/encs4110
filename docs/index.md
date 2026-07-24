@@ -14,6 +14,7 @@ hero:
     - theme: alt
       text: "Download Full Manual"
       link: /manual/encs4110_manual.pdf
+      target: _blank
     - theme: alt
       text: "Setup Guide"
       link: /setup

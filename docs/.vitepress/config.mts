@@ -1,5 +1,5 @@
 import { defineConfig } from "vitepress";
-import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 
 import { withPwa } from '@vite-pwa/vitepress'
 import Icons from 'unplugin-icons/vite'
@@ -45,21 +45,17 @@ export default withPwa(defineConfig({
       gtag('js', new Date());
       gtag('config', 'G-YVX3LGJEHB');`,
     ],
+    [
+      "script",
+      {},
+      `addEventListener('load', function() {
+        document.querySelectorAll('.VPHero .actions a[href*="manual"]').forEach(function(el) {
+          el.setAttribute('target', '_blank');
+        });
+      });`,
+    ],
 
-    [
-      "meta",
-      {
-        property: "og:image",
-        content: "/path/to/image.png",
-      },
-    ],
-    [
-      "meta",
-      {
-        name: "twitter:image",
-        content: "/path/to/image.png",
-      },
-    ],
+
   ],
 
   title: "ENCS4110 Birzeit University",
@@ -72,7 +68,7 @@ export default withPwa(defineConfig({
       copyright: 'Developed by <a href="https://mabushelbaia.com" target="_blank">Mohammad Abu-Shelbaia</a>'
     }, 
     siteTitle: "ENCS4110-BZU",
-    // logo: "icons/monitor.svg",
+
     nav: [
       { text: "Home", link: "/" },
       { text: "Experiments", link: "/experiments/" },
