@@ -45,17 +45,6 @@ export default withPwa(defineConfig({
       gtag('js', new Date());
       gtag('config', 'G-YVX3LGJEHB');`,
     ],
-    [
-      "script",
-      {},
-      `addEventListener('load', function() {
-        document.querySelectorAll('.VPHero .actions a[href*="manual"]').forEach(function(el) {
-          el.setAttribute('target', '_blank');
-        });
-      });`,
-    ],
-
-
   ],
 
   title: "ENCS4110 Birzeit University",
