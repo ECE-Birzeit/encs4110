@@ -20,5 +20,8 @@
   },
   "dependencies": {
     "vitepress-plugin-group-icons": "latest"
+  },
+  "overrides": {
+    "vite": "^6.4.3"
   }
 }
