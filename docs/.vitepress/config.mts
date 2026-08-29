@@ -130,6 +130,7 @@ export default withPwa(defineConfig({
     },
   },
   pwa: {
+    registerType: "autoUpdate",
     manifest: {
       name: "Computer Design Laboratory",
       short_name: "ENCS4110",

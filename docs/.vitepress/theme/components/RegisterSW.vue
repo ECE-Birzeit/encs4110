@@ -14,6 +14,11 @@ onBeforeMount(async () => {
   registerSW({
     immediate: true,
     onOfflineReady,
+    // registerType: 'autoUpdate' (see config.mts) makes a waiting service
+    // worker activate on its own -- this callback doesn't need to do
+    // anything, but vite-plugin-pwa's documented auto-update recipe keeps
+    // it defined rather than omitted.
+    onNeedRefresh() {},
     onRegistered() {
       console.info('Service Worker registered')
     },
