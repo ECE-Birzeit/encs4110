@@ -61,7 +61,7 @@ export default withPwa(defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Experiments", link: "/experiments/" },
-      { text: "PWA Update Test", link: "/" },
+      { text: "PWA Update Test 2", link: "/" },
     ],
 
     sidebar: [
