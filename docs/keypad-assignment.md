@@ -1,7 +1,6 @@
 ---
 outline: deep
 lastUpdated: true
-search: false
 ---
 
 # Matrix Keypad Interfacing — Polling vs. Interrupts

@@ -94,6 +94,13 @@ export default withPwa(defineConfig({
         ],
       },
       {
+        text: "Training Assignments",
+        collapsed: false,
+        items: [
+          { text: "1. Matrix Keypad Interfacing", link: "/keypad-assignment" },
+        ],
+      },
+      {
         text: "Additional Resources",
         items: [
           {
