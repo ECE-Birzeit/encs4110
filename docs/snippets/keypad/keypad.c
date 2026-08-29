@@ -60,6 +60,6 @@ void KeyPad_HandleKey(char key)
         // TODO -- Step 5: case 'D' resets the interval to BLINK_DEFAULT
 
         default:
-            break;   // 8, 9, *, # -- see Extras
+            break;   // 8, 9, *, # -- left unused
     }
 }
