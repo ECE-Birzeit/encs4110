@@ -97,7 +97,10 @@ export default withPwa(defineConfig({
         text: "Training Assignments",
         collapsed: false,
         items: [
-          { text: "1. Matrix Keypad Interfacing", link: "/keypad-assignment" },
+          { text: "Matrix Keypad Interfacing", link: "/keypad-assignment" },
+          { text: "Simon-Says Sequence Repeater", link: "/simon-assignment" },
+          { text: "Stopwatch with LED Indicator", link: "/ledstopwatch-assignment" },
+          { text: "Traffic Light with Pedestrian Crossing", link: "/trafficlight-assignment" },
         ],
       },
       {
