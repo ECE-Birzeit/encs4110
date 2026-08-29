@@ -9,6 +9,25 @@ async function close() {
   offlineReady.value = false
 }
 
+// GitHub Pages serves sw.js with a fixed Cache-Control (no way to set
+// per-file headers there), which can let a plain reload be satisfied
+// straight from the browser's own HTTP cache without ever checking the
+// server for a newer version. Poll for a genuinely fresh copy on an
+// interval instead, explicitly bypassing cache -- this is vite-plugin-pwa's
+// own documented workaround for hosts with this exact limitation.
+const CHECK_INTERVAL_MS = 30 * 1000
+
+function registerPeriodicUpdateCheck(swUrl: string, registration: ServiceWorkerRegistration) {
+  setInterval(async () => {
+    if (registration.installing || !navigator.onLine) return
+    const resp = await fetch(swUrl, {
+      cache: 'no-store',
+      headers: { 'cache-control': 'no-cache' },
+    })
+    if (resp?.status === 200) await registration.update()
+  }, CHECK_INTERVAL_MS)
+}
+
 onBeforeMount(async () => {
   const { registerSW } = await import('virtual:pwa-register')
   registerSW({
@@ -19,8 +38,9 @@ onBeforeMount(async () => {
     // anything, but vite-plugin-pwa's documented auto-update recipe keeps
     // it defined rather than omitted.
     onNeedRefresh() {},
-    onRegistered() {
+    onRegisteredSW(swUrl, registration) {
       console.info('Service Worker registered')
+      if (registration) registerPeriodicUpdateCheck(swUrl, registration)
     },
     onRegisterError(e) {
       console.error('Service Worker registration error!', e)
