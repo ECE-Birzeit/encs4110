@@ -25,6 +25,10 @@ void KeyPad_Poll(void)
     // TODO -- Step 2: read COL_MASK while current_row is whatever SysTick left active
     // TODO -- Step 2: if exactly one column reads HIGH, decode (current_row, column)
     //                 through keymap and call KeyPad_HandleKey
+    // TODO -- Step 6: decode using the row that was active when you actually
+    //                 read the columns, not a re-read of current_row later
+    // TODO -- Step 6: debounce with DEBOUNCE_MS, and don't re-fire while the
+    //                 same key is still held down
 }
 
 void Blink_Timer_Init(void)

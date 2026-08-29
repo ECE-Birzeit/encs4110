@@ -60,7 +60,7 @@ You get two files to fill in — `keypad.c`/`keypad.h` hold all the keypad and L
 <<< @/snippets/keypad/keypad.h
 :::
 
-Fill it in through the five steps below, **in order**. Each one ends with a way to check your work in the Keil debugger before moving to the next — don't start Step *N+1* until Step *N*'s check actually passes.
+Fill it in through the six steps below, **in order**. Each one ends with a way to check your work in the Keil debugger before moving to the next — don't start Step *N+1* until Step *N*'s check actually passes.
 
 Interrupt-driven column detection is **not** part of the base build — it's an optional alternative to Step 2, described in Extras.
 
@@ -166,7 +166,31 @@ switch (key) {
 - `C` — same check at the `BLINK_MAX` ceiling.
 - `D` — `TAILR` resets to the default from any interval you reached with `B`/`C`.
 
-Once Step 5 verifies clean, the base build is done and fully verified end to end.
+Once Step 5 verifies clean, move on to Step 6 — the last piece of the base build.
+
+### Step 6: Harden Against Scan Races and Held Keys
+
+Steps 1–5 got you a keypad that reads correctly most of the time — but two real bugs are still lurking, and they show up under exactly the conditions you'd actually use this thing: pressing keys at a normal pace, and holding one down.
+
+**The scan race.** `current_row` keeps changing in the background, once every SysTick tick, completely independent of whatever `KeyPad_Poll` happens to be doing at that moment. If you read the columns, and *then* separately use `current_row` again to decode which key that was, what guarantees those two reads saw the same row? What could happen to a key's decoded value if the scan advances in between — and how would you close that gap so a single `Poll` call always decodes against the row it actually read, no matter what happens after?
+
+**No repeat while held.** Right now, `KeyPad_Poll` calls `KeyPad_HandleKey` on every single call where a key reads as pressed — which, while a key is held, is every few milliseconds, for as long as it's held. Fixing that needs two things: **debounce** (`DEBOUNCE_MS` is defined for you — use `global_ms` to require a minimum time between accepted presses, following the pattern from Experiment 6, Task 1), and a way to recognize "still held" so it isn't treated as a fresh press every time. That second part runs straight into the scan race above: a column reading is only meaningful while its own row is active, so what does it mean if you check "is anything pressed" while the scan happens to be on some *other* row, and treat "nothing there" as if your held key had been released? What do you need to remember about *which row* a held key was on, so that revisiting an unrelated row doesn't get mistaken for its release?
+
+```c
+void KeyPad_Poll(void)
+{
+    // TODO -- Step 6: decode using the row that was active when you actually
+    //         read the columns, not a re-read of current_row later
+    // TODO -- Step 6: debounce with DEBOUNCE_MS, and don't re-fire while the
+    //         same key is still held down
+}
+```
+
+**Verify:**
+- **Scan race** — pick two keys that share a column but sit on different rows (any standard phone-style layout has several such pairs). Press one repeatedly at a normal pace and watch closely for the *other* one's action flashing briefly instead of — or in addition to — the one you actually pressed. It shouldn't happen at all, at any pace.
+- **Held key** — hold a single key down for several seconds and confirm its action fires exactly once, not repeatedly. Then release and immediately press a *different* key — it should register right away, with no leftover delay from the previous hold.
+
+Once Step 6 verifies clean, the base build is done and fully verified end to end.
 
 ## Extras (Optional)
 
@@ -186,15 +210,9 @@ void GPIOC_Handler(void);             // TODO: on a HIGH column, decode + call K
 > [!Note] Why `IBE = 1`?
 > Rows are never floating — the scan drives every row explicitly, HIGH on the active one and LOW on the rest. A column tied to a held key flips right along with the scan, not just on physical press or release, so you can't safely bet on one fixed edge direction (`IEV`) always meaning "pressed." `IBE = 1` interrupts on any change instead, leaving it to you to read the level and decide what actually happened.
 
-### No repeat while held
+### No repeat while held (interrupt version)
 
-Both the polling and interrupt versions above will visibly misbehave if you hold a key down: the action repeats every scan cycle — every few milliseconds — for as long as it's held. Fixing that is a natural next step.
-
-**Debounce.** Use `global_ms` to require a minimum time between accepted presses, following the pattern from Experiment 6, Task 1.
-
-**Polling version.** Restructure `KeyPad_Poll` as an explicit state machine with these states: `IDLE`, `DEBOUNCE`, `PRESSED`, `WAIT_RELEASE`. A column reading is only meaningful while its own row is active, so ask yourself: what breaks if your state machine checks a column at the wrong moment relative to `current_row`?
-
-**Interrupt version.** This one's trickier. A held key's column pulses at the *scan* rate, not just on physical press and release, so a simple "latch on press, clear on any edge" design will still repeat every cycle. What do you need to remember *per column* to tell "the row cycled away" apart from "the key was actually released"?
+The interrupt-driven build above has the same held-key problem Step 6 solved for polling — but it's trickier here: a held key's column pulses at the *scan* rate, not just on physical press and release, so a simple "latch on press, clear on any edge" design will still repeat every cycle. What do you need to remember *per column* to tell "the row cycled away" apart from "the key was actually released"?
 
 ### Open keys
 
@@ -207,4 +225,5 @@ By this point every item below should already be confirmed from the step-by-step
 1. **Wiring** — all 16 keys map to the right `(row, column)` pair (Step 2).
 2. **Colors** — `1`–`7` show the right combination, and `0` clears them (Step 3).
 3. **Blink** — the default toggles roughly every 2 s; `A` starts and pauses it; `B`/`C` shift the interval by 0.25 s and hold at the floor/ceiling; `D` resets it back to 2 s (Steps 4–5).
-4. **If you did the Extras** — holding a key for two or more seconds should fire its action exactly once.
+4. **Reliability** — no wrong-row flashes at any pace, and holding a key fires its action exactly once (Step 6).
+5. **If you did the interrupt Extras** — the same reliability requirement holds for that path too.
