@@ -62,8 +62,6 @@ You get two files to fill in — `keypad.c`/`keypad.h` hold all the keypad and L
 
 Fill it in through the six steps below, **in order**. Each one ends with a way to check your work in the Keil debugger before moving to the next — don't start Step *N+1* until Step *N*'s check actually passes.
 
-Interrupt-driven column detection is **not** part of the base build — it's an optional alternative to Step 2, described in Extras.
-
 ### Step 1: Configure the Ports
 
 Fill in `KeyPad_GPIO_Init`: clocks for GPIOC/GPIOD/GPIOF, then `DIR`/`DEN` for the rows (outputs, idle LOW), `DEN`/`PDR` for the columns (inputs, pull-down), and `DIR`/`DEN` for the RGB LED (outputs).
@@ -192,32 +190,6 @@ void KeyPad_Poll(void)
 
 Once Step 6 verifies clean, the base build is done and fully verified end to end.
 
-## Extras (Optional)
-
-### Interrupt-driven detection
-
-An alternative to Step 2: instead of `KeyPad_Poll` running every main-loop iteration, detect presses with GPIOC edge interrupts on PC4–PC7, while SysTick keeps scanning rows in the background exactly as before.
-
-**Requirements:**
-- Configure the columns with `IBE = 1` (interrupt on both edges) — see the note below for why.
-- In the handler, snapshot `current_row`, then check the triggering column's current level: HIGH means a press — decode it and call `KeyPad_HandleKey`. LOW means a release; ignore it for now.
-
-```c
-void GPIOC_ColInterrupt_Init(void);   // TODO: edge interrupt config for PC4-7 + NVIC (IRQ 2)
-void GPIOC_Handler(void);             // TODO: on a HIGH column, decode + call KeyPad_HandleKey
-```
-
-> [!Note] Why `IBE = 1`?
-> Rows are never floating — the scan drives every row explicitly, HIGH on the active one and LOW on the rest. A column tied to a held key flips right along with the scan, not just on physical press or release, so you can't safely bet on one fixed edge direction (`IEV`) always meaning "pressed." `IBE = 1` interrupts on any change instead, leaving it to you to read the level and decide what actually happened.
-
-### No repeat while held (interrupt version)
-
-The interrupt-driven build above has the same held-key problem Step 6 solved for polling — but it's trickier here: a held key's column pulses at the *scan* rate, not just on physical press and release, so a simple "latch on press, clear on any edge" design will still repeat every cycle. What do you need to remember *per column* to tell "the row cycled away" apart from "the key was actually released"?
-
-### Open keys
-
-**Keys `8`, `9`, `*`, `#`** are left open — propose and justify your own action for each.
-
 ## Verification Checklist
 
 By this point every item below should already be confirmed from the step-by-step checks above — this is just the final end-to-end pass.
@@ -226,4 +198,3 @@ By this point every item below should already be confirmed from the step-by-step
 2. **Colors** — `1`–`7` show the right combination, and `0` clears them (Step 3).
 3. **Blink** — the default toggles roughly every 2 s; `A` starts and pauses it; `B`/`C` shift the interval by 0.25 s and hold at the floor/ceiling; `D` resets it back to 2 s (Steps 4–5).
 4. **Reliability** — no wrong-row flashes at any pace, and holding a key fires its action exactly once (Step 6).
-5. **If you did the interrupt Extras** — the same reliability requirement holds for that path too.
