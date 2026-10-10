@@ -38,5 +38,5 @@ NUM2    DCD     12              ; Second integer
 RP      DCD     RESULT          ; Pointer to RESULT variable
 
     AREA MYDATA, DATA, READWRITE
-RESULT  DCD     0               ; Will hold the final computed value
+RESULT  SPACE   4               ; Will hold the final computed value
     END

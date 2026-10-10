@@ -7,7 +7,7 @@ void ADC0SS3_Handler(void)
 {
     adc_value = ADC0->SSFIFO3 & 0xFFF; // Read 12-bit ADC value from FIFO
     temp = 147.5 - (75 * 3.3f * adc_value)/ 4096; // Convert to temperature in Celsius
-    ADC0->ISC = 8; // Clear SS3 interrupt flag
+    ADC0->ISC = (1<<3); // Clear SS3 interrupt flag
 }
 
 int main(void)

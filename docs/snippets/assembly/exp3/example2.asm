@@ -38,6 +38,6 @@ STOP    B       STOP
 MYSTR   DCB     "Hello ARM World!", 0
 
         AREA    MYDATA, DATA, READWRITE
-UPPERCOUNT DCD  0                   ; expect 5 ('H','A','R','M','W')
+UPPERCOUNT SPACE 4                  ; expect 5 ('H','A','R','M','W')
 
         END

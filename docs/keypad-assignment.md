@@ -5,7 +5,7 @@ lastUpdated: true
 
 # Matrix Keypad Interfacing — A Build Roadmap
 
-A standalone assignment that pulls together **Experiment 5** (GPIO polling) and **Experiment 6** (SysTick and GPTM timers) into one build: a 4x4 matrix keypad, scanned continuously in the background, driving the onboard RGB LED.
+A standalone assignment that pulls together **Experiment 6** (GPIO polling) and **Experiment 7** (SysTick and GPTM timers) into one build: a 4x4 matrix keypad, scanned continuously in the background, driving the onboard RGB LED.
 
 **Target device:** TM4C123GH6PM.
 
@@ -172,7 +172,7 @@ Steps 1–5 got you a keypad that reads correctly most of the time — but two r
 
 **The scan race.** `current_row` keeps changing in the background, once every SysTick tick, completely independent of whatever `KeyPad_Poll` happens to be doing at that moment. If you read the columns, and *then* separately use `current_row` again to decode which key that was, what guarantees those two reads saw the same row? What could happen to a key's decoded value if the scan advances in between — and how would you close that gap so a single `Poll` call always decodes against the row it actually read, no matter what happens after?
 
-**No repeat while held.** Right now, `KeyPad_Poll` calls `KeyPad_HandleKey` on every single call where a key reads as pressed — which, while a key is held, is every few milliseconds, for as long as it's held. Fixing that needs two things: **debounce** (`DEBOUNCE_MS` is defined for you — use `global_ms` to require a minimum time between accepted presses, following the pattern from Experiment 6, Task 1), and a way to recognize "still held" so it isn't treated as a fresh press every time. That second part runs straight into the scan race above: a column reading is only meaningful while its own row is active, so what does it mean if you check "is anything pressed" while the scan happens to be on some *other* row, and treat "nothing there" as if your held key had been released? What do you need to remember about *which row* a held key was on, so that revisiting an unrelated row doesn't get mistaken for its release?
+**No repeat while held.** Right now, `KeyPad_Poll` calls `KeyPad_HandleKey` on every single call where a key reads as pressed — which, while a key is held, is every few milliseconds, for as long as it's held. Fixing that needs two things: **debounce** (`DEBOUNCE_MS` is defined for you — use `global_ms` to require a minimum time between accepted presses, following the pattern from Experiment 7, Task 1), and a way to recognize "still held" so it isn't treated as a fresh press every time. That second part runs straight into the scan race above: a column reading is only meaningful while its own row is active, so what does it mean if you check "is anything pressed" while the scan happens to be on some *other* row, and treat "nothing there" as if your held key had been released? What do you need to remember about *which row* a held key was on, so that revisiting an unrelated row doesn't get mistaken for its release?
 
 ```c
 void KeyPad_Poll(void)

@@ -24,9 +24,9 @@ int main(void)
     while (1)
     {
         ADC0->PSSI |= (1 << 3);            // initiate SS3 conversion
-        while ((ADC0->RIS & 8) == 0);      // Wait untill sample conversion completed
+        while ((ADC0->RIS & (1<<3)) == 0);      // Wait untill sample conversion completed
         adc_value = ADC0->SSFIFO3;         // read adc coversion result from SS3 FIFO
-        ADC0->ISC = 8;                     // clear coversion clear flag bit
+        ADC0->ISC = (1<<3);                     // clear coversion clear flag bit
 
         if (adc_value >= 2048)
             GPIOF->DATA |= GREEN_LED; // turn on green LED

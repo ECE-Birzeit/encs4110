@@ -3,9 +3,8 @@
         EXPORT  __main                   ; Export symbol
 __main  PROC
         BL      PF_Init                  ; Initialize Port F
-loop    
         LDR     R1, =0x40025038          ; Masked DATA address for PF1-PF3
-        
+loop    
         MOV     R0, #0x02                ; Turn ON red LED (PF1)
         STR     R0, [R1]                 ; Write to GPIODATA	
         LDR     R0, =10000000            ; Load delay count

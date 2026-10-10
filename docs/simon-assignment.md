@@ -5,7 +5,7 @@ lastUpdated: true
 
 # Simon-Says Sequence Repeater — A Build Roadmap
 
-A standalone assignment that pulls together **Experiment 4** (GPIO output), **Experiment 5** (GPIO interrupts), and **Experiment 6** (SysTick timing) into one build: the board plays a growing sequence of LED flashes, and the player has to repeat it back exactly.
+A standalone assignment that pulls together **Experiment 5** (GPIO output), **Experiment 6** (GPIO interrupts), and **Experiment 7** (SysTick timing) into one build: the board plays a growing sequence of LED flashes, and the player has to repeat it back exactly.
 
 **Target device:** TM4C123GH6PM.
 
@@ -24,7 +24,7 @@ Button presses are handled entirely by GPIO interrupts here, not by polling the 
 | Button 1 – Button 4 | PC4 – PC7 | Input, pull-up |
 | LED 1 – LED 4 (paired with buttons 1–4 by index) | PD0 – PD3 | Output |
 
-Buttons idle HIGH (internal pull-up) and read LOW when pressed — the same convention as the onboard SW1/SW2 buttons from Experiment 5. Button *i* and LED *i* are meant to correspond — pressing Button 1 should match a flash on LED 1, and so on.
+Buttons idle HIGH (internal pull-up) and read LOW when pressed — the same convention as the onboard SW1/SW2 buttons from Experiment 6. Button *i* and LED *i* are meant to correspond — pressing Button 1 should match a flash on LED 1, and so on.
 
 ### Game Behavior
 

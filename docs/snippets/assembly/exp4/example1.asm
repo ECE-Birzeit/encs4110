@@ -39,5 +39,5 @@ STOP    B       STOP
         AREA    CONSTANTS, DATA, READONLY
 mystring DCB    "Hello ARM World!", 0  ; Uppercase: H, A, R, M, W -> 5
         AREA    MYDATA, DATA, READWRITE
-UPPERCOUNT  DCD 0                      ; should be 5
+UPPERCOUNT  SPACE 4                    ; should be 5
         END

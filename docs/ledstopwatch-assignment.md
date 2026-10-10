@@ -5,7 +5,7 @@ lastUpdated: true
 
 # Stopwatch with LED Indicator — A Build Roadmap
 
-A standalone assignment that pulls together **Experiment 5** (GPIO interrupts), **Experiment 6** (GPTM timing), and **Experiment 7** (character LCD) into one build: a stopwatch with start/stop/lap control, its elapsed time shown on an LCD instead of a serial terminal, with an LED that shows at a glance whether it's running.
+A standalone assignment that pulls together **Experiment 6** (GPIO interrupts), **Experiment 7** (GPTM timing), and **Experiment 8** (character LCD) into one build: a stopwatch with start/stop/lap control, its elapsed time shown on an LCD instead of a serial terminal, with an LED that shows at a glance whether it's running.
 
 **Target device:** TM4C123GH6PM.
 
@@ -15,7 +15,7 @@ A standalone assignment that pulls together **Experiment 5** (GPIO interrupts), 
 
 A hardware timer counts in fixed increments — here, hundredths of a second — for as long as the stopwatch is "running." Two buttons control it, each handled by a GPIO interrupt rather than being polled in the main loop: one toggles running/paused, the other records a lap while running or resets the clock while paused. An LED blinks while the stopwatch is running and goes dark while paused, so the state is readable without even looking at the display. The elapsed time and most recent lap are shown as text on a 16×2 LCD.
 
-None of these pieces are new on their own — the timer pattern is the same one from Experiment 6, the LCD driver is the same one from Experiment 7. What's new is making all of them coexist correctly: the timer has to keep perfectly accurate time whether or not anyone touches a button, a button's interrupt handler has to mean something different depending on whether the clock is currently running or paused, and the display has to stay readable without needing every single tick.
+None of these pieces are new on their own — the timer pattern is the same one from Experiment 7, the LCD driver is the same one from Experiment 8. What's new is making all of them coexist correctly: the timer has to keep perfectly accurate time whether or not anyone touches a button, a button's interrupt handler has to mean something different depending on whether the clock is currently running or paused, and the display has to stay readable without needing every single tick.
 
 ### Hardware Setup
 
@@ -26,7 +26,7 @@ None of these pieces are new on their own — the timer pattern is the same one 
 | Running indicator (onboard LED) | PF1 | Output |
 | LCD (RS/E/D4–D7) | PB0, PB2, PB4–PB7 | Output |
 
-No breadboard buttons needed — this reuses the LaunchPad's own SW1/SW2. PF0 is the one pin on this board that ships commit-protected: unlock it the same way Experiment 5 did, `GPIOF->LOCK = 0x4C4F434B;` then `GPIOF->CR = 0x01;`, before touching its `DIR`/`DEN`/`PUR`. Wire the LCD exactly as in Experiment 7 (4-bit mode, `RW` tied to ground for write-only).
+No breadboard buttons needed — this reuses the LaunchPad's own SW1/SW2. PF0 is the one pin on this board that ships commit-protected: unlock it the same way Experiment 6 did, `GPIOF->LOCK = 0x4C4F434B;` then `GPIOF->CR = 0x01;`, before touching its `DIR`/`DEN`/`PUR`. Wire the LCD exactly as in Experiment 8 (4-bit mode, `RW` tied to ground for write-only).
 
 ### Behavior
 
@@ -40,7 +40,7 @@ The onboard LED blinks at roughly 1 Hz while running, and stays off while paused
 
 ## Build Steps
 
-You get two files to fill in — `ledstopwatch.c`/`ledstopwatch.h` hold the timer, button, and display logic, `main.c` just calls into them (plus the LCD driver from Experiment 7, reused as-is). Every function is stubbed out with `// TODO` comments and builds cleanly as-is; no logic is implemented yet.
+You get two files to fill in — `ledstopwatch.c`/`ledstopwatch.h` hold the timer, button, and display logic, `main.c` just calls into them (plus the LCD driver from Experiment 8, reused as-is). Every function is stubbed out with `// TODO` comments and builds cleanly as-is; no logic is implemented yet.
 
 ::: code-group
 <<< @/snippets/ledstopwatch/main.c

@@ -5,7 +5,7 @@ lastUpdated: true
 
 # Traffic Light with Pedestrian Crossing — A Build Roadmap
 
-A standalone assignment that pulls together **Experiment 4** (GPIO output), **Experiment 5** (GPIO interrupts), **Experiment 6** (SysTick timing), and **Experiment 9** (UART) into one build: a timer-driven traffic light cycle that a pedestrian can interrupt — safely, not immediately.
+A standalone assignment that pulls together **Experiment 5** (GPIO output), **Experiment 6** (GPIO interrupts), **Experiment 7** (SysTick timing), and **Experiment 10** (UART) into one build: a timer-driven traffic light cycle that a pedestrian can interrupt — safely, not immediately.
 
 **Target device:** TM4C123GH6PM.
 
@@ -23,9 +23,9 @@ That's the actual assignment: separating *when a request arrives* from *when it'
 |---|---|---|
 | Traffic phase LED (onboard RGB) | PF1 / PF2 / PF3 | Output (Red / Blue / Green) |
 | Pedestrian request button (onboard SW1) | PF4 | Input, pull-up |
-| UART0 TX / RX | PA1 / PA0 | Same wiring as Experiment 9 |
+| UART0 TX / RX | PA1 / PA0 | Same wiring as Experiment 10 |
 
-Everything here is onboard — no breadboard needed. UART0 rides the same USB virtual COM port as Experiment 9; open a terminal at 115200 baud before resetting the board.
+Everything here is onboard — no breadboard needed. UART0 rides the same USB virtual COM port as Experiment 10; open a terminal at 115200 baud before resetting the board.
 
 ### Behavior
 
@@ -40,7 +40,7 @@ Normal order: Stop → Go → Caution → Stop → … A pedestrian request (SW1
 
 ## Build Steps
 
-You get two files to fill in — `trafficlight.c`/`trafficlight.h` hold the phase and interrupt logic, `main.c` just calls into them (plus the UART driver from Experiment 9, reused as-is). Every function is stubbed out with `// TODO` comments and builds cleanly as-is; no logic is implemented yet.
+You get two files to fill in — `trafficlight.c`/`trafficlight.h` hold the phase and interrupt logic, `main.c` just calls into them (plus the UART driver from Experiment 10, reused as-is). Every function is stubbed out with `// TODO` comments and builds cleanly as-is; no logic is implemented yet.
 
 ::: code-group
 <<< @/snippets/trafficlight/main.c

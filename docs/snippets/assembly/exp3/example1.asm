@@ -34,6 +34,6 @@ ARR     DCD     10, 20, 30, -5, 11, 0
 LEN     EQU     6
 
         AREA    MYDATA, DATA, READWRITE
-MAXRES  DCD     0                   ; expect 30
+MAXRES  SPACE   4                   ; expect 30
 
         END

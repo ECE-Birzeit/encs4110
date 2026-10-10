@@ -20,7 +20,8 @@ __main  PROC
         ORR     R0, R0, #0x02            ; Enable digital function for PF1
         STR     R0, [R1]                 ; Write back
 
-loop    LDR     R1, =0x40025008          ; Masked DATA address for PF1
+        LDR     R1, =0x40025008          ; Masked DATA address for PF1
+loop
         MOV     R0, #0x02                ; Turn ON red LED (PF1)
         STR     R0, [R1]                 ; Write to GPIODATA
 

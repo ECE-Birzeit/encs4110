@@ -78,19 +78,20 @@ export default withPwa(defineConfig({
         items: [
           { text: "1. Assembly Basics and Program Structure", link: "/experiments/1" },
           { text: "2. Data Processing and Memory Operations", link: "/experiments/2" },
-          { text: "3. Control Flow and Subroutines", link: "/experiments/3" },
+          { text: "3. Branching and Loops", link: "/experiments/3" },
+          { text: "4. Procedures and the Stack", link: "/experiments/4" },
         ],
       },
       {
         text: "Part 2: TM4C123 LaunchPad",
         collapsed: false,
         items: [
-          { text: "4. Microcontroller Architecture and GPIO Output", link: "/experiments/4" },
-          { text: "5. GPIO Inputs and Interrupt Handling", link: "/experiments/5" },
-          { text: "6. Hardware Timers and Timing Control", link: "/experiments/6" },
-          { text: "7. Character LCD Display Interface", link: "/experiments/7" },
-          { text: "8. Analog-to-Digital Converter (ADC)", link: "/experiments/8" },
-          { text: "9. Universal Asynchronous Receiver-Transmitter (UART)", link: "/experiments/9" },
+          { text: "5. Microcontroller Architecture and GPIO Output", link: "/experiments/5" },
+          { text: "6. GPIO Inputs and Interrupt Handling", link: "/experiments/6" },
+          { text: "7. Hardware Timers and Timing Control", link: "/experiments/7" },
+          { text: "8. Character LCD Display Interface", link: "/experiments/8" },
+          { text: "9. Analog-to-Digital Converter (ADC)", link: "/experiments/9" },
+          { text: "10. Universal Asynchronous Receiver-Transmitter (UART)", link: "/experiments/10" },
         ],
       },
       {

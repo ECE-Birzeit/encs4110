@@ -18,12 +18,12 @@ int main(void)
 	TIMER1->CTL = 0;        			// Disable the timer
 	TIMER1->CFG = 0x4;       			// Choose 16-bit mode
 	TIMER1->TAMR = 0x02;       			// Periodic mode
-	TIMER1->TAPR = 256  - 1;			// Set prescaler value
-	TIMER1->TAILR = 65536 - 1;  		// Set initial reload value
-	TIMER1->ICR = 0x1;           		// Clear any prior interrupts
+	TIMER1->TAPR = (1 << 8)  - 1;			// Set prescaler value
+	TIMER1->TAILR = (1 << 16) - 1;  		// Set initial reload value
+	TIMER1->ICR = (1 << 0);           		// Clear any prior interrupts
 	TIMER1->IMR |=(1<<0);				// Enable timeout interrupt
 	NVIC->ISER[0] |= (1<<21);			// Enable Timer1A interrupt in NVIC
-	TIMER1->CTL |= 0x01;          		// Enable the timer
+	TIMER1->CTL |= (1 << 0);          		// Enable the timer
 	
     while(1)							// Main loop
     {
