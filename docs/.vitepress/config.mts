@@ -1,8 +1,23 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 
 import { withPwa } from '@vite-pwa/vitepress'
 
+
+// Vendored rather than referenced by URL. vitepress-plugin-group-icons passes
+// an http(s) customIcon through fetch() at build time and, if that fails, only
+// warns and drops the icon -- so a flaky host would silently ship a missing
+// icon. Reading the file keeps the build self-contained. The leading <?xml?>
+// prolog is stripped because the plugin inlines a string only when it starts
+// with "<svg"; anything else is treated as an "collection:name" icon id.
+const cProgramSvg = readFileSync(
+  fileURLToPath(new URL("./icons/c-program.svg", import.meta.url)),
+  "utf8",
+);
+const cProgramIcon = cProgramSvg.slice(cProgramSvg.indexOf("<svg"));
 
 export default withPwa(defineConfig({
   markdown: {
@@ -15,7 +30,7 @@ export default withPwa(defineConfig({
     plugins: [
       groupIconVitePlugin({
         customIcon: {
-          'c': 'https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/c-program-icon.svg',
+          'c': cProgramIcon,
         },
       }),
     ],
