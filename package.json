@@ -13,10 +13,8 @@
     "smoke-test:pwa": "node scripts/smoke-test-pwa.mjs"
   },
   "devDependencies": {
-    "@iconify-json/material-symbols": "^1.2.87",
     "@vite-pwa/vitepress": "^1.1.0",
     "markdown-it-mathjax3": "latest",
-    "unplugin-icons": "^23.0.1",
     "vitepress": "latest"
   },
   "dependencies": {

@@ -2,7 +2,6 @@ import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 
 import { withPwa } from '@vite-pwa/vitepress'
-import Icons from 'unplugin-icons/vite'
 
 
 export default withPwa(defineConfig({
@@ -18,9 +17,6 @@ export default withPwa(defineConfig({
         customIcon: {
           'c': 'https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/c-program-icon.svg',
         },
-      }),
-      Icons({
-        compiler: 'vue3',
       }),
     ],
   },
@@ -128,6 +124,8 @@ export default withPwa(defineConfig({
       },
     ],
 
+    outline: { level: [2, 3] },
+
     socialLinks: [{ icon: "github", link: "https://github.com/mabushelbaia/encs4110" }],
     search: {
       provider: "local",
@@ -158,7 +156,7 @@ export default withPwa(defineConfig({
       ],
     },
     workbox: {
-      globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2,pdf}"],
+      globPatterns: ["**/*.{css,js,html,svg,png,jpg,jpeg,ico,txt,woff2,pdf}"],
       maximumFileSizeToCacheInBytes: 5000000,
     },
     experimental: {
