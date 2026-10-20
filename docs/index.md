@@ -21,7 +21,8 @@ hero:
 
 features:
   - icon:
-      src: /icons/cortex.svg
+      light: /icons/cortex.svg
+      dark: /icons/cortex-dark.svg
       alt: Processor
       width: 28
       height: 28
@@ -32,7 +33,8 @@ features:
       structured labs covering its components, registers,
       instruction set, and operating modes.
   - icon:
-      src: /icons/assembly.svg
+      light: /icons/assembly.svg
+      dark: /icons/assembly-dark.svg
       alt: Assembly code
       width: 28
       height: 28
@@ -43,7 +45,8 @@ features:
       focusing on data processing, flow control, procedures,
       and stack management.
   - icon:
-      src: /icons/launchpad.svg
+      light: /icons/launchpad.svg
+      dark: /icons/launchpad-dark.svg
       alt: LaunchPad board
       width: 28
       height: 28

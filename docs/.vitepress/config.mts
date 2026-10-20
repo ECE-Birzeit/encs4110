@@ -25,12 +25,17 @@ export default withPwa(defineConfig({
       md.use(groupIconMdPlugin)
     },
     math: true,
+    // Shiki has no "h" grammar, so C headers fell back to plain text.
+    languageAlias: { h: 'c' },
   },
   vite: {
     plugins: [
       groupIconVitePlugin({
         customIcon: {
-          'c': cProgramIcon,
+          // Keyed on the extension, not the bare letter: matching is
+          // label.includes(key), so 'c' also hit lcd.h, trafficlight.h and
+          // ledstopwatch.h purely because those names contain a "c".
+          '.c': cProgramIcon,
         },
       }),
     ],
