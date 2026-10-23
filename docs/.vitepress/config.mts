@@ -61,7 +61,8 @@ export default withPwa(defineConfig({
       `window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-YVX3LGJEHB');`,
+      gtag('config', 'G-YVX3LGJEHB');
+      gtag('config', 'G-K834Q72PP9');`,
     ],
   ],
 
