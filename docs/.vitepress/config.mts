@@ -149,7 +149,7 @@ export default withPwa(defineConfig({
 
     outline: { level: [2, 3] },
 
-    socialLinks: [{ icon: "github", link: "https://github.com/mabushelbaia/encs4110" }],
+    socialLinks: [{ icon: "github", link: "https://github.com/ECE-Birzeit/encs4110" }],
     search: {
       provider: "local",
     },
