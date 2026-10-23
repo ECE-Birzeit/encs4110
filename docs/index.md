@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "ENCS4110"
   text: "Computer Design Laboratory"
-  tagline: "Department of Electrical & Computer Engineering"
+  tagline: "Department of Electrical & Computer Engineering · Birzeit University"
 
   actions:
     - theme: brand
@@ -21,9 +21,8 @@ hero:
 
 features:
   - icon:
-      light: /icons/cortex.svg
-      dark: /icons/cortex-dark.svg
-      alt: Processor
+      src: /icons/cortex.svg
+      alt: Arm
       width: 28
       height: 28
       wrap: true
@@ -33,9 +32,8 @@ features:
       structured labs covering its components, registers,
       instruction set, and operating modes.
   - icon:
-      light: /icons/assembly.svg
-      dark: /icons/assembly-dark.svg
-      alt: Assembly code
+      src: /icons/assembly.svg
+      alt: Binary code
       width: 28
       height: 28
       wrap: true
@@ -45,9 +43,8 @@ features:
       focusing on data processing, flow control, procedures,
       and stack management.
   - icon:
-      light: /icons/launchpad.svg
-      dark: /icons/launchpad-dark.svg
-      alt: LaunchPad board
+      src: /icons/launchpad.svg
+      alt: Microcontroller
       width: 28
       height: 28
       wrap: true

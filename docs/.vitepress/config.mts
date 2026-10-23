@@ -46,6 +46,8 @@ export default withPwa(defineConfig({
 
   base: "/",
   head: [
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
+    ["meta", { name: "theme-color", content: "#dc2626" }],
     [
       "script",
       {
@@ -67,6 +69,7 @@ export default withPwa(defineConfig({
   description:
     "A hands-on ARM Cortex-M4 embedded systems laboratory covering assembly programming, GPIO, interrupts, timers, ADC, UART, and peripheral interfacing using the TM4C123 LaunchPad.",
   themeConfig: {
+    logo: "/favicon.svg",
 
     footer: {
       message: 'ENCS4110 · Computer Design Laboratory',
@@ -157,7 +160,7 @@ export default withPwa(defineConfig({
       name: "Computer Design Laboratory",
       short_name: "ENCS4110",
       description: "A comprehensive guide and resource for ARM assembly language experiments. and TM4C123 LaunchPad microcontroller interfacing.",
-      theme_color: "#181818",
+      theme_color: "#dc2626",
       background_color: "#ffffff",
       display: "standalone",
       scope: "/",

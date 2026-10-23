@@ -1,85 +1,44 @@
 /**
- * ENCS4110 — monochrome brand with a green accent.
+ * Default VitePress theme with red brand colors.
  *
  * Every icon here is local: a data-URI mask below, or a file under
- * public/icons. That is deliberate. This site is a
- * PWA, and Workbox can only precache the site's own build output, so
- * anything served from a remote origin (an icon webfont, a hotlinked image)
- * is simply absent offline. The hero buttons used to render their icons from
- * Material Symbols over Google Fonts, which is why they broke offline.
+ * public/icons. That is deliberate. This site is a PWA, and Workbox can only
+ * precache the site's own build output, so anything served from a remote
+ * origin (an icon webfont, a hotlinked image) is simply absent offline.
  *
  * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
  * -------------------------------------------------------------------------- */
 
 :root {
-  --vp-c-brand-1: #181818;
-  --vp-c-brand-2: #181818;
-  --vp-c-brand-3: #181818;
-  --vp-c-brand-soft: rgba(24, 24, 24, 0.14);
+  --vp-c-brand-1: #b91c1c;
+  --vp-c-brand-2: #dc2626;
+  --vp-c-brand-3: #dc2626;
+  --vp-c-brand-soft: rgba(239, 68, 68, 0.14);
 
-  --c-fg: #181818;
-  --c-bg: #ededed;
-  --c-accent: #22c55e;
+  --vp-button-brand-bg: #dc2626;
+  --vp-button-brand-hover-bg: #b91c1c;
+  --vp-button-brand-active-bg: #991b1b;
 
-  --vp-badge-tip-border: var(--c-accent);
-  --vp-badge-tip-text: var(--c-accent);
-  --vp-badge-tip-bg: rgba(34, 197, 94, 0.14);
+  --vp-home-hero-name-color: #dc2626;
 
-  --vp-custom-block-tip-border: var(--c-accent);
-  --vp-custom-block-tip-text: #15803d;
-  --vp-custom-block-tip-bg: rgba(34, 197, 94, 0.08);
-
-  /* Outline book glyph, used as a mask so it inherits the block's colour. */
   --icon-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M10.4 8.6 16 12l-5.6 3.4Z'/%3E%3C/svg%3E");
   --icon-download: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v10.5'/%3E%3Cpath d='M7.5 10 12 14.5 16.5 10'/%3E%3Cpath d='M4.5 19.5h15'/%3E%3C/svg%3E");
   --icon-settings: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9h16'/%3E%3Cpath d='M4 15h16'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Ccircle cx='15' cy='15' r='2'/%3E%3C/svg%3E");
+  /* Outline book glyph, used as a mask so it inherits the block's colour. */
   --icon-book: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2Z'/%3E%3Cpath d='M8 3v18'/%3E%3C/svg%3E");
 }
 
 .dark {
-  --vp-c-brand-1: #ededed;
-  --vp-c-brand-2: #ededed;
-  --vp-c-brand-3: #ededed;
-  --vp-c-brand-soft: rgba(237, 237, 237, 0.16);
+  --vp-c-brand-1: #f87171;
+  --vp-c-brand-2: #ef4444;
+  --vp-c-brand-3: #b91c1c;
+  --vp-c-brand-soft: rgba(248, 113, 113, 0.16);
 
-  --c-fg: #ededed;
-  --c-bg: #181818;
-  --c-accent: #4ade80;
+  --vp-button-brand-bg: #b91c1c;
+  --vp-button-brand-hover-bg: #dc2626;
+  --vp-button-brand-active-bg: #ef4444;
 
-  --vp-badge-tip-bg: rgba(74, 222, 128, 0.16);
-
-  --vp-custom-block-tip-border: var(--c-accent);
-  --vp-custom-block-tip-text: #bbf7d0;
-  --vp-custom-block-tip-bg: rgba(74, 222, 128, 0.08);
-}
-
-.VPHero .name {
-  background: none !important;
-  -webkit-background-clip: unset !important;
-  -webkit-text-fill-color: unset !important;
-  color: var(--c-accent) !important;
-}
-
-.VPButton.brand {
-  background: var(--c-fg) !important;
-  color: var(--c-bg) !important;
-  border: 1px solid var(--c-fg) !important;
-}
-
-.VPButton.brand:hover {
-  background: var(--c-fg) !important;
-  opacity: 0.85;
-}
-
-.VPButton.alt {
-  background: transparent !important;
-  color: var(--c-fg) !important;
-  border: 1px solid var(--c-fg) !important;
-}
-
-.VPButton.alt:hover {
-  background: var(--c-fg) !important;
-  color: var(--c-bg) !important;
+  --vp-home-hero-name-color: #f87171;
 }
 
 /* Hero action icons.
@@ -137,10 +96,6 @@
   mask: var(--icon-book) no-repeat center / contain;
 }
 
-.VPFooter {
-  border-top: none !important;
-}
-
 /* Keep reference links at the foot of the sidebar, as on the ENCS4101 and
    ENCS5150 sites. */
 .VPSidebar .nav {
@@ -154,7 +109,8 @@
 }
 
 /* Schematics and screenshots are the point of these pages, so frame them and
-   give them a light backdrop that survives dark mode. */
+   give them a light backdrop that survives dark mode. Matches ENCS4101 and
+   ENCS5150. */
 .vp-doc img {
   border-radius: 8px;
   border: 1px solid var(--vp-c-divider);
