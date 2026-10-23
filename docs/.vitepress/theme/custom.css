@@ -1,7 +1,7 @@
 /**
  * Default VitePress theme with red brand colors.
  *
- * Every icon here is local: a data-URI mask below, or a file under
+ * Every icon here is local: the data-URI mask below, or a file under
  * public/icons. That is deliberate. This site is a PWA, and Workbox can only
  * precache the site's own build output, so anything served from a remote
  * origin (an icon webfont, a hotlinked image) is simply absent offline.
@@ -21,9 +21,6 @@
 
   --vp-home-hero-name-color: #dc2626;
 
-  --icon-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M10.4 8.6 16 12l-5.6 3.4Z'/%3E%3C/svg%3E");
-  --icon-download: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5v10.5'/%3E%3Cpath d='M7.5 10 12 14.5 16.5 10'/%3E%3Cpath d='M4.5 19.5h15'/%3E%3C/svg%3E");
-  --icon-settings: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9h16'/%3E%3Cpath d='M4 15h16'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Ccircle cx='15' cy='15' r='2'/%3E%3C/svg%3E");
   /* Outline book glyph, used as a mask so it inherits the block's colour. */
   --icon-book: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2Z'/%3E%3Cpath d='M8 3v18'/%3E%3C/svg%3E");
 }
@@ -39,49 +36,6 @@
   --vp-button-brand-active-bg: #ef4444;
 
   --vp-home-hero-name-color: #f87171;
-}
-
-/* Hero action icons.
-   Masks rather than webfont glyphs: identical look, no network request, and
-   they inherit each button's text colour in both themes. Styled via CSS
-   rather than a component override, because VPHomeHero.vue statically
-   imports its own VPHero -- a globally registered replacement is ignored. */
-.VPHero .actions .VPButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.VPHero .actions a[href*="experiments"]::before,
-.VPHero .actions a[href*="manual"]::before,
-.VPHero .actions a[href*="setup"]::before {
-  content: "";
-  display: inline-block;
-  width: 1.15em;
-  height: 1.15em;
-  flex: none;
-  background-color: currentColor;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-}
-
-.VPHero .actions a[href*="experiments"]::before {
-  -webkit-mask-image: var(--icon-play);
-  mask-image: var(--icon-play);
-}
-
-.VPHero .actions a[href*="manual"]::before {
-  -webkit-mask-image: var(--icon-download);
-  mask-image: var(--icon-download);
-}
-
-.VPHero .actions a[href*="setup"]::before {
-  -webkit-mask-image: var(--icon-settings);
-  mask-image: var(--icon-settings);
 }
 
 .custom-block.tip .custom-block-title::before {
