@@ -48,6 +48,14 @@ export default withPwa(defineConfig({
   head: [
     ["link", { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
     ["meta", { name: "theme-color", content: "#dc2626" }],
+    ["meta", { property: "og:type", content: "website" }],
+    ["meta", { property: "og:site_name", content: "ECE Lab Manuals · Birzeit University" }],
+    ["meta", { property: "og:title", content: "ENCS4110 Computer Design Laboratory" }],
+    ["meta", { property: "og:description", content: "Step-by-step ARM Cortex-M4 lab manual (TM4C123 LaunchPad) for ENCS4110 at Birzeit University." }],
+    ["meta", { property: "og:image", content: "https://encs4110.birzeit.me/og.png" }],
+    ["meta", { property: "og:image:width", content: "1200" }],
+    ["meta", { property: "og:image:height", content: "630" }],
+    ["meta", { name: "twitter:card", content: "summary_large_image" }],
     [
       "script",
       {
@@ -69,6 +77,8 @@ export default withPwa(defineConfig({
   title: "ENCS4110 Birzeit University",
   description:
     "A hands-on ARM Cortex-M4 embedded systems laboratory covering assembly programming, GPIO, interrupts, timers, ADC, UART, and peripheral interfacing using the TM4C123 LaunchPad.",
+  sitemap: { hostname: "https://encs4110.birzeit.me/" },
+
   themeConfig: {
     logo: "/favicon.svg",
 
@@ -81,6 +91,7 @@ export default withPwa(defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Experiments", link: "/experiments/" },
+      { text: "All labs", link: "https://birzeit.me/" },
     ],
 
     sidebar: [
