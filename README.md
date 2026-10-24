@@ -56,6 +56,12 @@ Found a mistake? Click **Edit this page on GitHub** at the bottom of any page, o
 
 `.github/workflows/deploy.yml` builds the site, runs the PWA smoke test, and deploys to GitHub Pages on every push to `main`, so merged changes are live within a couple of minutes at [encs4110.birzeit.me](https://encs4110.birzeit.me). The old domain, `encs4110.me`, redirects there through [encs4110-redirect](https://github.com/ECE-Birzeit/encs4110-redirect).
 
+## License
+
+The written content is licensed under [CC BY 4.0](LICENSE): you may share and adapt it, including for your own course, as long as you credit the source. Code, meaning `docs/snippets/`, `scripts/` and the site code (`docs/.vitepress/`, `.github/`), is licensed under [MIT](LICENSE-CODE). © 2026 Mohammad Abu-Shelbaia.
+
+The Birzeit University name and logo are the university's; they are not licensed here. Screenshots of third-party software, and product names and logos, belong to their respective owners.
+
 ---
 
 <sub>Part of [ECE Lab Manuals](https://birzeit.me) · Maintained by [Mohammad Abu-Shelbaia](https://github.com/mabushelbaia)</sub>
