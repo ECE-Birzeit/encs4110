@@ -49,7 +49,7 @@ export default withPwa(defineConfig({
     ["link", { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
     ["meta", { name: "theme-color", content: "#dc2626" }],
     ["meta", { property: "og:type", content: "website" }],
-    ["meta", { property: "og:site_name", content: "ECE Lab Manuals · Birzeit University" }],
+    ["meta", { property: "og:site_name", content: "ECE Labs · Birzeit University" }],
     ["meta", { property: "og:image", content: "https://encs4110.birzeit.me/og.png" }],
     ["meta", { property: "og:image:width", content: "1200" }],
     ["meta", { property: "og:image:height", content: "630" }],
