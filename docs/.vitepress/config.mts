@@ -171,6 +171,11 @@ export default withPwa(defineConfig({
     outline: { level: [2, 3] },
 
     socialLinks: [{ icon: "github", link: "https://github.com/ECE-Birzeit/encs4110" }],
+
+    editLink: {
+      pattern: "https://github.com/ECE-Birzeit/encs4110/edit/main/docs/:path",
+      text: "Edit this page on GitHub",
+    },
     search: {
       provider: "local",
     },
