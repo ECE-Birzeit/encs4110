@@ -50,8 +50,6 @@ export default withPwa(defineConfig({
     ["meta", { name: "theme-color", content: "#dc2626" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:site_name", content: "ECE Lab Manuals · Birzeit University" }],
-    ["meta", { property: "og:title", content: "ENCS4110 Computer Design Laboratory" }],
-    ["meta", { property: "og:description", content: "Step-by-step ARM Cortex-M4 lab manual (TM4C123 LaunchPad) for ENCS4110 at Birzeit University." }],
     ["meta", { property: "og:image", content: "https://encs4110.birzeit.me/og.png" }],
     ["meta", { property: "og:image:width", content: "1200" }],
     ["meta", { property: "og:image:height", content: "630" }],
@@ -78,6 +76,17 @@ export default withPwa(defineConfig({
   description:
     "A hands-on ARM Cortex-M4 embedded systems laboratory covering assembly programming, GPIO, interrupts, timers, ADC, UART, and peripheral interfacing using the TM4C123 LaunchPad.",
   sitemap: { hostname: "https://encs4110.birzeit.me/" },
+
+  // Link previews: per-page title, the page's (or site's) description, and canonical URL.
+  transformHead({ pageData, siteData }) {
+    const page = pageData.frontmatter.layout === "home" ? "" : pageData.title
+    const path = pageData.relativePath.replace(/(^|\/)index\.md$/, "$1").replace(/\.md$/, "")
+    return [
+      ["meta", { property: "og:title", content: page ? `${page} · ENCS4110` : "ENCS4110 Computer Design Laboratory" }],
+      ["meta", { property: "og:description", content: pageData.frontmatter.description || pageData.description || siteData.description }],
+      ["meta", { property: "og:url", content: `https://encs4110.birzeit.me/${path}` }],
+    ]
+  },
 
   themeConfig: {
     logo: "/favicon.svg",
