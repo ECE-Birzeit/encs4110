@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="12" fill="#dc2626"/>
-  <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="35" y="35" width="10" height="16" rx="5"/>
-    <rect x="19" y="13" width="10" height="16" rx="5"/>
-    <path d="M19 51h10M35 29h10M19 35h5v16M35 13h5v16"/>
+  <!-- lucide "microchip" (launchpad.svg), ISC -->
+  <g transform="translate(10 10) scale(1.8333)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 4h2M18 8h2M18 12h2M18 16h2M18 20h2M4 4h2M4 8h2M4 12h2M4 16h2M4 20h2"/>
+    <path fill="#fca5a5" d="M8 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-1.5c-.276 0-.494.227-.562.495a2 2 0 0 1-3.876 0C9.994 2.227 9.776 2 9.5 2z"/>
   </g>
 </svg>
