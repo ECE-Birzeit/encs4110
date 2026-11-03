@@ -62,6 +62,16 @@
   margin-top: auto;
 }
 
+/* VitePress leaves 6rem under the sidebar and 1.5rem under the last group,
+   which floats the bottom groups off the edge. Sit them on it instead. */
+.Layout .VPSidebar {
+  padding-bottom: 1rem;
+}
+
+.VPSidebar .nav > .group:last-child .VPSidebarItem.level-0 {
+  padding-bottom: 0;
+}
+
 /* Schematics and screenshots are the point of these pages, so frame them and
    give them a light backdrop that survives dark mode. Matches ENCS4101 and
    ENCS5150. */
