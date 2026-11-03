@@ -5,6 +5,7 @@ import 'virtual:group-icons.css'
 import './custom.css'
 
 import RegisterSW from './components/RegisterSW.vue'
+import Screenshot from './components/Screenshot.vue'
 
 export default {
   extends: DefaultTheme,
@@ -12,5 +13,8 @@ export default {
     return h(DefaultTheme.Layout, null, {
       'layout-bottom': () => h(RegisterSW),
     })
+  },
+  enhanceApp({ app }) {
+    app.component('Screenshot', Screenshot)
   },
 }
