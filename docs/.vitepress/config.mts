@@ -108,9 +108,14 @@ export default withPwa(defineConfig({
         text: "Experiment Navigator",
         link: "/experiments/",
       },
-      { 
-        text: "Keil uVision5 IDE Setup",
-        link: "/setup",
+      {
+        text: "Getting Started",
+        collapsed: false,
+        items: [
+          { text: "Installing Keil and Tiva Support", link: "/setup" },
+          { text: "Assembly Project", link: "/assembly-project" },
+          { text: "Tiva LaunchPad Project", link: "/tiva-project" },
+        ],
       },
       {
         text: "Part 1: ARM Assembly",
