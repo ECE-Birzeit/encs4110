@@ -23,7 +23,7 @@ You need **all four** steps of the [setup guide](./setup) done: Keil, the TM4C p
 2. Device: **Texas Instruments → Tiva C Series → TM4C123x Series → TM4C123GH6PM** → **OK**.
 3. Run-Time Environment: tick **CMSIS → CORE** and **Device → Startup** → **OK**.
 4. Right-click **Source Group 1** → **Add New Item…** → `main.c` (or `main.s`).
-5. <kbd>Alt</kbd>+<kbd>F7</kbd>: **C/C++** → Optimization `-O0`; **Asm** → *armasm (Arm Syntax)*; **Debug** → *Stellaris ICDI*; **Utilities** → *Stellaris ICDI*, tick *Update Target before Debugging*.
+5. <kbd>Alt</kbd>+<kbd>F7</kbd> → **Debug** → **Use:** *Stellaris ICDI*.
 6. <kbd>F7</kbd> build, <kbd>F8</kbd> download, press **RESET** on the board.
 :::
 
@@ -181,27 +181,7 @@ A project has exactly one of these. Two files both defining `main` (or `__main`)
 
 ## Step 6: Set the project options
 
-Open **Project → Options for Target 'Target 1'…** (<kbd>Alt</kbd>+<kbd>F7</kbd>, or the magic-wand icon).
-
-### Target tab
-
-Leave it as Keil set it: **Xtal (MHz)** `16.0` (the LaunchPad's crystal), **ARM Compiler** *Use default compiler version 6*, **Floating Point Hardware** *Use Single Precision*.
-
-<Screenshot src="tiva/06-options-target.png" alt="Options for Target, Target tab for the TM4C123GH6PM">
-Options for Target, Target tab for the TM4C123GH6PM, showing Xtal 16.0, ARM Compiler default version 6, Use Single Precision, IROM1 0x0/0x40000 and IRAM1 0x20000000/0x8000.
-</Screenshot>
-
-### C/C++ (AC6) tab
-
-Set **Optimization** to **-O0**. Higher levels make the compiler remove or reorder code, so the debugger jumps around unexpectedly and variables in the Watch window show *not in scope*. `-O0` keeps your code exactly as written, which is what you want while learning.
-
-<Screenshot src="tiva/07-options-c-optimization.png" alt="Options for Target, C/C++ (AC6) tab with Optimization set to -O0">
-Options for Target, C/C++ (AC6) tab with the Optimization drop-down set to "-O0". Highlight it.
-</Screenshot>
-
-### Asm tab
-
-Set **Assembler Option** to **armasm (Arm Syntax)**, the same as in the [Assembly Project](./assembly-project#asm-tab). The startup file and the experiment 5 programs use Arm syntax.
+Open **Project → Options for Target 'Target 1'…** (<kbd>Alt</kbd>+<kbd>F7</kbd>, or the magic-wand icon). Keil's defaults are fine everywhere except the **Debug** tab, where you tell it to use the board instead of the simulator.
 
 ### Debug tab: select the Stellaris ICDI
 
@@ -209,6 +189,7 @@ On the **Debug** tab:
 
 1. On the **right** half, select **Use:** and pick **Stellaris ICDI** from the drop-down.
 2. Make sure **Load Application at Startup** and **Run to main()** are ticked. (For an assembly program, untick *Run to main()*.)
+3. Click **OK**.
 
 <Screenshot src="tiva/08-options-debug-icdi.png" alt="Options for Target, Debug tab with Stellaris ICDI selected on the right">
 Options for Target, Debug tab, with the right-hand "Use:" radio selected and "Stellaris ICDI" in the drop-down; "Load Application at Startup" and "Run to main()" ticked. Highlight the drop-down.
@@ -217,19 +198,6 @@ Options for Target, Debug tab, with the right-hand "Use:" radio selected and "St
 ::: details "Stellaris ICDI" isn't in the list
 The ICDI add-on is missing or went into the wrong folder. Re-do [setup Step 3](./setup#step-3-install-the-stellaris-icdi-debugger-add-on), restart Keil, and check again.
 :::
-
-### Utilities tab
-
-This tells Keil how to write your program into the chip's flash memory.
-
-1. Select **Use Target Driver for Flash Programming**.
-2. Pick **Stellaris ICDI** from the drop-down. (Ticking **Use Debug Driver** does the same: it reuses the Debug tab's choice.)
-3. Tick **Update Target before Debugging** so every debug session flashes the latest build.
-4. Click **OK**.
-
-<Screenshot src="tiva/09-options-utilities.png" alt="Options for Target, Utilities tab with Stellaris ICDI selected for flash programming">
-Options for Target, Utilities tab, "Use Target Driver for Flash Programming" selected with "Stellaris ICDI", and "Update Target before Debugging" ticked.
-</Screenshot>
 
 ::: tip Set it once, copy it after
 These options are saved in the project. For the next experiment, you can copy the whole project folder, rename it, and replace `main.c`, instead of starting over.
@@ -307,8 +275,8 @@ End the debug session (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) before editing and pressin
 | `Undefined symbol __main (referred from startup_TM4C123.o)` | Assembly project: your file doesn't `EXPORT __main`, or the label isn't spelt `__main` (two underscores). |
 | `Symbol main multiply defined` | Two files in Source Group 1 each have a `main`. Remove one, or right-click it → **Options for File** → untick **Include in Target Build**. |
 | `No ICDI device was found` / `Flash Download failed - Target DLL has been cancelled` | Keil can't see the board. Check the **DEBUG** port and switch, try another cable and USB port, and check Device Manager shows the [Stellaris entries](./setup#check-that-it-worked). Close any other program using the board (another Keil window, a terminal on the COM port). |
-| `Flash Download failed - "Cortex-M4"` | The Utilities tab is set to the wrong driver. Pick **Stellaris ICDI** ([Utilities tab](#utilities-tab)). |
+| `Flash Download failed - "Cortex-M4"` | The flash driver is wrong. In **Options for Target → Utilities**, tick **Use Debug Driver** (or pick **Stellaris ICDI**). |
 | Download says *Verify OK* but nothing happens | Press **RESET** on the board. If still nothing, check you are toggling the right pin (red LED is PF1, `0x02`). |
-| The LED never blinks, but stepping works | The delay loop was optimised away. Use **-O0** ([C/C++ tab](#c-c-ac6-tab)) and declare the loop counter `volatile`. |
+| The LED never blinks, but stepping works | The delay loop was optimised away. Declare the loop counter `volatile`, or set **Options for Target → C/C++ (AC6) → Optimization** to **-O0**. |
 | `L6050U: The code size of this image exceeds the maximum allowed` | You hit MDK-Lite's 32 KB limit, usually by using `printf` or floating-point maths heavily. Remove what you don't need. |
 | Watch window shows `<not in scope>` | The program is stopped outside the function that owns the variable, or optimisation is above `-O0`. Make the variable global or step into its function. |
