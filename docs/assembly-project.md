@@ -23,7 +23,7 @@ You need Keil uVision5 and the **ARM::Cortex_DFP** pack. If you haven't installe
 2. Device: **ARM → ARM Cortex M4 → ARMCM4** → **OK**.
 3. Run-Time Environment: **tick nothing** → **OK**.
 4. Right-click **Source Group 1** → **Add New Item…** → **Asm File (.s)** → `main.s`.
-5. <kbd>Alt</kbd>+<kbd>F7</kbd>: **Target** → default compiler version 6; **Asm** → *armasm (Arm Syntax)*; **Debug** → **Use Simulator**, untick *Run to main()*.
+5. <kbd>Alt</kbd>+<kbd>F7</kbd> → **Debug** → **Use Simulator**, untick *Run to main()*.
 6. <kbd>F7</kbd> to build, <kbd>Ctrl</kbd>+<kbd>F5</kbd> to debug, <kbd>F11</kbd> to step.
 :::
 
@@ -144,23 +144,7 @@ The examples on the experiment pages are shown as `.asm`. Copy their contents in
 
 ## Step 6: Set the project options
 
-Open **Project → Options for Target 'Target 1'…** (<kbd>Alt</kbd>+<kbd>F7</kbd>, or the magic-wand icon in the toolbar). You only need to touch three tabs.
-
-### Target tab
-
-Check that **ARM Compiler** says **Use default compiler version 6**. Leave the memory areas as they are (`IROM1` at `0x0`, `IRAM1` at `0x20000000`).
-
-<Screenshot src="assembly/07-options-target.png" alt="Options for Target, Target tab, with ARM Compiler set to the default version 6">
-Options for Target 'Target 1', Target tab. Highlight "ARM Compiler: Use default compiler version 6" and the IROM1/IRAM1 rows.
-</Screenshot>
-
-### Asm tab
-
-Set **Assembler Option** to **armasm (Arm Syntax)**. The lab code uses Arm syntax (`AREA`, `DCD`, `END`); the other choices expect GNU syntax and reject it.
-
-<Screenshot src="assembly/08-options-asm.png" alt="Options for Target, Asm tab, Assembler Option set to armasm (Arm Syntax)">
-Options for Target, Asm tab, with the "Assembler Option" drop-down set to "armasm (Arm Syntax)". Highlight the drop-down.
-</Screenshot>
+Open **Project → Options for Target 'Target 1'…** (<kbd>Alt</kbd>+<kbd>F7</kbd>, or the magic-wand icon in the toolbar). Keil's defaults are fine everywhere except the **Debug** tab.
 
 ### Debug tab
 
@@ -274,7 +258,7 @@ To hand in a project, zip the whole folder. Delete `Objects\` first to keep it s
 | Message or symptom | Cause and fix |
 |--------------------|---------------|
 | `Symbol __Vectors multiply defined` | Either **Device → Startup** is ticked in the Run-Time Environment ([Step 4](#step-4-skip-the-run-time-environment)), or two example files are both in the build ([Step 9](#step-9-reuse-the-project-for-more-examples)). |
-| `error: unknown directive` / `unexpected token` on `AREA` | The assembler is set to GNU syntax. Set **Asm → Assembler Option** to **armasm (Arm Syntax)** ([Step 6](#asm-tab)). |
+| `error: unknown directive` / `unexpected token` on `AREA` | The assembler is set to GNU syntax. Set **Asm → Assembler Option** to **armasm (Arm Syntax)** (**Project → Options for Target → Asm**). |
 | `A1163E: Unknown opcode` on a line that looks fine | The instruction isn't indented, so it was read as a label. Indent it. |
 | `A1167E: Invalid line start` | A label is indented, or there is a stray character in the first column. Labels go in column one. |
 | `L6236E: No section matches selector - no section to be FIRST/LAST` | The vector table is missing. Check your file starts with `AREA RESET` and that the file is in the build. |
