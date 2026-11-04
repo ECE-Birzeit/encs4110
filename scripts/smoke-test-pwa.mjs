@@ -78,10 +78,16 @@ const registerSWSource = readFileSync(
   path.join(repoRoot, "docs/.vitepress/theme/components/RegisterSW.vue"),
   "utf8"
 );
-if (!registerSWSource.includes("onNeedRefresh")) {
+if (!registerSWSource.includes("registration.update()")) {
   fail(
-    "RegisterSW.vue no longer defines onNeedRefresh -- this is the exact " +
-      "callback commit 6420c87 removed, which is what broke auto-update."
+    "RegisterSW.vue no longer calls registration.update() -- open tabs never " +
+      "navigate (single-page app), so without it they never see a new deploy."
+  );
+}
+if (!registerSWSource.includes("visibilitychange")) {
+  fail(
+    "RegisterSW.vue no longer checks for updates when the tab comes back " +
+      "to the front -- a deploy would wait up to an hour to reach open tabs."
   );
 }
 
