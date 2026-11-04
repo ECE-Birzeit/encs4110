@@ -47,6 +47,7 @@ export default withPwa(defineConfig({
   base: "/",
   head: [
     ["link", { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
+    ["link", { rel: "apple-touch-icon", href: "/apple-touch-icon.png" }],
     ["meta", { name: "theme-color", content: "#dc2626" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:site_name", content: "ECE Labs · Birzeit University" }],
@@ -190,23 +191,18 @@ export default withPwa(defineConfig({
     manifest: {
       name: "Computer Design Laboratory",
       short_name: "ENCS4110",
-      description: "A comprehensive guide and resource for ARM assembly language experiments. and TM4C123 LaunchPad microcontroller interfacing.",
+      description: "A comprehensive guide and resource for ARM assembly language experiments and TM4C123 LaunchPad microcontroller interfacing.",
       theme_color: "#dc2626",
       background_color: "#ffffff",
       display: "standalone",
       scope: "/",
       start_url: "/",
+      // Rendered from favicon.svg, the sidebar logo, so the installed app matches the site.
       icons: [
-        {
-          src: "/icons/pwa-icon.svg",
-          sizes: "192x192",
-          type: "image/svg+xml",
-        },
-        {
-          src: "/icons/pwa-icon.svg",
-          sizes: "512x512",
-          type: "image/svg+xml",
-        },
+        { src: "/icons/pwa-192x192.png", sizes: "192x192", type: "image/png" },
+        { src: "/icons/pwa-512x512.png", sizes: "512x512", type: "image/png" },
+        { src: "/icons/maskable-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+        { src: "/favicon.svg", sizes: "any", type: "image/svg+xml" },
       ],
     },
     workbox: {

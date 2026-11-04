@@ -2,96 +2,83 @@
 import { onBeforeMount, ref } from 'vue'
 
 const offlineReady = ref(false)
-function onOfflineReady() {
-  offlineReady.value = true
-}
-async function close() {
+function close() {
   offlineReady.value = false
 }
 
-// GitHub Pages serves sw.js with a fixed Cache-Control (no way to set
-// per-file headers there), which can let a plain reload be satisfied
-// straight from the browser's own HTTP cache without ever checking the
-// server for a newer version. Poll for a genuinely fresh copy on an
-// interval instead, explicitly bypassing cache -- this is vite-plugin-pwa's
-// own documented workaround for hosts with this exact limitation.
-const CHECK_INTERVAL_MS = 30 * 1000
+// registerType: 'autoUpdate' (see config.mts) makes a new service worker
+// activate on its own, and the plugin then reloads every open tab. The site is
+// a single-page app, so a tab that stays open never navigates and the browser
+// never checks for a new version by itself. Check here instead: once an hour,
+// and whenever the tab comes back to the front. An hour keeps surprise
+// reloads rare while someone is reading; refocusing the tab picks a deploy up
+// right away. registration.update() fetches sw.js past the HTTP cache, so
+// GitHub Pages' max-age=600 does not hide a new version.
+const CHECK_INTERVAL_MS = 60 * 60 * 1000
 
-function registerPeriodicUpdateCheck(swUrl: string, registration: ServiceWorkerRegistration) {
-  setInterval(async () => {
+function registerUpdateChecks(registration: ServiceWorkerRegistration) {
+  const check = () => {
     if (registration.installing || !navigator.onLine) return
-    const resp = await fetch(swUrl, {
-      cache: 'no-store',
-      headers: { 'cache-control': 'no-cache' },
-    })
-    if (resp?.status === 200) await registration.update()
-  }, CHECK_INTERVAL_MS)
+    registration.update().catch(() => {})
+  }
+  setInterval(check, CHECK_INTERVAL_MS)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') check()
+  })
 }
 
 onBeforeMount(async () => {
   const { registerSW } = await import('virtual:pwa-register')
   registerSW({
     immediate: true,
-    onOfflineReady,
-    // registerType: 'autoUpdate' (see config.mts) makes a waiting service
-    // worker activate on its own -- this callback doesn't need to do
-    // anything, but vite-plugin-pwa's documented auto-update recipe keeps
-    // it defined rather than omitted.
-    onNeedRefresh() {},
-    onRegisteredSW(swUrl, registration) {
-      console.info('Service Worker registered')
-      if (registration) registerPeriodicUpdateCheck(swUrl, registration)
+    onOfflineReady() {
+      offlineReady.value = true
+    },
+    onRegisteredSW(_swUrl, registration) {
+      if (registration) registerUpdateChecks(registration)
     },
     onRegisterError(e) {
-      console.error('Service Worker registration error!', e)
+      console.error('Service worker registration failed', e)
     },
   })
 })
 </script>
 
 <template>
-  <template v-if="offlineReady">
-    <div
-      class="pwa-toast"
-      role="alertdialog"
-      aria-labelledby="pwa-message"
-    >
-      <div id="pwa-message" class="mb-3">
-        App ready to work offline
-      </div>
-      <button
-        type="button"
-        class="pwa-cancel"
-        @click="close"
-      >
-        Close
-      </button>
-    </div>
-  </template>
+  <div v-if="offlineReady" class="pwa-toast" role="status">
+    <span>Ready to work offline</span>
+    <button type="button" @click="close">Close</button>
+  </div>
 </template>
 
 <style>
-    .pwa-toast {
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        margin: 16px;
-        padding: 12px;
-        border: 1px solid #8885;
-        border-radius: 4px;
-        z-index: 100;
-        text-align: left;
-        box-shadow: 3px 4px 5px 0 #8885;
-        background-color: white;
-    }
-    .pwa-toast #pwa-message {
-        margin-bottom: 8px;
-    }
-    .pwa-toast button {
-        border: 1px solid #8885;
-        outline: none;
-        margin-right: 5px;
-        border-radius: 2px;
-        padding: 3px 10px;
-    }
+.pwa-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px 10px 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-elv);
+  color: var(--vp-c-text-1);
+  box-shadow: var(--vp-shadow-3);
+  font-size: 14px;
+}
+.pwa-toast button {
+  padding: 4px 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  font-weight: 500;
+}
+.pwa-toast button:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
 </style>
