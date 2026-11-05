@@ -136,7 +136,7 @@
 /* Home hero image: the course icon (favicon.svg), tilted on a soft two-tone
    halo, the way vitepress.dev shows its logo. The halo is only a little larger
    than the icon, so it shows as a glow around the edges, not a blob.
-   It floats gently, and straightens up and grows a little on hover. */
+   It floats gently. */
 :root {
   --vp-home-hero-image-background-image: linear-gradient(-45deg, #ef4444 50%, #f59e0b 50%);
   --vp-home-hero-image-filter: blur(44px);
@@ -153,11 +153,6 @@
   transform: translate(-50%, -50%) rotate(-10deg);
   filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.3));
   animation: hero-float 6s ease-in-out infinite;
-  transition: rotate 0.5s cubic-bezier(0.2, 0.7, 0.3, 1), scale 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-.VPHero .image-container:hover .image-src {
-  rotate: 8deg;
-  scale: 1.06;
 }
 @keyframes hero-float {
   0%, 100% { translate: 0 0; }
@@ -171,7 +166,6 @@
   .VPHero .image-bg,
   .VPHero .image-src {
     animation: none;
-    transition: none;
   }
 }
 @media (min-width: 640px) {
