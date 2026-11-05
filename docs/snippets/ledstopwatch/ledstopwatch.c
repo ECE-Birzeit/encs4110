@@ -1,7 +1,6 @@
 #include "ledstopwatch.h"
 #include "lcd.h"
 
-volatile uint32_t global_ms  = 0;
 volatile uint32_t elapsed_cs = 0;
 volatile uint8_t  running    = 0;
 
@@ -17,11 +16,6 @@ void Stopwatch_GPIO_Init(void)
     // TODO: unlock PF0 -- GPIOF->LOCK = 0x4C4F434B, then GPIOF->CR |= 0x01
     // TODO: PF0, PF4 as inputs -- DIR cleared, DEN, PUR (pull-up)
     // TODO: PF1 as output -- DIR, DEN
-}
-
-void SysTick_Handler(void)
-{
-    // TODO: increment global_ms
 }
 
 void Timer0_Init(void)
