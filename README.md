@@ -32,7 +32,6 @@ Already cloned without the submodule? Run `git submodule update --init`.
 | `docs/index.md` | Home page |
 | `docs/setup.md` | Keil uVision5 and LaunchPad setup |
 | `docs/experiments/` | One page per experiment (`1.md` … `10.md`) and the index |
-| `docs/*-assignment.md` | Assignment pages (keypad, LED stopwatch, Simon, traffic light) |
 | `docs/snippets/` | Code included into pages |
 | `docs/public/manual/` | Submodule: the `pdf` branch of [encs4110-manual](https://github.com/ECE-Birzeit/encs4110-manual) |
 | `docs/.vitepress/config.mts` | Site config: nav, sidebar, PWA, analytics, link previews |
