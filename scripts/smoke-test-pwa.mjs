@@ -84,6 +84,13 @@ if (!registerSWSource.includes("registration.update()")) {
       "navigate (single-page app), so without it they never see a new deploy."
   );
 }
+if (!registerSWSource.includes("addEventListener('focus'")) {
+  fail(
+    "RegisterSW.vue no longer checks for updates when the window gets focus -- " +
+      "Safari keeps a covered page \"visible\", so switching back to an " +
+      "installed web app would never pick up a deploy."
+  );
+}
 if (!registerSWSource.includes("visibilitychange")) {
   fail(
     "RegisterSW.vue no longer checks for updates when the tab comes back " +
