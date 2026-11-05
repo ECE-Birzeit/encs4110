@@ -40,7 +40,7 @@ The onboard LED blinks at roughly 1 Hz while running, and stays off while paused
 
 ## Build Steps
 
-You get two files to fill in — `ledstopwatch.c`/`ledstopwatch.h` hold the timer, button, and display logic, `main.c` just calls into them (plus the LCD driver from Experiment 8, reused as-is). Every function is stubbed out with `// TODO` comments and builds cleanly as-is; no logic is implemented yet.
+You get two files to fill in — `ledstopwatch.c`/`ledstopwatch.h` hold the timer, button, and display logic, `main.c` just calls into them (plus the LCD driver from Experiment 8, reused as-is — it also provides `millis()`, a free-running millisecond counter driven by SysTick). Every function is stubbed out with `// TODO` comments and builds cleanly as-is; no logic is implemented yet.
 
 ::: code-group
 <<< @/snippets/ledstopwatch/main.c
@@ -70,14 +70,9 @@ void Stopwatch_GPIO_Init(void)
 
 ### Step 2: Bring Up Both Timers
 
-Fill in `SysTick_Handler` (advance `global_ms`), `Timer0_Init` (Timer0A, 32-bit periodic mode, `TICK_RELOAD` for a 100 Hz tick), and `TIMER0A_Handler` (clear the interrupt, advance `elapsed_cs` and blink the LED while `running`).
+Fill in `Timer0_Init` (Timer0A, 32-bit periodic mode, `TICK_RELOAD` for a 100 Hz tick), and `TIMER0A_Handler` (clear the interrupt, advance `elapsed_cs` and blink the LED while `running`).
 
 ```c
-void SysTick_Handler(void)
-{
-    // TODO: increment global_ms
-}
-
 void Timer0_Init(void)
 {
     // TODO: enable the Timer0 clock
@@ -94,13 +89,13 @@ void TIMER0A_Handler(void)
 }
 ```
 
-`global_ms` and `elapsed_cs` look similar but serve different purposes: `global_ms` always advances, running or not, and Step 3's button interrupts lean on that. `elapsed_cs` is the actual stopwatch reading — it advances only while running, which is exactly why it isn't suitable for anything that also needs to work while paused.
+`millis()` and `elapsed_cs` look similar but serve different purposes: `millis()` always advances, running or not, and Step 3's button interrupts lean on that. `elapsed_cs` is the actual stopwatch reading — it advances only while running, which is exactly why it isn't suitable for anything that also needs to work while paused.
 
-**Verify in isolation, before Step 3 wires in the buttons:** confirm `global_ms` climbs steadily at roughly 1000/sec regardless of anything else. Then temporarily force `running = 1;` right after `Timer0_Init()` in `main.c`, watch `elapsed_cs` in the Watch window, and confirm it climbs by exactly 100 per second (time it against a clock) while the LED blinks at roughly 1 Hz. Delete the forced line once this checks out.
+**Verify in isolation, before Step 3 wires in the buttons:** add a `volatile uint32_t now = millis();` line to the main loop and confirm `now` climbs steadily at roughly 1000/sec in the Watch window, regardless of anything else. Then temporarily force `running = 1;` right after `Timer0_Init()` in `main.c`, watch `elapsed_cs` in the Watch window, and confirm it climbs by exactly 100 per second (time it against a clock) while the LED blinks at roughly 1 Hz. Delete the forced line once this checks out.
 
 ### Step 3: Handle the Buttons via Interrupt
 
-Fill in `GPIOF_ButtonInterrupt_Init` (falling-edge interrupt on PF0 and PF4 + NVIC), `GPIOF_Handler` (debounce each button independently using `global_ms`, then set a request flag), and `Stopwatch_Update` (act on the request flags per the Behavior table above).
+Fill in `GPIOF_ButtonInterrupt_Init` (falling-edge interrupt on PF0 and PF4 + NVIC), `GPIOF_Handler` (debounce each button independently using `millis()`, then set a request flag), and `Stopwatch_Update` (act on the request flags per the Behavior table above).
 
 ```c
 void GPIOF_ButtonInterrupt_Init(void)
@@ -171,7 +166,7 @@ Make the LED blink faster each time a lap is recorded, as a rough visual count o
 ## Verification Checklist
 
 1. **Ports** — buttons and LED are correctly wired and configured (Step 1).
-2. **Timers** — `global_ms` climbs steadily regardless of `running`; `elapsed_cs` advances at a steady 100/sec while forced on, and the LED blinks at roughly 1 Hz (Step 2).
+2. **Timers** — `millis()` climbs steadily regardless of `running`; `elapsed_cs` advances at a steady 100/sec while forced on, and the LED blinks at roughly 1 Hz (Step 2).
 3. **Buttons** — each button's interrupt reliably sets its request flag exactly once per press, with no hangs; Pause/Resume toggles `running` immediately, Lap records correctly while running and resets correctly while paused (Step 3).
 4. **Display** — the LCD updates smoothly at a fixed cursor position with no flashing, and a recorded lap shows up immediately (Step 4).
 5. **If you did the Extras** — confirm the behavior you chose works as intended.

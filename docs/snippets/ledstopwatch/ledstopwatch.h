@@ -18,7 +18,6 @@
 #define MAX_LAPS     8
 #define DEBOUNCE_MS  25
 
-extern volatile uint32_t global_ms;       // free-running millisecond counter (SysTick) -- independent of `running`
 extern volatile uint32_t elapsed_cs;      // centiseconds elapsed, advances only while running (Timer0A)
 extern volatile uint8_t  running;         // 0 = paused, 1 = running
 
@@ -29,13 +28,12 @@ extern uint32_t laps[MAX_LAPS];           // recorded lap times, in centiseconds
 extern uint8_t  lap_count;                // how many laps recorded so far
 
 void Stopwatch_GPIO_Init(void);           // Step 1 -- clocks + DIR/DEN/PUR for PF0/PF1/PF4 (unlock PF0 first)
-void SysTick_Handler(void);               // Step 2 -- advance global_ms
 
 void Timer0_Init(void);                   // Step 2 -- TIMER0A, 32-bit periodic mode, TICK_RELOAD, NVIC IRQ 19
 void TIMER0A_Handler(void);               // Step 2 -- clear the interrupt, advance elapsed_cs, blink RUN_LED while running
 
 void GPIOF_ButtonInterrupt_Init(void);    // Step 3 -- edge interrupt config for PF0/PF4 + NVIC (GPIOF = IRQ 30)
-void GPIOF_Handler(void);                 // Step 3 -- debounce (using global_ms), set pause_requested / lap_requested
+void GPIOF_Handler(void);                 // Step 3 -- debounce (using millis() from lcd.h), set pause_requested / lap_requested
 
 void Stopwatch_Update(void);              // Step 3 -- call every main-loop iteration, acts on the request flags
 
