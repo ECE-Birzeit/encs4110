@@ -33,8 +33,8 @@ export default withPwa(defineConfig({
       groupIconVitePlugin({
         customIcon: {
           // Keyed on the extension, not the bare letter: matching is
-          // label.includes(key), so 'c' also hit lcd.h, trafficlight.h and
-          // ledstopwatch.h purely because those names contain a "c".
+          // label.includes(key), so 'c' also hit lcd.h and uart.h purely
+          // because those names contain a "c".
           '.c': cProgramIcon,
         },
       }),
@@ -141,35 +141,33 @@ export default withPwa(defineConfig({
         ],
       },
       {
-        text: "Training Assignments",
-        collapsed: false,
+        // Downloads + Documentation are pushed to the sidebar bottom in custom.css.
+        text: "Downloads",
+        collapsed: true,
         items: [
-          { text: "Matrix Keypad Interfacing", link: "/keypad-assignment" },
-          { text: "Simon-Says Sequence Repeater", link: "/simon-assignment" },
-          { text: "Stopwatch with LED Indicator", link: "/ledstopwatch-assignment" },
-          { text: "Traffic Light with Pedestrian Crossing", link: "/trafficlight-assignment" },
+          { text: "Keil MDK (uVision5)", link: "https://www.keil.com/demo/eval/arm.htm" },
+          { text: "Keil TM4C Device Pack", link: "https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack" },
+          { text: "Stellaris ICDI Add-on for Keil", link: "https://developer.arm.com/documentation/ka002280/latest/" },
+          { text: "Stellaris ICDI Drivers", link: "https://www.ti.com/tool/STELLARIS_ICDI_DRIVERS" },
+          { text: "PuTTY (UART lab)", link: "https://www.putty.org/" },
+          // target '_blank' makes VitePress treat the link as external, so the
+          // PDF opens in a new tab instead of going through the router.
+          { text: "Full Lab Manual (PDF)", link: "/manual/encs4110_manual.pdf", target: "_blank" },
         ],
       },
       {
-        text: "Additional Resources",
+        text: "Documentation",
+        collapsed: true,
         items: [
-          {
-            text: "Keil uVision5 IDE",
-            link: "https://www.keil.com/demo/eval/arm.htm",
-          },
-          {
-            text: "ARM Documentation",
-            link: "https://developer.arm.com/documentation/dui0041/latest/",
-          },
+          { text: "TM4C123GH6PM Datasheet", link: "https://www.ti.com/lit/ds/spms376e/spms376e.pdf" },
+          { text: "EK-TM4C123GXL LaunchPad User's Guide", link: "https://www.ti.com/lit/ug/spmu296/spmu296.pdf" },
+          { text: "Arm Cortex-M4 Generic User Guide", link: "https://developer.arm.com/documentation/dui0553/latest/" },
           {
             text: "ARM Instruction Set Summary",
             link: "https://developer.arm.com/documentation/100165/0201/Programmers-Model/Instruction-set-summary/Processor-instructions",
           },
-          {
-            text: "TM4C123G Datasheet",
-            link: "https://www.ti.com/lit/ds/spms376e/spms376e.pdf",
-          },
-
+          { text: "armasm User Guide (directives)", link: "https://developer.arm.com/documentation/dui0473/latest/" },
+          { text: "HD44780 LCD Datasheet", link: "https://www.sparkfun.com/datasheets/LCD/HD44780.pdf" },
         ],
       },
     ],

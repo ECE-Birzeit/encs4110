@@ -50,15 +50,15 @@
   mask: var(--icon-book) no-repeat center / contain;
 }
 
-/* Keep reference links at the foot of the sidebar, as on the ENCS4101 and
-   ENCS5150 sites. */
+/* Push the last two sidebar groups (Downloads, Documentation) to the bottom,
+   as on the ENCS4101 and ENCS5101 sites. */
 .VPSidebar .nav {
   display: flex;
   flex-direction: column;
   min-height: 100%;
 }
 
-.VPSidebar .nav > .group:last-child {
+.VPSidebar .nav > .group:nth-last-child(2) {
   margin-top: auto;
 }
 
