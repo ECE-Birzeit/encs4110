@@ -1,53 +1,44 @@
 #include "lcd.h"
 
-//====================[ Timebase: SysTick, 1 ms tick ]====================
-static volatile uint32_t ms_ticks = 0;  // incremented every 1 ms by SysTick_Handler
+#define CYCLES_PER_US   (SystemCoreClock / 1000000u)
 
-void SysTick_Handler(void)
+
+
+//====================[ SysTick Delay Functions ]====================
+void SysTick_Init(void)
 {
-    ms_ticks++;
+    SysTick->CTRL = 0;
+    SysTick->LOAD = CYCLES_PER_US - 1;  // 1us delay at 50MHz
+    SysTick->VAL = 0;
+    SysTick->CTRL = 0x5;     // Enable with system clock
 }
 
-static void Timebase_Init(void)
+void delay_us(int us)
 {
-    SysTick_Config(SystemCoreClock / 1000);  // reload every 1 ms, enable interrupt, start
+    SysTick->LOAD = (CYCLES_PER_US * us) - 1;
+    SysTick->VAL = 0;
+    SysTick->CTRL = 0x5; // Enable with system clock
+    while ((SysTick->CTRL & 0x10000) == 0);
+    SysTick->CTRL = 0;
 }
 
-uint32_t millis(void)
+void delay_ms(int ms)
 {
-    return ms_ticks;
-}
-
-void delay_ms(uint32_t ms)
-{
-    // Count SysTick reloads (COUNTFLAG) instead of watching ms_ticks: inside another
-    // interrupt handler SysTick_Handler can't run, so ms_ticks would never change.
-    if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) == 0)  // reading CTRL also clears COUNTFLAG
-        Timebase_Init();
-
-    ms++;  // the first reload can come at any point in the next 1 ms, so wait one extra
-    while (ms)
-    {
-        if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)  // set once per reload, cleared by the read
-            ms--;
-    }
+    while (ms--)
+        delay_us(1000);
 }
 
 //====================[ LCD Helper Functions ]====================
-static void LCD_PulseDelay(void)
+void LCD_EnablePulse(void)
 {
-    for (volatile int i = 0; i < 20; i++);  // ~2 us at 50 MHz; EN needs at least 450 ns
-}
-
-static void LCD_EnablePulse(void)
-{
+    delay_us(1);
     GPIOB->DATA |= EN;
-    LCD_PulseDelay();
-    GPIOB->DATA &= ~EN;  // LCD latches D4-D7 on this falling edge
-    LCD_PulseDelay();
+    delay_us(1);
+    GPIOB->DATA &= ~EN;
+    delay_us(1);
 }
 
-static void LCD_SendNibble(unsigned char nibble)
+void LCD_SendNibble(unsigned char nibble)
 {
     // Send nibble to PB4-PB7
     GPIOB->DATA = (GPIOB->DATA & ~DATA_MASK) | ((nibble << 4) & DATA_MASK);
@@ -67,7 +58,7 @@ void LCD_Init(void)
     GPIOB->DEN |= RS | RW | EN | DATA_MASK;
     GPIOB->DATA &= ~(RS | RW | EN | DATA_MASK);  // Clear all
 
-    Timebase_Init();
+    SysTick_Init();
 
     delay_ms(50);  // Wait for LCD to power up
 
@@ -76,47 +67,52 @@ void LCD_Init(void)
     delay_ms(5);
 
     LCD_SendNibble(0x03);
-    delay_ms(1);
+    delay_us(150);
 
     LCD_SendNibble(0x03);
-    delay_ms(1);
+    delay_us(150);
 
     LCD_SendNibble(0x02);  // Set 4-bit mode
-    delay_ms(1);
+    delay_us(150);
 
     // Now in 4-bit mode: use full commands
     LCD_Command(0x28); // Function set: 4-bit, 2 lines, 5x8 dots
     LCD_Command(0x0C); // Display ON, Cursor OFF
     LCD_Command(0x06); // Entry mode: increment cursor
-    LCD_Clear();
+    LCD_Command(0x01); // Clear display
+    delay_ms(2);
 }
 
 //====================[ LCD Command/Data API ]====================
 void LCD_Command(unsigned char command)
 {
     GPIOB->DATA &= ~RS; // RS = 0 for command
+    delay_us(1);
     LCD_SendNibble(command >> 4);     // Upper nibble
     LCD_SendNibble(command & 0x0F);   // Lower nibble
-    delay_ms(2);                      // Longest command (clear/home) needs 1.52 ms
+    delay_ms(2);
 }
 
 void LCD_Data(unsigned char data)
 {
     GPIOB->DATA |= RS; // RS = 1 for data
+    delay_us(1);
     LCD_SendNibble(data >> 4);
     LCD_SendNibble(data & 0x0F);
-    delay_ms(1);                      // Writing a character needs 37 us
+    delay_ms(1);
 }
 
 void LCD_Clear(void)
 {
     LCD_Command(0x01);
+    delay_ms(2);
 }
 
 void LCD_SetCursor(unsigned char row, unsigned char col)
 {
     unsigned char address = (row == 0) ? 0x80 + col : 0xC0 + col;
     LCD_Command(address);
+    delay_ms(1);
 }
 
 void LCD_Print(char *str)
