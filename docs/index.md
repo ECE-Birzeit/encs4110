@@ -6,6 +6,9 @@ hero:
   name: "ENCS4110"
   text: "Computer Design Laboratory"
   tagline: "Department of Electrical & Computer Engineering · Birzeit University"
+  image:
+    src: /favicon.svg
+    alt: ENCS4110 course icon
 
   actions:
     - theme: brand
