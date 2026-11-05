@@ -8,23 +8,35 @@ function close() {
 
 // registerType: 'autoUpdate' (see config.mts) makes a new service worker
 // activate on its own, and the plugin then reloads every open tab. The site is
-// a single-page app, so a tab that stays open never navigates and the browser
-// never checks for a new version by itself. Check here instead: once an hour,
-// and whenever the tab comes back to the front. An hour keeps surprise
-// reloads rare while someone is reading; refocusing the tab picks a deploy up
-// right away. registration.update() fetches sw.js past the HTTP cache, so
-// GitHub Pages' max-age=600 does not hide a new version.
+// a single-page app, so a page that stays open never navigates and the browser
+// never checks for a new version by itself. Check here instead:
+// - right away, so every launch looks for a new deploy;
+// - when the tab becomes visible or the window gets focus. Safari keeps a page
+//   "visible" while other apps' windows cover it, so switching back to an
+//   installed web app fires only focus, never visibilitychange;
+// - when the network comes back;
+// - once an hour, as a fallback (background timers get throttled).
+// Checks less than a minute apart are skipped. registration.update() fetches
+// sw.js past the HTTP cache, so GitHub Pages' max-age=600 does not hide a new
+// version.
 const CHECK_INTERVAL_MS = 60 * 60 * 1000
+const MIN_GAP_MS = 60 * 1000
 
 function registerUpdateChecks(registration: ServiceWorkerRegistration) {
+  let lastCheck = 0
   const check = () => {
     if (registration.installing || !navigator.onLine) return
+    if (Date.now() - lastCheck < MIN_GAP_MS) return
+    lastCheck = Date.now()
     registration.update().catch(() => {})
   }
+  check()
   setInterval(check, CHECK_INTERVAL_MS)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') check()
   })
+  window.addEventListener('focus', check)
+  window.addEventListener('online', check)
 }
 
 onBeforeMount(async () => {
