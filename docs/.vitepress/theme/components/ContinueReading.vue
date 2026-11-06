@@ -92,11 +92,6 @@ if (props.mode === 'track') {
   watch(() => route.path, () => nextTick(save))
 }
 
-function forget() {
-  const domain = location.hostname.endsWith('birzeit.me') ? '; domain=.birzeit.me' : ''
-  document.cookie = `${KEY}=; path=/; max-age=0${domain}`
-  last.value = null
-}
 </script>
 
 <template>
@@ -107,7 +102,6 @@ function forget() {
       <span v-if="last.section" class="continue-section">{{ last.section }}</span>
       <span class="continue-arrow" aria-hidden="true">→</span>
     </a>
-    <button type="button" class="continue-forget" aria-label="Forget where I left off" @click="forget">×</button>
   </div>
 </template>
 
@@ -124,7 +118,7 @@ function forget() {
   grid-template-columns: 1fr auto;
   column-gap: 16px;
   row-gap: 2px;
-  padding: 14px 48px 14px 18px;
+  padding: 14px 20px 14px 18px;
   border: 1px solid var(--vp-c-brand-2);
   border-radius: 12px;
   background: var(--vp-c-brand-soft);
@@ -158,24 +152,6 @@ function forget() {
   align-self: center;
   font-size: 20px;
   color: var(--vp-c-brand-1);
-}
-.continue-forget {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  color: var(--vp-c-text-2);
-  font-size: 18px;
-  line-height: 1;
-}
-.continue-forget:hover {
-  background: var(--vp-c-default-soft);
-  color: var(--vp-c-text-1);
-}
-.continue-forget:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
 }
 @media (max-width: 959px) {
   .continue {
