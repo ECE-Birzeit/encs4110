@@ -35,10 +35,6 @@ Keil uVision5 runs on Windows. On a Mac, use a Windows virtual machine (Parallel
 2. Fill in the form. Any valid email works; for *Company* write `Birzeit University`.
 3. Click the **MDK5xx.EXE** link (the number changes with each release; take the newest).
 
-<Screenshot src="setup/01-mdk-download.png" alt="The MDK download page after submitting the form">
-Browser on the Keil download page after the form is submitted, with the MDK5xx.EXE link highlighted.
-</Screenshot>
-
 ### Run the installer
 
 1. Right-click the downloaded `.EXE` and choose **Run as administrator**.
@@ -51,10 +47,6 @@ Browser on the Keil download page after the form is submitted, with the MDK5xx.E
 4. Enter your name and email on the *Customer Information* page and click **Next**.
 5. When Windows asks whether to install the **ULINK** / **Arm** device drivers, click **Install**.
 6. Click **Finish**.
-
-<Screenshot src="setup/02-mdk-install-folders.png" alt="Installer: Folder Selection page with the Core path visible">
-The MDK installer's "Folder Selection" page showing the default Core and Pack paths. Highlight the Core path.
-</Screenshot>
 
 ### Let the Pack Installer finish
 
@@ -85,10 +77,6 @@ Make sure uVision is **closed**, then:
 2. **Double-click** the downloaded `.pack` file. The *Pack Unzip* window opens.
 3. Click **Next** and wait for it to finish, then click **Finish**.
 
-<Screenshot src="setup/04-pack-unzip.png" alt="Pack Unzip window installing Keil.TM4C_DFP">
-The "Pack Unzip: Keil TM4C_DFP 1.1.0" window, on the page with the Next button.
-</Screenshot>
-
 ### Check both packs
 
 1. Open uVision5.
@@ -99,6 +87,27 @@ The "Pack Unzip: Keil TM4C_DFP 1.1.0" window, on the page with the Next button.
 <Screenshot src="setup/05-pack-installer-tm4c.png" alt="Pack Installer with TM4C123GH6PM selected and Keil::TM4C_DFP marked Up to date">
 Pack Installer with "TM4C123GH6PM" typed in the left search box, the device selected, and Keil::TM4C_DFP on the right showing "Up to date". Highlight both.
 </Screenshot>
+
+### Generate the System Viewer file
+
+The debugger's **System Viewer** (the live GPIO, UART, timer… register windows) reads a compiled `.SFR` file that sits next to the chip's `.svd` description. The TM4C pack ships without it and Keil often fails to build it, so in a debug session **Peripherals → System Viewer** shows only *Core Peripherals*. Build it yourself once with Keil's `SVDConv` tool:
+
+1. Close uVision.
+2. Open **Command Prompt** (press <kbd>Win</kbd>, type `cmd`, <kbd>Enter</kbd>).
+3. Run these two commands:
+   ```bat
+   cd /d "%LOCALAPPDATA%\Arm\Packs\Keil\TM4C_DFP\1.1.0\SVD\TM4C123"
+   "%LOCALAPPDATA%\Keil_v5\UV4\SVDConv.exe" TM4C123GH6PM.svd --generate=sfr
+   ```
+4. It should end with `Found 0 Error(s)` (warnings are fine). The folder now has a `TM4C123GH6PM.SFR` file next to `TM4C123GH6PM.svd`.
+
+::: details Keil is in C:\Keil_v5, or "The system cannot find the path specified"
+Use your own Core folder from Step 1 for `SVDConv.exe`, for example `"C:\Keil_v5\UV4\SVDConv.exe"`. On those installs the packs are often under the Core folder too, so the first line becomes `cd /d "C:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\SVD\TM4C123"`. If the pack version isn't `1.1.0`, open the `TM4C_DFP` folder and use the version folder you find there.
+:::
+
+::: warning Redo this after reinstalling or updating the pack
+The `.SFR` file lives inside the pack folder, so reinstalling Keil or installing a newer **TM4C_DFP** removes it. If System Viewer goes back to showing only *Core Peripherals*, run the two commands again.
+:::
 
 ## Step 3: Install the Stellaris ICDI debugger add-on
 
@@ -141,10 +150,6 @@ This step needs the board.
 1. Slide the **PWR SELECT** switch on the LaunchPad (top-left corner) to **DEBUG**.
 2. Plug a micro-USB cable into the **DEBUG** USB port, which is the one at the **top** of the board next to the switch, not the one on the side.
 3. The green **power LED** turns on. If the board still has TI's demo program, the RGB LED starts fading through colours.
-
-<Screenshot src="setup/07-launchpad-debug-port.png" alt="The LaunchPad's PWR SELECT switch on DEBUG and the cable in the DEBUG port">
-Photo of the EK-TM4C123GXL with labels: PWR SELECT switch set to DEBUG, cable in the top (DEBUG) micro-USB port, and the green power LED lit.
-</Screenshot>
 
 ::: warning Use a data cable
 Some micro-USB cables (especially ones that came with power banks) only carry power. If the board lights up but Windows shows no new devices, try another cable.

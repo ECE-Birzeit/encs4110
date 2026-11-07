@@ -233,10 +233,6 @@ Build Output after pressing Download (F8): "Erase Done. Programming Done. Verify
 
 Now press the **RESET** button on the board (next to the DEBUG USB port). **The red LED should start blinking** (or, for the assembly version, stay on).
 
-<Screenshot src="tiva/12-board-red-led.png" alt="Photo of the LaunchPad with the red LED on and the RESET button labelled">
-Photo of the LaunchPad running the test program: red RGB LED lit, RESET button and the RGB LED labelled.
-</Screenshot>
-
 The program stays in flash: unplug and replug the board and it runs again.
 
 ## Step 9: Debug on the board
@@ -249,6 +245,10 @@ The program stays in flash: unplug and replug the board and it runs again.
 ### Watch the hardware registers
 
 **Peripherals → System Viewer → GPIOF** opens a live view of every Port F register. Step over the `DIR` and `DEN` lines and watch bit 1 flip. You can also click a bit to change it and see the LED react.
+
+::: warning System Viewer only shows "Core Peripherals"?
+The pack's System Viewer file hasn't been generated. Stop debugging and follow [Generate the System Viewer file](./setup#generate-the-system-viewer-file) in the setup guide; it takes two commands.
+:::
 
 <Screenshot src="tiva/13-system-viewer-gpiof.png" alt="System Viewer window showing GPIOF registers with DATA bit 1 set">
 Debug session on the board with Peripherals → System Viewer → GPIOF open, showing DIR, DEN and DATA with bit 1 set. The editor shows the yellow arrow inside the while loop.
@@ -279,4 +279,5 @@ End the debug session (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) before editing and pressin
 | Download says *Verify OK* but nothing happens | Press **RESET** on the board. If still nothing, check you are toggling the right pin (red LED is PF1, `0x02`). |
 | The LED never blinks, but stepping works | The delay loop was optimised away. Declare the loop counter `volatile`, or set **Options for Target → C/C++ (AC6) → Optimization** to **-O0**. |
 | `L6050U: The code size of this image exceeds the maximum allowed` | You hit MDK-Lite's 32 KB limit, usually by using `printf` or floating-point maths heavily. Remove what you don't need. |
+| **Peripherals → System Viewer** lists only *Core Peripherals* (no GPIOF, UART…) | The `.SFR` file for the chip is missing. Generate it with `SVDConv`: see [setup](./setup#generate-the-system-viewer-file). |
 | Watch window shows `<not in scope>` | The program is stopped outside the function that owns the variable, or optimisation is above `-O0`. Make the variable global or step into its function. |
