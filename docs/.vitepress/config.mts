@@ -149,7 +149,7 @@ export default withPwa(defineConfig({
           { text: "Keil TM4C Device Pack", link: "https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack" },
           { text: "Stellaris ICDI Add-on for Keil", link: "https://developer.arm.com/documentation/ka002280/latest/" },
           { text: "Stellaris ICDI Drivers", link: "https://www.ti.com/tool/STELLARIS_ICDI_DRIVERS" },
-          { text: "PuTTY (UART lab)", link: "https://www.putty.org/" },
+          { text: "PuTTY (UART lab)", link: "https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" },
           // target '_blank' makes VitePress treat the link as external, so the
           // PDF opens in a new tab instead of going through the router.
           { text: "Full Lab Manual (PDF)", link: "/manual/encs4110_manual.pdf", target: "_blank" },
@@ -205,6 +205,8 @@ export default withPwa(defineConfig({
     },
     workbox: {
       globPatterns: ["**/*.{css,js,html,svg,png,jpg,jpeg,ico,txt,woff2,pdf}"],
+      // The site links only the full manual; the per-experiment PDFs from the submodule are unused.
+      globIgnores: ["manual/encs4110_[0-9]*.pdf"],
       maximumFileSizeToCacheInBytes: 5000000,
     },
     experimental: {
