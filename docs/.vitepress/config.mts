@@ -5,6 +5,10 @@ import { defineConfig } from "vitepress";
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 
 import { withPwa } from '@vite-pwa/vitepress'
+import { linkPreviews } from "./og.mts"
+
+// Per-experiment link previews, drawn at build time (see og.mts)
+const og = linkPreviews({ code: "ENCS4110", name: "Computer Design Laboratory", host: "encs4110.birzeit.me", accent: "#f87171", platform: "TM4C123 · ARM Cortex-M4" })
 
 
 // Vendored rather than referenced by URL. vitepress-plugin-group-icons passes
@@ -51,10 +55,7 @@ export default withPwa(defineConfig({
     ["meta", { name: "theme-color", content: "#dc2626" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:site_name", content: "ECE Labs · Birzeit University" }],
-    ["meta", { property: "og:image", content: "https://encs4110.birzeit.me/og.png" }],
-    ["meta", { property: "og:image:width", content: "1200" }],
-    ["meta", { property: "og:image:height", content: "630" }],
-    ["meta", { name: "twitter:card", content: "summary_large_image" }],
+    ...og.head,
     [
       "script",
       {
@@ -78,11 +79,14 @@ export default withPwa(defineConfig({
     "A hands-on ARM Cortex-M4 embedded systems laboratory covering assembly programming, GPIO, interrupts, timers, ADC, UART, and peripheral interfacing using the TM4C123 LaunchPad.",
   sitemap: { hostname: "https://encs4110.birzeit.me/" },
 
+  buildEnd: og.buildEnd,
+
   // Link previews: per-page title, the page's (or site's) description, and canonical URL.
   transformHead({ pageData, siteData }) {
     const page = pageData.frontmatter.layout === "home" ? "" : pageData.title
     const path = pageData.relativePath.replace(/(^|\/)index\.md$/, "$1").replace(/\.md$/, "")
     return [
+      ...og.transformHead({ pageData } as any),
       ["meta", { property: "og:title", content: page ? `${page} · ENCS4110` : "ENCS4110 Computer Design Laboratory" }],
       ["meta", { property: "og:description", content: pageData.frontmatter.description || pageData.description || siteData.description }],
       ["meta", { property: "og:url", content: `https://encs4110.birzeit.me/${path}` }],
@@ -206,7 +210,8 @@ export default withPwa(defineConfig({
     workbox: {
       globPatterns: ["**/*.{css,js,html,svg,png,jpg,jpeg,ico,txt,woff2,pdf}"],
       // The site links only the full manual; the per-experiment PDFs from the submodule are unused.
-      globIgnores: ["manual/encs4110_[0-9]*.pdf"],
+      // Link-preview images are for chat apps and search engines, not for reading offline.
+      globIgnores: ["manual/encs4110_[0-9]*.pdf", "og/**"],
       maximumFileSizeToCacheInBytes: 5000000,
     },
     experimental: {
