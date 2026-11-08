@@ -96,9 +96,18 @@ export function redirects(map: Record<string, string>, host: string) {
       const target = base.replace(/\/$/, '') + to
       const file = join(site.outDir, from.replace(/^\//, '').replace(/\/$/, '/index') + '.html')
       mkdirSync(dirname(file), { recursive: true })
+      // Chat apps and search engines read this page without following the redirect, so it carries the
+      // target's own link preview (title, description, image) copied from the target's built page
+      const built = join(site.outDir, to.replace(/^\//, '').replace(/\/$/, '/index') + '.html')
+      const page = existsSync(built) ? readFileSync(built, 'utf8') : ''
+      const title = (page.match(/<title>([^<]*)<\/title>/) || [])[1] || 'This page moved'
+      const preview = (page.match(/<meta (?:property="og:[^"]+"|name="(?:description|twitter:[^"]+)") content="[^"]*">/g) || [])
+        .filter((m) => !m.includes('og:url')).join('\n')
       writeFileSync(file, `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>This page moved</title>
+<html lang="en"><head><meta charset="utf-8"><title>${title}</title>
 <meta name="robots" content="noindex">
+${preview}
+<meta property="og:url" content="https://${host}${to}">
 <link rel="canonical" href="https://${host}${to}">
 <meta http-equiv="refresh" content="0; url=${target}">
 <script>location.replace(${JSON.stringify(target)} + location.hash)</script>
