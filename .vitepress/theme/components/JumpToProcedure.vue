@@ -1,16 +1,20 @@
 <script setup lang="ts">
 // Buttons at the top of an experiment page: "Jump to the procedure" (the first section after
-// Background: Examples, Configuration Steps, ...) and, when the page's front matter has a
-// `manual:` link, "Lab manual (PDF)" opening the experiment's chapter. Same component on every lab site.
+// Background: Examples, Configuration Steps, ...) and "Lab manual (PDF)": the page's own `manual:`
+// link (its chapter) or, failing that, the lab's whole manual (themeConfig.lab.manual, set by
+// lab-template's config). Same component on every lab site.
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
 
 const route = useRoute()
-const { frontmatter } = useData()
+const { frontmatter, theme } = useData()
 const target = ref<{ id: string } | null>(null)
 const IDS = ['procedure', 'examples', 'example', 'lab-work', 'tasks']
 const isExperiment = computed(() => /\/experiments\/exp\d+-/.test(route.path))
-const manual = computed(() => (isExperiment.value && frontmatter.value.manual ? withBase(frontmatter.value.manual) : ''))
+const manual = computed(() => {
+  const link = frontmatter.value.manual || theme.value.lab?.manual
+  return isExperiment.value && link ? withBase(link) : ''
+})
 
 function find() {
   target.value = null
