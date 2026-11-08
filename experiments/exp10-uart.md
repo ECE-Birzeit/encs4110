@@ -1,10 +1,10 @@
 ---
+title: "Universal Asynchronous Receiver-Transmitter (UART)"
 outline: deep
 lastUpdated: true
-prev:
-  text: "9. Analog-to-Digital Converter (ADC)"
-  link: /experiments/9
 next: false
+short: "UART"
+part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Universal Asynchronous Receiver-Transmitter (UART)
@@ -15,7 +15,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/tiva-project) guide first, and make sure its blinking-LED test works.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
 :::
 
 **Target device:** TM4C123GH6PM

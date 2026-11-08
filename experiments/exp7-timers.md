@@ -1,12 +1,8 @@
 ---
+title: "Hardware Timers and Timing Control"
 outline: deep
 lastUpdated: true
-prev:
-  text: "6. GPIO Inputs and Interrupt Handling"
-  link: /experiments/6
-next:
-  text: "8. Character LCD Display Interface"
-  link: /experiments/8
+part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Hardware Timers and Timing Control
@@ -17,7 +13,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/tiva-project) guide first, and make sure its blinking-LED test works.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
 :::
 
 **Target device:** TM4C123GH6PM
@@ -62,7 +58,7 @@ Modify the SysTick example so that the RED LED (PF1) toggles only when SW1 (PF4)
 
 **Requirements:**
 - Use `SysTick_Config(SystemCoreClock/1000)` to generate a 1 ms tick.
-- Implement interrupt-driven GPIO input for SW1 (PF4) as in [Experiment 6](./6).
+- Implement interrupt-driven GPIO input for SW1 (PF4) as in [Experiment 6](./exp6-gpio-interrupts).
 - In the GPIO ISR, use a global millisecond counter to implement 150 ms debouncing.
 - Only toggle the RED LED if at least 150 ms have elapsed since the last press.
 

@@ -2,12 +2,7 @@
 outline: deep
 title: Assembly Project
 description: Create a Keil uVision5 project for a generic ARM Cortex-M4, write an assembly program, and step through it in the simulator. Used for experiments 1 to 4.
-prev:
-  text: "Installing Keil and Tiva Support"
-  link: /setup
-next:
-  text: "Tiva LaunchPad Project"
-  link: /tiva-project
+order: 2
 ---
 
 # Assembly Project
@@ -15,7 +10,7 @@ next:
 Experiments **1–4** are pure ARM assembly. They run in Keil's built-in **simulator**, so you do not need the LaunchPad. This guide builds a project from an empty folder, runs a tiny program, and shows you the debugger windows you will use in every lab.
 
 ::: info Before you start
-You need Keil uVision5 and the **ARM::Cortex_DFP** pack. If you haven't installed them, do [Steps 1 and 2 of the setup guide](./setup) first.
+You need Keil uVision5 and the **ARM::Cortex_DFP** pack. If you haven't installed them, do [Steps 1 and 2 of the setup guide](./keil) first.
 :::
 
 ::: details The whole thing in 30 seconds (once you've done it before)

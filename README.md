@@ -1,4 +1,4 @@
-<a href="https://encs4110.birzeit.me"><img src="docs/public/og.png" alt="ENCS4110 Computer Design Laboratory" width="100%"></a>
+<a href="https://encs4110.birzeit.me"><img src="public/og.png" alt="ENCS4110 Computer Design Laboratory" width="100%"></a>
 
 # ENCS4110 · Computer Design Laboratory
 
@@ -14,13 +14,13 @@ Requires [Node.js](https://nodejs.org) 24 and npm. The PDFs come from a submodul
 git clone --recurse-submodules https://github.com/ECE-Birzeit/encs4110.git
 cd encs4110
 npm ci
-npm run docs:dev   # http://localhost:5173, reloads as you edit
+npm run dev # http://localhost:5173, reloads as you edit
 ```
 
 ```sh
-npm run docs:build       # outputs to docs/.vitepress/dist
+npm run build       # outputs to .vitepress/dist
 npm run docs:preview     # serve the built site on port 8080
-npm run smoke-test:pwa   # check the offline (PWA) build, run after docs:build
+npm run smoke-test:pwa   # check the offline (PWA) build, run after build
 ```
 
 Already cloned without the submodule? Run `git submodule update --init`.
@@ -29,12 +29,12 @@ Already cloned without the submodule? Run `git submodule update --init`.
 
 | Path | Contents |
 |:--|:--|
-| `docs/index.md` | Home page |
-| `docs/setup.md` | Keil uVision5 and LaunchPad setup |
-| `docs/experiments/` | One page per experiment (`1.md` … `10.md`) and the index |
-| `docs/snippets/` | Code included into pages |
-| `docs/public/manual/` | Submodule: the `pdf` branch of [encs4110-manual](https://github.com/ECE-Birzeit/encs4110-manual) |
-| `docs/.vitepress/config.mts` | Site config: nav, sidebar, PWA, analytics, link previews |
+| `index.md` | Home page |
+| `setup/` | Setup Guide (`index.md`) and one page per tool or project: Keil and Tiva support, the assembly project, the LaunchPad project |
+| `experiments/` | One page per experiment (`exp1-assembly-basics.md` … `exp10-uart.md`) and the Experiment Navigator. The sidebar is built from these files (`.vitepress/lab.mts`) |
+| `snippets/` | Code included into pages |
+| `public/manual/` | Submodule: the `pdf` branch of [encs4110-manual](https://github.com/ECE-Birzeit/encs4110-manual) |
+| `.vitepress/config.mts` | Site config: nav, sidebar, PWA, analytics, link previews |
 | `scripts/smoke-test-pwa.mjs` | Checks the service worker and offline manifest |
 
 ### Updating the PDFs
@@ -42,8 +42,8 @@ Already cloned without the submodule? Run `git submodule update --init`.
 The PDFs are built in [encs4110-manual](https://github.com/ECE-Birzeit/encs4110-manual) and published to its `pdf` branch. To pull the latest into this site:
 
 ```sh
-git submodule update --remote docs/public/manual
-git add docs/public/manual
+git submodule update --remote public/manual
+git add public/manual
 git commit -m "Update manual PDFs"
 ```
 
@@ -57,7 +57,7 @@ Found a mistake? Click **Edit this page on GitHub** at the bottom of any page, o
 
 ## License
 
-The written content is licensed under [CC BY 4.0](LICENSE): you may share and adapt it, including for your own course, as long as you credit the source. Code, meaning `docs/snippets/`, `scripts/` and the site code (`docs/.vitepress/`, `.github/`), is licensed under [MIT](LICENSE-CODE). © 2026 [Mohammad Abu-Shelbaia](https://mabushelbaia.com).
+The written content is licensed under [CC BY 4.0](LICENSE): you may share and adapt it, including for your own course, as long as you credit the source. Code, meaning `snippets/`, `scripts/` and the site code (`.vitepress/`, `.github/`), is licensed under [MIT](LICENSE-CODE). © 2026 [Mohammad Abu-Shelbaia](https://mabushelbaia.com).
 
 The Birzeit University name and logo are the university's; they are not licensed here. Screenshots of third-party software, and product names and logos, belong to their respective owners.
 

@@ -2,12 +2,7 @@
 outline: deep
 title: Tiva LaunchPad Project
 description: Create a Keil uVision5 project for the TM4C123GH6PM, flash it onto the Tiva C LaunchPad over the Stellaris ICDI, and debug it on the board. Used for experiments 5 to 10.
-prev:
-  text: "Assembly Project"
-  link: /assembly-project
-next:
-  text: "Experiment Navigator"
-  link: /experiments/
+order: 3
 ---
 
 # Tiva LaunchPad Project
@@ -15,7 +10,7 @@ next:
 Experiments **5–10** run on the real chip: the **TM4C123GH6PM** on the **Tiva C LaunchPad**. This guide builds a project from an empty folder, flashes a blinking-LED program onto the board, and shows you how to debug it live. Do it once before your first hardware lab; if the LED blinks, your whole setup is working.
 
 ::: info Before you start
-You need **all four** steps of the [setup guide](./setup) done: Keil, the TM4C pack, the Stellaris ICDI add-on, and the USB drivers. Have the LaunchPad plugged into the **DEBUG** port with the switch on **DEBUG**.
+You need **all four** steps of the [setup guide](./keil) done: Keil, the TM4C pack, the Stellaris ICDI add-on, and the USB drivers. Have the LaunchPad plugged into the **DEBUG** port with the switch on **DEBUG**.
 :::
 
 ::: details The whole thing in 30 seconds (once you've done it before)
@@ -73,7 +68,7 @@ In the **Select Device for Target** window:
 It's **TM4C123G<u>H6PM</u>**: the chip printed on the LaunchPad. Similar-looking parts (TM4C123GH6PGE, TM4C1233H6PM…) build fine but have different pins and memory, and things go wrong later in confusing ways.
 :::
 
-If the Texas Instruments entry is missing, the TM4C pack isn't installed: see [setup Step 2](./setup#step-2-install-the-device-packs).
+If the Texas Instruments entry is missing, the TM4C pack isn't installed: see [setup Step 2](./keil#step-2-install-the-device-packs).
 
 ## Step 4: Add the startup files
 
@@ -196,7 +191,7 @@ Options for Target, Debug tab, with the right-hand "Use:" radio selected and "St
 </Screenshot>
 
 ::: details "Stellaris ICDI" isn't in the list
-The ICDI add-on is missing or went into the wrong folder. Re-do [setup Step 3](./setup#step-3-install-the-stellaris-icdi-debugger-add-on), restart Keil, and check again.
+The ICDI add-on is missing or went into the wrong folder. Re-do [setup Step 3](./keil#step-3-install-the-stellaris-icdi-debugger-add-on), restart Keil, and check again.
 :::
 
 ::: tip Set it once, copy it after
@@ -247,7 +242,7 @@ The program stays in flash: unplug and replug the board and it runs again.
 **Peripherals → System Viewer → GPIOF** opens a live view of every Port F register. Step over the `DIR` and `DEN` lines and watch bit 1 flip. You can also click a bit to change it and see the LED react.
 
 ::: warning System Viewer only shows "Core Peripherals"?
-The pack's System Viewer file hasn't been generated. Stop debugging and follow [Generate the System Viewer file](./setup#generate-the-system-viewer-file) in the setup guide; it takes two commands.
+The pack's System Viewer file hasn't been generated. Stop debugging and follow [Generate the System Viewer file](./keil#generate-the-system-viewer-file) in the setup guide; it takes two commands.
 :::
 
 <Screenshot src="tiva/13-system-viewer-gpiof.png" alt="System Viewer window showing GPIOF registers with DATA bit 1 set">
@@ -274,10 +269,10 @@ End the debug session (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) before editing and pressin
 | `Undefined symbol main (referred from __rtentry2.o)` | Your C file has no `main()`, it's misspelt, or the file isn't in the build. |
 | `Undefined symbol __main (referred from startup_TM4C123.o)` | Assembly project: your file doesn't `EXPORT __main`, or the label isn't spelt `__main` (two underscores). |
 | `Symbol main multiply defined` | Two files in Source Group 1 each have a `main`. Remove one, or right-click it → **Options for File** → untick **Include in Target Build**. |
-| `No ICDI device was found` / `Flash Download failed - Target DLL has been cancelled` | Keil can't see the board. Check the **DEBUG** port and switch, try another cable and USB port, and check Device Manager shows the [Stellaris entries](./setup#check-that-it-worked). Close any other program using the board (another Keil window, a terminal on the COM port). |
+| `No ICDI device was found` / `Flash Download failed - Target DLL has been cancelled` | Keil can't see the board. Check the **DEBUG** port and switch, try another cable and USB port, and check Device Manager shows the [Stellaris entries](./keil#check-that-it-worked). Close any other program using the board (another Keil window, a terminal on the COM port). |
 | `Flash Download failed - "Cortex-M4"` | The flash driver is wrong. In **Options for Target → Utilities**, tick **Use Debug Driver** (or pick **Stellaris ICDI**). |
 | Download says *Verify OK* but nothing happens | Press **RESET** on the board. If still nothing, check you are toggling the right pin (red LED is PF1, `0x02`). |
 | The LED never blinks, but stepping works | The delay loop was optimised away. Declare the loop counter `volatile`, or set **Options for Target → C/C++ (AC6) → Optimization** to **-O0**. |
 | `L6050U: The code size of this image exceeds the maximum allowed` | You hit MDK-Lite's 32 KB limit, usually by using `printf` or floating-point maths heavily. Remove what you don't need. |
-| **Peripherals → System Viewer** lists only *Core Peripherals* (no GPIOF, UART…) | The `.SFR` file for the chip is missing. Generate it with `SVDConv`: see [setup](./setup#generate-the-system-viewer-file). |
+| **Peripherals → System Viewer** lists only *Core Peripherals* (no GPIOF, UART…) | The `.SFR` file for the chip is missing. Generate it with `SVDConv`: see [setup](./keil#generate-the-system-viewer-file). |
 | Watch window shows `<not in scope>` | The program is stopped outside the function that owns the variable, or optimisation is above `-O0`. Make the variable global or step into its function. |

@@ -2,10 +2,8 @@
 outline: deep
 title: Installing Keil and Tiva Support
 description: Install Keil uVision5, the TM4C device pack, the Stellaris ICDI debugger add-on and the LaunchPad USB drivers on Windows.
-prev: false
-next:
-  text: "Assembly Project"
-  link: /assembly-project
+short: Keil and Tiva Support
+order: 1
 ---
 
 # Installing Keil uVision5 and Tiva Support

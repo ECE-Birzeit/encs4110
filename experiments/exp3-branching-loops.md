@@ -1,12 +1,8 @@
 ---
+title: "Branching and Loops"
 outline: deep
 lastUpdated: true
-prev:
-  text: "2. Data Processing and Memory Operations"
-  link: /experiments/2
-next:
-  text: "4. Procedures and the Stack"
-  link: /experiments/4
+part: "Part 1: ARM Assembly"
 ---
 
 # Branching and Loops
@@ -17,7 +13,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/assembly-project) guide first.
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
 :::
 
 

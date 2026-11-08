@@ -16,7 +16,7 @@ const ready = computed(() => available.includes(props.src));
     <div v-else class="screenshot-placeholder" role="img" :aria-label="`Screenshot placeholder: ${alt}`">
       <span class="screenshot-badge">Screenshot placeholder · Windows</span>
       <p class="screenshot-capture"><slot /></p>
-      <code>docs/public/screenshots/{{ src }}</code>
+      <code>public/screenshots/{{ src }}</code>
     </div>
     <figcaption>{{ alt }}</figcaption>
   </figure>

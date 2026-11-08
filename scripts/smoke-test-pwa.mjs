@@ -1,7 +1,7 @@
 // Smoke test: catches the exact regression fixed on 2026-08-29, where the
 // service worker's update path was silently removed and new deploys stopped
 // activating for visitors who already had the PWA installed. Run this after
-// `npm run docs:build` -- it inspects the built output, not source files, so
+// `npm run build` -- it inspects the built output, not source files, so
 // it verifies what actually gets deployed.
 
 import { readFileSync, existsSync } from "node:fs";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const distDir = path.join(repoRoot, "docs/.vitepress/dist");
+const distDir = path.join(repoRoot, ".vitepress/dist");
 
 let failures = [];
 
@@ -20,7 +20,7 @@ function fail(message) {
 function requireFile(relPath) {
   const full = path.join(distDir, relPath);
   if (!existsSync(full)) {
-    fail(`Missing ${relPath} -- did you run "npm run docs:build" first?`);
+    fail(`Missing ${relPath} -- did you run "npm run build" first?`);
     return null;
   }
   return readFileSync(full, "utf8");
@@ -33,7 +33,7 @@ if (swSource) {
     fail(
       "sw.js never calls self.skipWaiting() -- a new service worker version " +
         "will sit in the \"waiting\" state forever instead of activating. " +
-        "Check that registerType: \"autoUpdate\" is set in docs/.vitepress/config.mts."
+        "Check that registerType: \"autoUpdate\" is set in .vitepress/config.mts."
     );
   }
   if (!swSource.includes("clientsClaim")) {
@@ -69,13 +69,13 @@ if (manifestSource) {
 }
 
 // ---- Source-level guard: catch the regression before it even reaches a build ----
-const configSource = readFileSync(path.join(repoRoot, "docs/.vitepress/config.mts"), "utf8");
+const configSource = readFileSync(path.join(repoRoot, ".vitepress/config.mts"), "utf8");
 if (!/registerType:\s*["']autoUpdate["']/.test(configSource)) {
-  fail('docs/.vitepress/config.mts no longer sets registerType: "autoUpdate"');
+  fail('.vitepress/config.mts no longer sets registerType: "autoUpdate"');
 }
 
 const registerSWSource = readFileSync(
-  path.join(repoRoot, "docs/.vitepress/theme/components/RegisterSW.vue"),
+  path.join(repoRoot, ".vitepress/theme/components/RegisterSW.vue"),
   "utf8"
 );
 if (!registerSWSource.includes("registration.update()")) {

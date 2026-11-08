@@ -1,12 +1,8 @@
 ---
+title: "Analog-to-Digital Converter (ADC)"
 outline: deep
 lastUpdated: true
-prev:
-  text: "8. Character LCD Display Interface"
-  link: /experiments/8
-next:
-  text: "10. Universal Asynchronous Receiver-Transmitter (UART)"
-  link: /experiments/10
+part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Analog-to-Digital Converter (ADC)
@@ -17,7 +13,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/tiva-project) guide first, and make sure its blinking-LED test works.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
 :::
 
 **Target device:** TM4C123GH6PM

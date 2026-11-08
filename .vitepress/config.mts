@@ -6,6 +6,9 @@ import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-i
 
 import { withPwa } from '@vite-pwa/vitepress'
 import { linkPreviews } from "./og.mts"
+import { all, redirects, sidebar } from "./lab.mts"
+
+const srcDir = fileURLToPath(new URL("..", import.meta.url))
 
 // Per-experiment link previews, drawn at build time (see og.mts)
 const og = linkPreviews({ code: "ENCS4110", name: "Computer Design Laboratory", host: "encs4110.birzeit.me", accent: "#f87171", platform: "TM4C123 · ARM Cortex-M4" })
@@ -22,6 +25,23 @@ const cProgramSvg = readFileSync(
   "utf8",
 );
 const cProgramIcon = cProgramSvg.slice(cProgramSvg.indexOf("<svg"));
+
+// Addresses from before the pages moved (2026-11-08), so bookmarks and shared links still work.
+// /setup itself needs no entry: GitHub Pages sends /setup to /setup/ on its own.
+const moved: Record<string, string> = {
+  "/experiments/1": "/experiments/exp1-assembly-basics",
+  "/experiments/2": "/experiments/exp2-data-processing",
+  "/experiments/3": "/experiments/exp3-branching-loops",
+  "/experiments/4": "/experiments/exp4-procedures-stack",
+  "/experiments/5": "/experiments/exp5-gpio-output",
+  "/experiments/6": "/experiments/exp6-gpio-interrupts",
+  "/experiments/7": "/experiments/exp7-timers",
+  "/experiments/8": "/experiments/exp8-lcd",
+  "/experiments/9": "/experiments/exp9-adc",
+  "/experiments/10": "/experiments/exp10-uart",
+  "/assembly-project": "/setup/assembly-project",
+  "/tiva-project": "/setup/tiva-project",
+}
 
 export default withPwa(defineConfig({
   markdown: {
@@ -45,6 +65,7 @@ export default withPwa(defineConfig({
     ],
   },
 
+  srcExclude: ["README.md", "snippets/**"],
   cleanUrls: true,
   lastUpdated: true,
 
@@ -79,7 +100,7 @@ export default withPwa(defineConfig({
     "A hands-on ARM Cortex-M4 embedded systems laboratory covering assembly programming, GPIO, interrupts, timers, ADC, UART, and peripheral interfacing using the TM4C123 LaunchPad.",
   sitemap: { hostname: "https://encs4110.birzeit.me/" },
 
-  buildEnd: og.buildEnd,
+  buildEnd: all(og.buildEnd, redirects(moved, "encs4110.birzeit.me")),
 
   // Link previews: per-page title, the page's (or site's) description, and canonical URL.
   transformHead({ pageData, siteData }) {
@@ -104,51 +125,13 @@ export default withPwa(defineConfig({
 
     nav: [
       { text: "Home", link: "/" },
-      { text: "Experiments", link: "/experiments/" },
+      { text: "Experiments", link: "/experiments/", activeMatch: "/experiments/" },
       { text: "All labs", link: "https://birzeit.me/" },
     ],
 
-    sidebar: [
-      {
-        text: "Experiment Navigator",
-        link: "/experiments/",
-      },
-      {
-        text: "Getting Started",
-        collapsed: false,
-        items: [
-          { text: "Installing Keil and Tiva Support", link: "/setup" },
-          { text: "Assembly Project", link: "/assembly-project" },
-          { text: "Tiva LaunchPad Project", link: "/tiva-project" },
-        ],
-      },
-      {
-        text: "Part 1: ARM Assembly",
-        collapsed: false,
-        items: [
-          { text: "1. Assembly Basics and Program Structure", link: "/experiments/1" },
-          { text: "2. Data Processing and Memory Operations", link: "/experiments/2" },
-          { text: "3. Branching and Loops", link: "/experiments/3" },
-          { text: "4. Procedures and the Stack", link: "/experiments/4" },
-        ],
-      },
-      {
-        text: "Part 2: TM4C123 LaunchPad",
-        collapsed: false,
-        items: [
-          { text: "5. Microcontroller Architecture and GPIO Output", link: "/experiments/5" },
-          { text: "6. GPIO Inputs and Interrupt Handling", link: "/experiments/6" },
-          { text: "7. Hardware Timers and Timing Control", link: "/experiments/7" },
-          { text: "8. Character LCD Display Interface", link: "/experiments/8" },
-          { text: "9. Analog-to-Digital Converter (ADC)", link: "/experiments/9" },
-          { text: "10. Universal Asynchronous Receiver-Transmitter (UART)", link: "/experiments/10" },
-        ],
-      },
-      {
-        // Downloads + Documentation are pushed to the sidebar bottom in custom.css.
-        text: "Downloads",
-        collapsed: true,
-        items: [
+    // Built from the pages (see lab.mts): adding an experiment or a setup page is the only step
+    sidebar: sidebar(srcDir, {
+      downloads: [
           { text: "Keil MDK (uVision5)", link: "https://www.keil.com/demo/eval/arm.htm" },
           { text: "Keil TM4C Device Pack", link: "https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack" },
           { text: "Stellaris ICDI Add-on for Keil", link: "https://developer.arm.com/documentation/ka002280/latest/" },
@@ -157,12 +140,8 @@ export default withPwa(defineConfig({
           // target '_blank' makes VitePress treat the link as external, so the
           // PDF opens in a new tab instead of going through the router.
           { text: "Full Lab Manual (PDF)", link: "/manual/encs4110_manual.pdf", target: "_blank" },
-        ],
-      },
-      {
-        text: "Documentation",
-        collapsed: true,
-        items: [
+      ],
+      docs: [
           { text: "TM4C123GH6PM Datasheet", link: "https://www.ti.com/lit/ds/spms376e/spms376e.pdf" },
           { text: "EK-TM4C123GXL LaunchPad User's Guide", link: "https://www.ti.com/lit/ug/spmu296/spmu296.pdf" },
           { text: "Arm Cortex-M4 Generic User Guide", link: "https://developer.arm.com/documentation/dui0553/latest/" },
@@ -172,16 +151,15 @@ export default withPwa(defineConfig({
           },
           { text: "armasm User Guide (directives)", link: "https://developer.arm.com/documentation/dui0473/latest/" },
           { text: "HD44780 LCD Datasheet", link: "https://www.sparkfun.com/datasheets/LCD/HD44780.pdf" },
-        ],
-      },
-    ],
+      ],
+    }),
 
     outline: { level: [2, 3] },
 
     socialLinks: [{ icon: "github", link: "https://github.com/ECE-Birzeit/encs4110" }],
 
     editLink: {
-      pattern: "https://github.com/ECE-Birzeit/encs4110/edit/main/docs/:path",
+      pattern: "https://github.com/ECE-Birzeit/encs4110/edit/main/:path",
       text: "Edit this page on GitHub",
     },
     search: {

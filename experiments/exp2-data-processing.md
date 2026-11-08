@@ -1,12 +1,8 @@
 ---
+title: "Data Processing and Memory Operations"
 outline: deep
 lastUpdated: true
-prev:
-  text: "1. Assembly Basics and Program Structure"
-  link: /experiments/1
-next:
-  text: "3. Branching and Loops"
-  link: /experiments/3
+part: "Part 1: ARM Assembly"
 ---
 
 # Data Processing and Memory Operations
@@ -17,7 +13,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/assembly-project) guide first.
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
 :::
 
 

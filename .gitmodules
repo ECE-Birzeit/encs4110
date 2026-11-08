@@ -1,4 +1,4 @@
 [submodule "docs/public/manual"]
-	path = docs/public/manual
+	path = public/manual
 	url = https://github.com/ECE-Birzeit/encs4110-manual.git
 	branch = pdf

@@ -1,12 +1,8 @@
 ---
+title: "Microcontroller Architecture and GPIO Output"
 outline: deep
 lastUpdated: true
-prev:
-  text: "4. Procedures and the Stack"
-  link: /experiments/4
-next:
-  text: "6. GPIO Inputs and Interrupt Handling"
-  link: /experiments/6
+part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Microcontroller Architecture and GPIO Output
@@ -17,7 +13,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/tiva-project) guide first, and make sure its blinking-LED test works.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
 :::
 
 

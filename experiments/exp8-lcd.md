@@ -1,12 +1,8 @@
 ---
+title: "Character LCD Display Interface"
 outline: deep
 lastUpdated: true
-prev:
-  text: "7. Hardware Timers and Timing Control"
-  link: /experiments/7
-next:
-  text: "9. Analog-to-Digital Converter (ADC)"
-  link: /experiments/9
+part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Character LCD Display Interface
@@ -17,7 +13,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/tiva-project) guide first, and make sure its blinking-LED test works.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
 :::
 
 **Target device:** TM4C123GH6PM
@@ -47,7 +43,7 @@ The following code demonstrates a complete LCD driver in 4-bit mode with initial
 **Initialization Sequence**
 
 The `LCD_Init()` function implements the complete 4-bit initialization:
-1. Enables the PORTB clock, then polls `SYSCTL->PRGPIO` bit 1 until it reads back as ready before touching `GPIOB` (the peripheral-ready alternative to the fixed-`NOP` delay used in [Experiment 5](./5)), and configures the pins as outputs. The driver also configures PB1 (`RW`) as an output and drives it low in software, the code-level equivalent of wiring RW to ground, so no physical wire from PB1 to the LCD's RW pin is required.
+1. Enables the PORTB clock, then polls `SYSCTL->PRGPIO` bit 1 until it reads back as ready before touching `GPIOB` (the peripheral-ready alternative to the fixed-`NOP` delay used in [Experiment 5](./exp5-gpio-output)), and configures the pins as outputs. The driver also configures PB1 (`RW`) as an output and drives it low in software, the code-level equivalent of wiring RW to ground, so no physical wire from PB1 to the LCD's RW pin is required.
 2. Waits 50 ms for LCD power-on stabilization
 3. Sends `0x03` (upper nibble) three times with delays (8-bit mode reset)
 4. Sends `0x02` (upper nibble) to switch to 4-bit mode

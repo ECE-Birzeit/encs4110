@@ -1,10 +1,9 @@
 ---
+title: "Assembly Basics and Program Structure"
 outline: deep
 lastUpdated: true
 prev: false
-next:
-  text: "2. Data Processing and Memory Operations"
-  link: /experiments/2
+part: "Part 1: ARM Assembly"
 ---
 
 # Assembly Basics and Program Structure
@@ -15,7 +14,7 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/assembly-project) guide first.
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
 :::
 
 

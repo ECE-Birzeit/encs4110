@@ -1,12 +1,8 @@
 ---
+title: "Procedures and the Stack"
 outline: deep
 lastUpdated: true
-prev:
-  text: "3. Branching and Loops"
-  link: /experiments/3
-next:
-  text: "5. Microcontroller Architecture and GPIO Output"
-  link: /experiments/5
+part: "Part 1: ARM Assembly"
 ---
 
 # Procedures and the Stack
@@ -17,14 +13,14 @@ The lab manual contains the full theory, circuit diagrams, and requirements for 
 :::
 
 ::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/assembly-project) guide first.
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
 :::
 
 
 ## Examples
 
 ### Example 1: Nested Uppercase Counter
-This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-terminated string and calls `IsUpper(ch)` for each character. It shows saving/restoring `LR` and using callee-saved registers (`R4` for the running count, `R5` for the scan pointer). Both values must survive the `BL IsUpper` call, so under the AAPCS they cannot be kept in caller-saved registers like R0–R3. Compare it with [Example 2 of Experiment 3](./3#example-2-count-uppercase-letters-in-string), which counts the same letters inline with no procedures.
+This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-terminated string and calls `IsUpper(ch)` for each character. It shows saving/restoring `LR` and using callee-saved registers (`R4` for the running count, `R5` for the scan pointer). Both values must survive the `BL IsUpper` call, so under the AAPCS they cannot be kept in caller-saved registers like R0–R3. Compare it with [Example 2 of Experiment 3](./exp3-branching-loops#example-2-count-uppercase-letters-in-string), which counts the same letters inline with no procedures.
 
 <<< @/snippets/assembly/exp4/example1.asm
 
@@ -40,7 +36,7 @@ This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-te
 ## Tasks
 
 ### Task 1: Count Vowels with Procedures
-Rewrite [Task 1 of Experiment 3](./3#task-1-count-vowels-and-non-vowels-in-a-string) as procedures:
+Rewrite [Task 1 of Experiment 3](./exp3-branching-loops#task-1-count-vowels-and-non-vowels-in-a-string) as procedures:
 - Create a procedure `IsVowel` that takes a character in R0 and returns 1 in R0 if it is a vowel (a, e, i, o, u, upper- or lowercase), and 0 otherwise.
 - Create a procedure `CountVowels` that takes a string pointer in R0 and returns the number of vowels in R0, calling `IsVowel` for each character.
 - Follow AAPCS conventions for parameter passing and register usage.
