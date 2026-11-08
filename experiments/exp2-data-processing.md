@@ -3,21 +3,13 @@ title: "Data Processing and Memory Operations"
 description: "This experiment develops fluency with the ARM Cortex-M4 instruction set for data manipulation and memory access."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.2"
 part: "Part 1: ARM Assembly"
 ---
 
 # Data Processing and Memory Operations
 
 This experiment develops fluency with the ARM Cortex-M4 instruction set for data manipulation and memory access. You will practice arithmetic, logical, and shift/rotate instructions, apply various addressing modes for load/store operations, and define data structures with assembler directives. By the end of this lab, you will be able to write assembly routines that perform register-level computation and structured memory access, providing the foundation for flow control and procedure calls in later experiments.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.2" target="_blank">Open Experiment 2 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
-:::
 
 ## Objectives
 
@@ -268,6 +260,10 @@ Addressing modes define how the effective address or operand value is obtained b
 [^1]: For more details, see ARM Developer Documentation, “Literal pools and `LDR =const`”. <https://developer.arm.com/documentation/dui0473/m/dom1359731147760>
 
 ## Examples
+
+::: info Setting up the project
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
+:::
 
 ### Example 1: Data Processing Instructions
 This example demonstrates various arithmetic and bitwise operations on registers.

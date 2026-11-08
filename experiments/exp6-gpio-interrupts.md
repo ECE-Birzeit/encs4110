@@ -3,23 +3,13 @@ title: "GPIO Inputs and Interrupt Handling"
 description: "This experiment extends GPIO functionality to inputs and introduces interrupt-driven programming."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.6"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # GPIO Inputs and Interrupt Handling
 
 This experiment extends GPIO functionality to inputs and introduces interrupt-driven programming. You will configure GPIO pins to read mechanical switches using both polling and interrupt approaches, implement software debouncing techniques, write interrupt service routines, and enable GPIO interrupts in the NVIC. By the end of this lab, you will understand how to implement both polling and interrupt-driven input handling, and write responsive embedded applications that react to external events in real time.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.6" target="_blank">Open Experiment 6 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
-:::
-
-**Target device:** TM4C123GH6PM
 
 ## Objectives
 
@@ -622,6 +612,13 @@ void GPIOF_Handler(void) {
 ```
 
 ## Examples
+
+::: info Setting up the project
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+:::
+
+**Target device:** TM4C123GH6PM
+
 The following examples demonstrate GPIO input configuration using polling and interrupt-based approaches.
 
 ### Example 1: Reading Switch Input Using Polling

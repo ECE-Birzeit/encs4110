@@ -4,21 +4,13 @@ description: "This experiment introduces ARM Cortex-M4 assembly programming fund
 outline: deep
 lastUpdated: true
 prev: false
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.1"
 part: "Part 1: ARM Assembly"
 ---
 
 # Assembly Basics and Program Structure
 
 This experiment introduces ARM Cortex-M4 assembly programming fundamentals, including register architecture, status flags, and memory organization. You will build minimal startup code with a vector table and Reset_Handler, practice data-movement and arithmetic instructions while tracking their effect on the condition flags, and use the Keil µVision5 debugger to single-step through code while inspecting registers and memory. By the end of this lab, you will understand the core building blocks of ARM assembly programming and be able to write, assemble, and debug low-level embedded code.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.1" target="_blank">Open Experiment 1 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
-:::
 
 ## Objectives
 
@@ -161,6 +153,10 @@ STOP    B       STOP                      ; Stay here forever
 - `READWRITE` data is **not initialized** in this lab’s projects. Initial values for RAM have to be copied from flash by startup code before `Reset_Handler` runs, and these projects have no such copy step. So a `DCD`/`DCB` value in a `READWRITE` area is *not* what RAM holds at run time; reserve RAM with `SPACE` and always write a variable before reading it (as `Reset_Handler` does with `COUNT` above). Constants, strings, and lookup tables with fixed values belong in a `READONLY` area, where their initial values are part of the program image.
 
 ## Example 1: Simple Arithmetic Operations and Flag Manipulation
+
+::: info Setting up the project
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
+:::
 The following example demonstrates basic arithmetic operations, flag manipulation.
 
 <<< @/snippets/assembly/exp1/example1.asm

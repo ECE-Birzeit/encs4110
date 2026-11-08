@@ -3,23 +3,13 @@ title: "Analog-to-Digital Converter (ADC)"
 description: "This experiment introduces analog-to-digital conversion using the TM4C123’s dual 12-bit ADC modules."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.9"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Analog-to-Digital Converter (ADC)
 
 This experiment introduces analog-to-digital conversion using the TM4C123’s dual 12-bit ADC modules. You will configure sample sequencers for automatic multi-channel data acquisition, implement both polling and interrupt-driven sampling modes, and interface with analog sensors such as potentiometers and the internal temperature sensor. By the end of this lab, you will understand how to convert continuous analog signals to discrete digital values, configure trigger sources for periodic sampling, and implement sensor interfacing applications that bridge the analog and digital domains.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.9" target="_blank">Open Experiment 9 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
-:::
-
-**Target device:** TM4C123GH6PM
 
 ## Objectives
 
@@ -486,6 +476,13 @@ If interrupts are required:
 4.  Clear the interrupt flag by writing to the appropriate bit in the `ADCISC` register.
 
 ## Examples
+
+::: info Setting up the project
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+:::
+
+**Target device:** TM4C123GH6PM
+
 This section demonstrates how to configure and use the ADC module on the TM4C123 microcontroller using both polling and interrupt-driven sampling methods. A potentiometer is used as a controllable analog input source by wiring its terminals to 3.3 V and ground, with the adjustable rotor connected to an ADC input such as AIN0 (PE3). Rotating the potentiometer varies the rotor voltage between 0 V and 3.3 V, allowing you to generate different analog levels and observe the corresponding ADC conversion results.
 
 ![ADC Connection Diagram](/images/adc-connection.jpg)

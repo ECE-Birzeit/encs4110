@@ -1,18 +1,20 @@
 <script setup lang="ts">
-// A "Jump to the procedure" button at the top of an experiment page, for students who know the
-// background and want the hands-on part. It links to the first section after Background (Examples,
-// or Configuration Steps, ...), or failing that to a Procedure, Examples or Lab work heading, and only
-// shows when the page has one. Same component on every lab site.
-import { nextTick, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vitepress'
+// Buttons at the top of an experiment page: "Jump to the procedure" (the first section after
+// Background: Examples, Configuration Steps, ...) and, when the page's front matter has a
+// `manual:` link, "Lab manual (PDF)" opening the experiment's chapter. Same component on every lab site.
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useData, useRoute, withBase } from 'vitepress'
 
 const route = useRoute()
+const { frontmatter } = useData()
 const target = ref<{ id: string } | null>(null)
 const IDS = ['procedure', 'examples', 'example', 'lab-work', 'tasks']
+const isExperiment = computed(() => /\/experiments\/exp\d+-/.test(route.path))
+const manual = computed(() => (isExperiment.value && frontmatter.value.manual ? withBase(frontmatter.value.manual) : ''))
 
 function find() {
   target.value = null
-  if (!/\/experiments\/exp\d+-/.test(route.path)) return
+  if (!isExperiment.value) return
   const h2s = Array.from(document.querySelectorAll<HTMLElement>('.vp-doc h2[id]'))
   const bg = h2s.findIndex((h) => h.id === 'background')
   if (bg !== -1 && h2s[bg + 1]) { target.value = { id: h2s[bg + 1].id }; return }
@@ -34,20 +36,24 @@ function go(e: MouseEvent) {
 </script>
 
 <template>
-  <div v-if="target" class="jump-row">
-    <a class="jump" :href="'#' + target.id" @click="go">Jump to the procedure <span aria-hidden="true">↓</span></a>
+  <div v-if="target || manual" class="jump-row">
+    <a v-if="manual" class="jump alt" :href="manual" target="_blank" rel="noopener">Lab manual (PDF) <span aria-hidden="true">↗</span></a>
+    <a v-if="target" class="jump" :href="'#' + target.id" @click="go">Jump to the procedure <span aria-hidden="true">↓</span></a>
   </div>
 </template>
 
 <style scoped>
-.jump-row { display: flex; justify-content: flex-end; margin-bottom: 8px }
+.jump-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-bottom: 8px }
 .jump {
   display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px;
   border: 1px solid var(--vp-c-brand-1); border-radius: 18px; color: var(--vp-c-brand-1);
-  font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .2s, color .2s;
+  font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .2s, color .2s, border-color .2s;
 }
 .jump:hover { background: var(--vp-c-brand-1); color: var(--vp-c-bg) }
+.jump.alt { border-color: var(--vp-c-divider); color: var(--vp-c-text-2) }
+.jump.alt:hover { border-color: var(--vp-c-text-1); background: transparent; color: var(--vp-c-text-1) }
 .jump span { transition: transform .3s }
 .jump:hover span { transform: translateY(2px) }
+.jump.alt:hover span { transform: translate(2px, -2px) }
 @media (prefers-reduced-motion: reduce) { .jump span { transition: none } }
 </style>

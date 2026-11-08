@@ -5,23 +5,13 @@ outline: deep
 lastUpdated: true
 next: false
 short: "UART"
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.10"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Universal Asynchronous Receiver-Transmitter (UART)
 
 This experiment introduces serial communication using the TM4C123’s UART modules. You will configure UART0 for 115200 baud operation on pins PA0 (RX) and PA1 (TX), implement character and string transmission functions, and create an echo server that receives data from a PC terminal and echoes it back. By the end of this lab, you will understand how asynchronous serial communication enables data exchange between embedded systems and external devices, forming the foundation for debugging, sensor interfacing, and wireless communication modules.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.10" target="_blank">Open Experiment 10 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
-:::
-
-**Target device:** TM4C123GH6PM
 
 ## Objectives
 
@@ -364,6 +354,12 @@ Contains the data to transmit or received data. Reading removes data from RX FIF
 - **DATA** (bits 7-0): Received or Transmit Data
 
 ## Configuration Steps
+
+::: info Setting up the project
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+:::
+
+**Target device:** TM4C123GH6PM
 
 Configuring UART0 on the TM4C123 microcontroller involves two stages.
 

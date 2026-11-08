@@ -3,23 +3,13 @@ title: "Hardware Timers and Timing Control"
 description: "This experiment introduces precise timing control using the TM4C123’s SysTick timer and General-Purpose Timer Modules (GPTM)."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.7"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Hardware Timers and Timing Control
 
 This experiment introduces precise timing control using the TM4C123’s SysTick timer and General-Purpose Timer Modules (GPTM). You will configure SysTick for periodic interrupts and millisecond timing, explore GPTM’s 16-bit and 32-bit modes with prescalers, and implement multiple independent timing tasks. By the end of this lab, you will understand how to select and configure timers for different timing requirements and implement timer-based interrupt-driven applications.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.7" target="_blank">Open Experiment 7 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
-:::
-
-**Target device:** TM4C123GH6PM
 
 ## Objectives
 
@@ -618,6 +608,13 @@ To configure a GPTM timer in periodic mode:
 *GPTM Configuration Register Summary*
 
 ## Examples
+
+::: info Setting up the project
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+:::
+
+**Target device:** TM4C123GH6PM
+
 The following examples demonstrate SysTick and GPTM configuration and usage.
 
 ### Example 1: Millisecond Counter with SysTick Timer

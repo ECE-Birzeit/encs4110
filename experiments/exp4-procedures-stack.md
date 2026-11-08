@@ -3,21 +3,13 @@ title: "Procedures and the Stack"
 description: "This experiment builds on the branching and loop patterns from Experiment 3 to write modular assembly code."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.4"
 part: "Part 1: ARM Assembly"
 ---
 
 # Procedures and the Stack
 
 This experiment builds on the branching and loop patterns from Experiment 3 to write modular assembly code. You will define procedures, follow the AAPCS calling convention for arguments, return values, and register preservation, and use the stack to save the return address and working registers across nested and recursive calls. By the end of this lab, you will be able to split a program into reusable procedures that call each other safely.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.4" target="_blank">Open Experiment 4 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
-:::
 
 ## Objectives
 
@@ -151,6 +143,10 @@ This restores R6, then R7, then R8 from successively higher addresses; the stack
 This figure deliberately reuses the stack contents from the earlier `PUSH {R0, R2, R4, LR}` example, relabeling them R6/R7/R8 to illustrate that `POP` restores registers by *address*, not by the name they were pushed under — it is not meant to represent the same code sequence continuing.
 
 ## Examples
+
+::: info Setting up the project
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
+:::
 
 ### Example 1: Nested Uppercase Counter
 This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-terminated string and calls `IsUpper(ch)` for each character. It shows saving/restoring `LR` and using callee-saved registers (`R4` for the running count, `R5` for the scan pointer). Both values must survive the `BL IsUpper` call, so under the AAPCS they cannot be kept in caller-saved registers like R0–R3. Compare it with [Example 2 of Experiment 3](./exp3-branching-loops#example-2-count-uppercase-letters-in-string), which counts the same letters inline with no procedures.

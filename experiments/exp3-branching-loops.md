@@ -3,21 +3,13 @@ title: "Branching and Loops"
 description: "This experiment introduces program flow control on the ARM Cortex-M4 processor."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.3"
 part: "Part 1: ARM Assembly"
 ---
 
 # Branching and Loops
 
 This experiment introduces program flow control on the ARM Cortex-M4 processor. You will compare values and test bits to set the condition flags, use conditional branches and conditional execution to make decisions, and combine them into `for` and `while` loops that walk through arrays and strings. By the end of this lab, you will be able to translate high-level `if`, `for`, and `while` constructs into assembly. Procedures and the stack build on this in Experiment 4.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.3" target="_blank">Open Experiment 3 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
-:::
 
 ## Objectives
 
@@ -242,6 +234,10 @@ while_end
 ```
 
 ## Examples
+
+::: info Setting up the project
+This experiment is written in assembly and runs in Keil's simulator. If you haven't made a project yet, follow the [Assembly Project](/setup/assembly-project) guide first.
+:::
 
 ### Example 1: Find Maximum Element in Array
 This example demonstrates how to find the maximum element in an array using a standard for loop structure.

@@ -3,23 +3,13 @@ title: "Character LCD Display Interface"
 description: "This experiment introduces LCD interfacing using the HD44780-based 16x2 character display module."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.8"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Character LCD Display Interface
 
 This experiment introduces LCD interfacing using the HD44780-based 16x2 character display module. You will learn the controller’s architecture, implement 4-bit communication mode to minimize GPIO usage, and create a reusable LCD driver library with functions for initialization, command transmission, and data display. By the end of this lab, you will be able to interface an LCD with the TM4C123 microcontroller and create interactive display applications combining LCD output with GPIO input and interrupts.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.8" target="_blank">Open Experiment 8 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
-:::
-
-**Target device:** TM4C123GH6PM
 
 ## Objectives
 
@@ -244,6 +234,12 @@ A well-structured LCD driver separates concerns into distinct layers:
 - `LCD_Print(string)`: Displays string at current cursor position
 
 ## Example: Basic LCD Driver Implementation
+
+::: info Setting up the project
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+:::
+
+**Target device:** TM4C123GH6PM
 
 ![LCD Connection Schematic](/image-3.png)
 

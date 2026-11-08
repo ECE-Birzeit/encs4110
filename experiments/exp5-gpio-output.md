@@ -3,24 +3,13 @@ title: "Microcontroller Architecture and GPIO Output"
 description: "This experiment introduces the TM4C123 microcontroller architecture and digital I/O interfacing through GPIO ports."
 outline: deep
 lastUpdated: true
+manual: "/manual/encs4110_manual.pdf#nameddest=chapter.5"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
 # Microcontroller Architecture and GPIO Output
 
 This experiment introduces the TM4C123 microcontroller architecture and digital I/O interfacing through GPIO ports. You will explore the internal structure including the ARM Cortex-M4 core, memory regions, and peripheral interconnect, then write Assembly programs to control the on-board LEDs connected to PORTF. By the end of this lab, you will understand how peripheral registers are memory-mapped, be able to initialize and configure GPIO ports, and control external hardware through register manipulation—forming the foundation for subsequent experiments with interrupts, timers, and analog peripherals.
-
-::: tip Laboratory Manual
-The same material as a PDF, for printing or reading offline.
-<a href="/manual/encs4110_manual.pdf#nameddest=chapter.5" target="_blank">Open Experiment 5 in the lab manual</a>
-:::
-
-::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
-:::
-
-
-**Target device:** TM4C123GH6PM
 
 ## Objectives
 
@@ -364,6 +353,13 @@ By writing different bit combinations, various LED colors can be generated:
 *LED Color Combinations on TM4C123 LaunchPad (PF1-PF3)*
 
 ## Examples
+
+::: info Setting up the project
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+:::
+
+**Target device:** TM4C123GH6PM
+
 The following examples illustrate the complete process of initializing Port F and controlling the on-board LEDs using Assembly language.
 
 ### Example 1: Simple LED Blink
