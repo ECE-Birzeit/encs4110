@@ -3,7 +3,6 @@ title: "Assembly Basics and Program Structure"
 description: "This experiment introduces ARM Cortex-M4 assembly programming fundamentals, including register architecture, status flags, and memory organization."
 outline: deep
 lastUpdated: true
-prev: false
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.1"
 part: "Part 1: ARM Assembly"
 ---

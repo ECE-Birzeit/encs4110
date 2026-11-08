@@ -3,7 +3,6 @@ title: "Universal Asynchronous Receiver-Transmitter (UART)"
 description: "This experiment introduces serial communication using the TM4C123’s UART modules."
 outline: deep
 lastUpdated: true
-next: false
 short: "UART"
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.10"
 part: "Part 2: TM4C123 LaunchPad"

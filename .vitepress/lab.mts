@@ -109,6 +109,18 @@ export function redirects(map: Record<string, string>, host: string) {
   }
 }
 
+// The first experiment has no "Previous page" and the last no "Next page": the sidebar around them is
+// setup pages and downloads, not experiments. For transformPageData.
+export function experimentEdges(srcDir: string) {
+  return (pageData: { relativePath: string; frontmatter: Record<string, any> }) => {
+    const list = experiments(srcDir)
+    if (!list.length) return
+    const path = pageData.relativePath.replace(/\.md$/, '')
+    if (path === `experiments/${list[0].slug}` && pageData.frontmatter.prev === undefined) pageData.frontmatter.prev = false
+    if (path === `experiments/${list[list.length - 1].slug}` && pageData.frontmatter.next === undefined) pageData.frontmatter.next = false
+  }
+}
+
 // Several buildEnd hooks in order (link previews, redirects, ...)
 export function all(...hooks: ((site: SiteConfig) => unknown)[]) {
   return async (site: SiteConfig) => { for (const h of hooks) await h(site) }

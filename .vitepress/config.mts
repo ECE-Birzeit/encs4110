@@ -6,7 +6,7 @@ import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-i
 
 import { withPwa } from '@vite-pwa/vitepress'
 import { linkPreviews } from "./og.mts"
-import { all, redirects, sidebar } from "./lab.mts"
+import { all, redirects, experimentEdges, sidebar } from "./lab.mts"
 
 const srcDir = fileURLToPath(new URL("..", import.meta.url))
 
@@ -101,6 +101,9 @@ export default withPwa(defineConfig({
   sitemap: { hostname: "https://encs4110.birzeit.me/" },
 
   buildEnd: all(og.buildEnd, redirects(moved, "encs4110.birzeit.me")),
+
+  // No Previous page on the first experiment, no Next page on the last (see lab.mts)
+  transformPageData: experimentEdges(srcDir),
 
   // Link previews: per-page title, the page's (or site's) description, and canonical URL.
   transformHead({ pageData, siteData }) {
