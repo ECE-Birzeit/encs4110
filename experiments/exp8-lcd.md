@@ -1,5 +1,6 @@
 ---
 title: "Character LCD Display Interface"
+description: "This experiment introduces LCD interfacing using the HD44780-based 16x2 character display module."
 outline: deep
 lastUpdated: true
 part: "Part 2: TM4C123 LaunchPad"
@@ -7,8 +8,10 @@ part: "Part 2: TM4C123 LaunchPad"
 
 # Character LCD Display Interface
 
+This experiment introduces LCD interfacing using the HD44780-based 16x2 character display module. You will learn the controller’s architecture, implement 4-bit communication mode to minimize GPIO usage, and create a reusable LCD driver library with functions for initialization, command transmission, and data display. By the end of this lab, you will be able to interface an LCD with the TM4C123 microcontroller and create interactive display applications combining LCD output with GPIO input and interrupts.
+
 ::: tip Laboratory Manual
-The lab manual contains the full theory, circuit diagrams, and requirements for this experiment - keep it open while you work.
+The same material as a PDF, for printing or reading offline.
 <a href="/manual/encs4110_manual.pdf#nameddest=chapter.8" target="_blank">Open Experiment 8 in the lab manual</a>
 :::
 
@@ -17,6 +20,228 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 :::
 
 **Target device:** TM4C123GH6PM
+
+## Objectives
+
+- Understand the architecture and operation of the HD44780-based 16x2 LCD module.
+- Differentiate between command and data registers and their respective control signals.
+- Configure the LCD in 4-bit mode to minimize GPIO pin usage.
+- Implement the initialization sequence for 4-bit LCD operation.
+- Send commands and data to the LCD using proper timing and enable pulse sequences.
+- Display text strings at specific cursor positions on the LCD.
+- Implement scrolling and dynamic display effects using LCD commands.
+- Integrate LCD interfacing with GPIO and interrupt-driven input from push buttons.
+
+## Background
+
+### HD44780 LCD Controller Architecture
+
+The HD44780 is an LCD controller/driver developed by Hitachi and widely adopted as an industry standard for character-based LCD modules. It provides a simple microprocessor interface for controlling alphanumeric displays with minimal external components.
+
+#### LCD Module Overview
+
+The 16x2 LCD module consists of:
+
+- **HD44780 Controller**: Manages display operations, character generation, and timing
+- **LCD Panel**: 2 rows x 16 columns of character positions
+- **Character Generator ROM (CGROM)**: Contains 208 predefined character patterns (alphanumeric, symbols, Japanese kana)
+- **Character Generator RAM (CGRAM)**: 64 bytes for up to 8 user-defined custom characters (5x8 pixels each)
+- **Display Data RAM (DDRAM)**: 80 bytes storing characters currently displayed (40 bytes per line)
+- **Backlight**: Optional LED backlight for improved visibility
+
+The controller handles all low-level display refresh, character rendering, and cursor management automatically. The microcontroller simply writes characters to DDRAM and issues commands for cursor positioning, display control, and special effects.
+
+#### LCD Registers
+
+The HD44780 has two main registers accessible by the microcontroller:
+
+##### Instruction Register (IR)
+
+The Instruction Register receives commands that control display operations:
+
+- Clear display and return cursor to home
+- Set cursor position in DDRAM
+- Control display on/off, cursor visibility, and blinking
+- Set entry mode (cursor direction, display shift)
+- Shift cursor or entire display left/right
+- Configure interface width (4-bit or 8-bit), number of lines, and font size
+
+##### Data Register (DR)
+
+The Data Register receives character codes (ASCII) to be displayed:
+
+- Writing to DR displays a character at the current cursor position
+- The cursor automatically advances after each write (direction set by entry mode)
+- Reading from DR retrieves the character at the current cursor position (rarely used)
+
+### LCD Pin Configuration
+
+The HD44780 interface consists of 16 pins (some modules have 18 pins with additional backlight control):
+
+| **Pin** | **Name** | **Description** |
+|:--:|:---|:---|
+| 1 | VSS | Ground (0V) |
+| 2 | VDD | Power supply (+5V or +3.3V) |
+| 3 | V0 | Contrast adjustment (connect to potentiometer) |
+| 4 | RS | Register Select: 0 = Instruction (command), 1 = Data (character) |
+| 5 | RW | Read/Write: 0 = Write to LCD, 1 = Read from LCD (usually grounded for write-only) |
+| 6 | E | Enable: Falling edge latches data/command into LCD |
+| 7­14 | D0-D7 | 8-bit data bus (D0-D3 unused in 4-bit mode) |
+| 15 | A | Backlight anode (+5V, typically with series resistor) |
+| 16 | K | Backlight cathode (Ground) |
+
+*HD44780 LCD Pin Definitions*
+
+### 4-Bit vs. 8-Bit Communication Mode
+
+The HD44780 supports two communication modes:
+
+#### 8-Bit Mode
+
+- Uses all 8 data pins (D0-D7)
+- Each command or character requires one write cycle
+- Faster communication (single byte transfer)
+- Requires 11 GPIO pins total (3 control + 8 data)
+
+#### 4-Bit Mode
+
+- Uses only upper 4 data pins (D4-D7), D0-D3 are left unconnected
+- Each command or character requires two write cycles (upper nibble, then lower nibble)
+- Slightly slower due to two transfers per byte
+- Requires only 7 GPIO pins total (3 control + 4 data)
+- **Preferred mode** for GPIO-constrained systems
+
+**4-Bit Communication Protocol:**
+
+1.  Set RS and RW to appropriate values
+2.  Place upper 4 bits (bits 7-4) on D7-D4
+3.  Generate enable pulse: E high → delay → E low
+4.  Place lower 4 bits (bits 3-0) on D7-D4
+5.  Generate another enable pulse: E high → delay → E low
+
+In this experiment, we use 4-bit mode with the following connections:
+
+- **PB0** → RS (Register Select)
+- **PB2** → E (Enable)
+- **PB4-PB7** → D4-D7 (Data pins)
+- **RW** → Ground (write-only operation)
+
+### LCD Initialization Sequence
+
+Proper initialization is critical for reliable LCD operation. The HD44780 requires a specific sequence of commands with precise timing delays, especially during the transition to 4-bit mode.
+
+#### Initialization Steps (4-Bit Mode)
+
+The initialization sequence must account for the fact that the LCD powers up in 8-bit mode and must be switched to 4-bit mode:
+
+1.  **Wait for power-on stabilization**: Delay at least 40 ms after VDD rises to 4.5V
+2.  **Initial function set (8-bit interface)**: Send `0x30` (upper nibble only) three times:
+
+    - First time: Wait $`>`$ 4.1 ms
+
+    - Second time: Wait $`>`$ 100 $`\mu`$s
+
+    - Third time: Wait $`>`$ 100 $`\mu`$s
+
+3.  **Switch to 4-bit mode**: Send `0x20` (upper nibble only), wait $`>`$ 100 $`\mu`$s
+4.  **Configure display parameters**: Now send full 8-bit commands in two nibbles:
+
+    - `0x28`: Function set — 4-bit mode, 2 lines, 5x8 font
+
+    - `0x0C`: Display control — Display ON, cursor OFF, blink OFF
+
+    - `0x06`: Entry mode set — Increment cursor, no display shift
+
+    - `0x01`: Clear display
+
+    - `0x02`: Return home
+
+**Critical Note**: Steps 2-3 send only the *upper nibble* because the LCD is still in 8-bit mode. After step 3 completes, the LCD switches to 4-bit mode, and all subsequent commands must be sent as two nibbles (upper first, then lower).
+
+### LCD Command Set
+
+The HD44780 supports a comprehensive set of commands for display control, cursor manipulation, and special effects.
+
+| **Command** | **Hex Code** | **Description** |
+|:---|:--:|:---|
+| Clear Display | `0x01` | Clears entire display, sets DDRAM address 0, cursor to home |
+| Return Home | `0x02` | Sets DDRAM address 0, cursor to home (display content unchanged) |
+| Entry Mode Set | `0x04-0x07` | Controls cursor direction and display shift |
+|  | `0x04` | Cursor moves left, no shift |
+|  | `0x06` | Cursor moves right, no shift (default) |
+|  | `0x05` | Cursor moves left, display shifts right |
+|  | `0x07` | Cursor moves right, display shifts left |
+| Display Control | `0x08-0x0F` | Controls display, cursor, and blink on/off |
+|  | `0x08` | Display OFF |
+|  | `0x0C` | Display ON, cursor OFF, blink OFF |
+|  | `0x0E` | Display ON, cursor ON, blink OFF |
+|  | `0x0F` | Display ON, cursor ON, blink ON |
+| Cursor/Display Shift | `0x10-0x1F` | Shifts cursor or display left/right |
+|  | `0x10` | Shift cursor left |
+|  | `0x14` | Shift cursor right |
+|  | `0x18` | Shift display left |
+|  | `0x1C` | Shift display right |
+| Function Set | `0x20-0x3F` | Sets interface length, line number, font |
+|  | `0x28` | 4-bit mode, 2 lines, 5x8 font |
+|  | `0x38` | 8-bit mode, 2 lines, 5x8 font |
+| Set DDRAM Address | `0x80 + addr` | Positions cursor at DDRAM address (see [DDRAM Address Mapping](#ddram-address-mapping) for the full address layout) |
+
+*Common HD44780 LCD Commands*
+
+### DDRAM Address Mapping
+
+The Display Data RAM (DDRAM) is 80 bytes, but only 32 bytes (16 per line) are visible at any time. Understanding the address mapping is essential for cursor positioning:
+
+| **Display Position** | **DDRAM Address** | **Command** |
+|:---------------------|:------------------|:------------|
+| Line 1, Column 0     | `0x00`            | `0x80`      |
+| Line 1, Column 1     | `0x01`            | `0x81`      |
+| Line 1, Column 15    | `0x0F`            | `0x8F`      |
+| Line 2, Column 0     | `0x40`            | `0xC0`      |
+| Line 2, Column 1     | `0x41`            | `0xC1`      |
+| Line 2, Column 15    | `0x4F`            | `0xCF`      |
+
+*DDRAM Address Mapping for 16x2 LCD*
+
+**Formula for cursor positioning:**
+$$
+\text{Command} = \begin{cases}
+0x80 + \text{column} & \text{for line 1 (row 0)} \\
+0xC0 + \text{column} & \text{for line 2 (row 1)}
+\end{cases}
+$$
+
+### Timing Requirements
+
+The HD44780 datasheet specifies minimum pulse widths and setup/hold times (e.g., enable pulse width $`\geq`$450 ns, enable cycle $`\geq`$1 $`\mu`$s, RS/data setup and hold times of tens of nanoseconds) that are far shorter than anything achievable with a simple software delay loop — in practice, the driver below uses generously-rounded, safe delays instead of hitting those minimums precisely:
+
+- **Around each enable pulse** (`LCD_EnablePulse()`): a $`\sim`$1 $`\mu`$s `delay_us()` before and after toggling E, comfortably covering the enable pulse width/cycle and RS/data setup-hold requirements together.
+- **After most commands**: $`\sim`$1-2 ms (datasheet minimum is $`\sim`$40 $`\mu`$s).
+- **After `Clear Display` (`0x01`) or `Return Home` (`0x02`)**: $`\sim`$2 ms (datasheet minimum is $`\sim`$1.6 ms), since these two commands take noticeably longer than other commands.
+
+We implement these delays using the SysTick timer (at 50 MHz, 1 $`\mu`$s = 50 clock cycles) for precise, non-blocking-free timing.
+
+### LCD Driver Implementation Strategy
+
+A well-structured LCD driver separates concerns into distinct layers:
+
+##### Low-Level Functions
+
+- `LCD_EnablePulse()`: Generates enable pulse (E high → delay → E low)
+- `LCD_SendNibble()`: Sends 4 bits on D7-D4 with enable pulse
+- `delay_us()`, `delay_ms()`: Precise timing using SysTick
+
+##### Mid-Level Functions
+
+- `LCD_Command()`: Sends 8-bit command (RS=0) as two nibbles
+- `LCD_Data()`: Sends 8-bit character (RS=1) as two nibbles
+
+##### High-Level API
+
+- `LCD_Init()`: Complete initialization sequence
+- `LCD_Clear()`: Clears display
+- `LCD_SetCursor(row, col)`: Positions cursor
+- `LCD_Print(string)`: Displays string at current cursor position
 
 ## Example: Basic LCD Driver Implementation
 
@@ -72,9 +297,8 @@ Then sends the address as a command.
 
 The `LCD_Print(str)` function iterates through the string and sends each character using `LCD_Data()`.
 
-## Tasks
-
-### Task 1: Display Your Name and ID
+## Lab work
+### Lab work 1: Display Your Name and ID
 
 Update the main program to display your name on the first line and your student ID on the second line of the LCD.
 
@@ -94,7 +318,7 @@ LCD_SetCursor(1, 0);  // Line 2
 LCD_Print("ID: 1234567");
 ```
 
-### Task 2: Button-Controlled Name Scrolling
+### Lab work 2: Button-Controlled Name Scrolling
 
 Write a program that displays your name on the LCD and allows the user to scroll the text left or right using the two on-board push buttons (SW1 and SW2).
 
@@ -105,7 +329,7 @@ Write a program that displays your name on the LCD and allows the user to scroll
 - When SW2 is pressed: Shift display right (command `0x1C`)
 - The display should not scroll automatically; only respond to button presses
 
-### Task 3: Bidirectional Continuous Scrolling
+### Lab work 3: Bidirectional Continuous Scrolling
 
 Write a program that displays your name on line 1 and your student ID on line 2, with continuous scrolling in opposite directions after a button press.
 

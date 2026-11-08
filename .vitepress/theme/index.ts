@@ -5,6 +5,7 @@ import 'virtual:group-icons.css'
 import './custom.css'
 
 import RegisterSW from './components/RegisterSW.vue'
+import JumpToProcedure from './components/JumpToProcedure.vue'
 import ContinueReading from './components/ContinueReading.vue'
 import Screenshot from './components/Screenshot.vue'
 
@@ -13,6 +14,7 @@ export default {
   Layout() {
     return h(DefaultTheme.Layout, null, {
       'home-hero-actions-after': () => h(ContinueReading, { lab: 'encs4110', mode: 'card' }),
+      'doc-before': () => h(JumpToProcedure),
       'layout-bottom': () => [h(RegisterSW), h(ContinueReading, { lab: 'encs4110', mode: 'track' })],
     })
   },
