@@ -147,7 +147,7 @@ $$
 The `GPIODATA` register supports **address masking**: address bits \[9:2\] form a bit mask that selects which pins are affected.
 
 - **Full access:** Base + `0x3FC` — all 8 pins.
-- **Masked access:** Base + (`mask` $`\ll`$ 2) — only the pins in `mask`.
+- **Masked access:** Base + (`mask` $\ll$ 2) — only the pins in `mask`.
 
 Example (PF1 only):
 $$

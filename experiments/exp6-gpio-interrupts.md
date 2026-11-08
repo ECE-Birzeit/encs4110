@@ -53,29 +53,29 @@ Digital inputs must not be left floating: an undefined voltage can produce rando
 
 ##### Pull-Up (active-low)
 
-A **pull-up** connects the pin weakly to $`V_{CC}`$, so the idle level is logic 1. Pressing the switch drives the pin to GND $`\rightarrow`$ logic 0.
+A **pull-up** connects the pin weakly to $V_{CC}$, so the idle level is logic 1. Pressing the switch drives the pin to GND → logic 0.
 
 ##### Pull-Down (active-high)
 
-A **pull-down** connects the pin weakly to GND, so the idle level is logic 0. Pressing the switch drives the pin to $`V_{CC}`$ $`\rightarrow`$ logic 1.
+A **pull-down** connects the pin weakly to GND, so the idle level is logic 0. Pressing the switch drives the pin to $V_{CC}$ → logic 1.
 
-(0, 4) node\[above\] $`V_{CC}`$ coordinate (VCC_PU) to\[R, l=$`R_{PU}`$\] (0, 2.5) coordinate (Input_PU);
+(0, 4) node\[above\] $V_{CC}$ coordinate (VCC_PU) to\[R, l=$R_{PU}$\] (0, 2.5) coordinate (Input_PU);
 
-(Input_PU) – ++(1.5, 0) node\[right\] $`\substack{\text{MCU Input} \\ \text{(Default High)}}`$;
+(Input_PU) – ++(1.5, 0) node\[right\] $\substack{\text{MCU Input} \\ \text{(Default High)}}$;
 
 (Input_PU) to\[short, \*-\] (-1.5, 2.5) coordinate (SW_Top); (SW_Top) to\[nopb, l=SW\] (-1.5, 0) coordinate (SW_Bottom); (SW_Bottom) – (0, 0) node\[ground\] node\[below\] ;
 
 at (0, 5.2) **A) Pull-Up Configuration**;
 
-(0, 4) node\[above\] $`V_{CC}`$ coordinate (VCC_PD);
+(0, 4) node\[above\] $V_{CC}$ coordinate (VCC_PD);
 
 (VCC_PD) to\[short, \*-\] (-1.5, 4) coordinate (SW_Top); (SW_Top) to\[nopb, l=SW\] (-1.5, 1.5) coordinate (SW_Bottom);
 
 (SW_Bottom) to\[short, \*-\] (0, 1.5) coordinate (Input_PD);
 
-(Input_PD) to\[R, l\_=$`R_{PD}`$\] (0, 0) node\[ground\] node\[below\] ;
+(Input_PD) to\[R, l\_=$R_{PD}$\] (0, 0) node\[ground\] node\[below\] ;
 
-(Input_PD) – ++(1.5, 0) node\[right\] $`\substack{\text{MCU Input} \\ \text{(Default Low)}}`$;
+(Input_PD) – ++(1.5, 0) node\[right\] $\substack{\text{MCU Input} \\ \text{(Default Low)}}$;
 
 at (0, 5.2) **B) Pull-Down Configuration**;
 
@@ -253,7 +253,7 @@ These resistors are controlled by two dedicated registers:
 
 **Register:** `GPIOPUR` — GPIO Pull-Up Select (Port F: `0x40025510`)
 
-The `GPIOPUR` register enables the internal pull-up resistor for each GPIO pin. When enabled, the pin is weakly pulled to logic ’1’ (3.3V) through a resistor (typically 13-40 k$`\Omega`$). This prevents floating inputs and is essential for switches connected to ground.
+The `GPIOPUR` register enables the internal pull-up resistor for each GPIO pin. When enabled, the pin is weakly pulled to logic ’1’ (3.3V) through a resistor (typically 13-40 k$\Omega$). This prevents floating inputs and is essential for switches connected to ground.
 
 **GPIOPUR Register — Pull-Up Enable**
 

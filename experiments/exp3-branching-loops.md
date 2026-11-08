@@ -153,20 +153,20 @@ Conditional branches use condition codes that test the processor status flags (N
 
 | **Cond.** | **Meaning** | **Description** |
 |:---|:---|:---|
-| EQ | Equal | Execute if $`Z=1`$. |
-| NE | Not equal | Execute if $`Z=0`$. |
-| CS/HS | Carry set / Unsigned higher or same | Execute if $`C=1`$. |
-| CC/LO | Carry clear / Unsigned lower | Execute if $`C=0`$. |
-| MI | Minus (negative) | Execute if $`N=1`$. |
-| PL | Plus (non-negative) | Execute if $`N=0`$. |
-| VS | Overflow set | Execute if $`V=1`$. |
-| VC | Overflow clear | Execute if $`V=0`$. |
-| HI | Unsigned higher | Execute if $`C=1`$ *and* $`Z=0`$. |
-| LS | Unsigned lower or same | Execute if $`C=0`$ *or* $`Z=1`$. |
-| GE | Greater or equal (signed) | Execute if $`N=V`$. |
-| LT | Less than (signed) | Execute if $`N\neq V`$. |
-| GT | Greater than (signed) | Execute if $`Z=0`$ *and* $`N=V`$. |
-| LE | Less or equal (signed) | Execute if $`Z=1`$ *or* $`N\neq V`$. |
+| EQ | Equal | Execute if $Z=1$. |
+| NE | Not equal | Execute if $Z=0$. |
+| CS/HS | Carry set / Unsigned higher or same | Execute if $C=1$. |
+| CC/LO | Carry clear / Unsigned lower | Execute if $C=0$. |
+| MI | Minus (negative) | Execute if $N=1$. |
+| PL | Plus (non-negative) | Execute if $N=0$. |
+| VS | Overflow set | Execute if $V=1$. |
+| VC | Overflow clear | Execute if $V=0$. |
+| HI | Unsigned higher | Execute if $C=1$ *and* $Z=0$. |
+| LS | Unsigned lower or same | Execute if $C=0$ *or* $Z=1$. |
+| GE | Greater or equal (signed) | Execute if $N=V$. |
+| LT | Less than (signed) | Execute if $N\neq V$. |
+| GT | Greater than (signed) | Execute if $Z=0$ *and* $N=V$. |
+| LE | Less or equal (signed) | Execute if $Z=1$ *or* $N\neq V$. |
 | AL | Always | Always execute (default if no condition). |
 | NV | Never | Reserved / do not use. |
 

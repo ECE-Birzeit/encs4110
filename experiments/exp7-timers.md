@@ -94,7 +94,7 @@ $$
 T = \frac{(\text{TAILR} + 1) \times (\text{TAPR} + 1)}{f_{\text{SysClk}}}
 $$
 
-This formula holds for down-counting mode, which is what this experiment uses. In count-up mode, the prescaler instead extends the counter range rather than dividing the clock. The prescaler is ignored in 32-bit mode. For example, with `TAPR = 255` (divisor = 256), the effective clock frequency is reduced to $`50\,\text{MHz} / 256 \approx 195.3\,\text{kHz}`$.
+This formula holds for down-counting mode, which is what this experiment uses. In count-up mode, the prescaler instead extends the counter range rather than dividing the clock. The prescaler is ignored in 32-bit mode. For example, with `TAPR = 255` (divisor = 256), the effective clock frequency is reduced to $50\,\text{MHz} / 256 \approx 195.3\,\text{kHz}$.
 
 #### Interrupt Handling
 
@@ -213,7 +213,7 @@ $$
 T = \frac{\text{LOAD} + 1}{f_{\text{clock}}}
 $$
 
-where $`f_{\text{clock}}`$ is the processor clock frequency (typically 50 MHz on the TM4C123).
+where $f_{\text{clock}}$ is the processor clock frequency (typically 50 MHz on the TM4C123).
 
 **Maximum Period:** With a 24-bit counter at 50 MHz:
 $$

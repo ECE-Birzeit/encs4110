@@ -55,22 +55,22 @@ Arithmetic instructions perform basic mathematical operations. Some common arith
 
 | **Instr.** | **Syntax** | **Operation** | **Description** |
 |:---|:---|:---|:---|
-| ADD | `ADD{S} Rd, Rn, Operand2` | $`Rd \leftarrow Rn + Operand2`$ | *Operand2* may be a register, an immediate, or a shifted register. |
-| ADC | `ADC{S} Rd, Rn, Operand2` | $`Rd \leftarrow Rn + Operand2 + C`$ | Adds carry-in $`C`$. |
-| SUB | `SUB{S} Rd, Rn, Operand2` | $`Rd \leftarrow Rn - Operand2`$ | Standard subtraction. |
-| SBC | `SBC{S} Rd, Rn, Operand2` | $`Rd \leftarrow Rn - Operand2 - \overline{C}`$ | Subtract with carry. If carry flag is clear, result is reduced by one. Used for multiword arithmetic. |
-| RSB | `RSB{S} Rd, Rn, Operand2` | $`Rd \leftarrow Operand2 - Rn`$ | Reverse subtract. |
-| MUL | `MUL{S} Rd, Rn, Rm` | $`Rd \leftarrow (Rn \times Rm)_{[31{:}0]}`$ | 32$`\times`$32 $`\rightarrow`$ low 32 bits. |
-| MLA | `MLA Rd, Rn, Rm, Ra` | $`Rd \leftarrow (Rn \times Rm) + Ra`$ | Multiply-accumulate. |
-| MLS | `MLS Rd, Rn, Rm, Ra` | $`Rd \leftarrow Ra - (Rn \times Rm)`$ | Multiply-subtract. |
-| UMULL | `UMULL RdLo, RdHi, Rn, Rm` | $`\{RdHi,RdLo\} \leftarrow Rn \times Rm`$ | Unsigned 32$`\times`$32 $`\rightarrow`$ 64-bit product. |
-| SMULL | `SMULL RdLo, RdHi, Rn, Rm` | $`\{RdHi,RdLo\} \leftarrow Rn \times Rm`$ | Signed 32$`\times`$32 $`\rightarrow`$ 64-bit product. |
-| UDIV | `UDIV Rd, Rn, Rm` | $`Rd \leftarrow Rn \div Rm`$ | Unsigned division. |
-| SDIV | `SDIV Rd, Rn, Rm` | $`Rd \leftarrow Rn \div Rm`$ | Signed division. |
+| ADD | `ADD{S} Rd, Rn, Operand2` | $Rd \leftarrow Rn + Operand2$ | *Operand2* may be a register, an immediate, or a shifted register. |
+| ADC | `ADC{S} Rd, Rn, Operand2` | $Rd \leftarrow Rn + Operand2 + C$ | Adds carry-in $C$. |
+| SUB | `SUB{S} Rd, Rn, Operand2` | $Rd \leftarrow Rn - Operand2$ | Standard subtraction. |
+| SBC | `SBC{S} Rd, Rn, Operand2` | $Rd \leftarrow Rn - Operand2 - \overline{C}$ | Subtract with carry. If carry flag is clear, result is reduced by one. Used for multiword arithmetic. |
+| RSB | `RSB{S} Rd, Rn, Operand2` | $Rd \leftarrow Operand2 - Rn$ | Reverse subtract. |
+| MUL | `MUL{S} Rd, Rn, Rm` | $Rd \leftarrow (Rn \times Rm)_{[31{:}0]}$ | 32×32 → low 32 bits. |
+| MLA | `MLA Rd, Rn, Rm, Ra` | $Rd \leftarrow (Rn \times Rm) + Ra$ | Multiply-accumulate. |
+| MLS | `MLS Rd, Rn, Rm, Ra` | $Rd \leftarrow Ra - (Rn \times Rm)$ | Multiply-subtract. |
+| UMULL | `UMULL RdLo, RdHi, Rn, Rm` | $\{RdHi,RdLo\} \leftarrow Rn \times Rm$ | Unsigned 32×32 → 64-bit product. |
+| SMULL | `SMULL RdLo, RdHi, Rn, Rm` | $\{RdHi,RdLo\} \leftarrow Rn \times Rm$ | Signed 32×32 → 64-bit product. |
+| UDIV | `UDIV Rd, Rn, Rm` | $Rd \leftarrow Rn \div Rm$ | Unsigned division. |
+| SDIV | `SDIV Rd, Rn, Rm` | $Rd \leftarrow Rn \div Rm$ | Signed division. |
 
 *Common ARM Cortex-M4 Arithmetic Instructions*
 
-*Note:* $`C`$ denotes the carry flag in `xPSR`. *Operand2* may be an immediate or a shifted register depending on the encoding.
+*Note:* $C$ denotes the carry flag in `xPSR`. *Operand2* may be an immediate or a shifted register depending on the encoding.
 
 #### Logical and Move Instructions
 
@@ -78,18 +78,18 @@ Logical instructions perform bitwise operations on data, while move instructions
 
 | **Instr.** | **Syntax** | **Operation** | **Description** |
 |:---|:---|:---|:---|
-| AND | `AND Rd, Rn, Operand2` | $`Rd \leftarrow Rn \,\&\, Operand2`$ | Bitwise AND. |
-| ORR | `ORR Rd, Rn, Operand2` | $`Rd \leftarrow Rn \,|\, Operand2`$ | Bitwise OR. |
-| EOR | `EOR Rd, Rn, Operand2` | $`Rd \leftarrow Rn \oplus Operand2`$ | Bitwise XOR. |
-| BIC | `BIC Rd, Rn, Operand2` | $`Rd \leftarrow Rn \,\&\, \neg Operand2`$ | Bit clear. |
-| MVN | `MVN Rd, Operand2` | $`Rd \leftarrow \neg Operand2`$ | Bitwise NOT of operand. |
-| MOV | `MOV Rd, Operand2` | $`Rd \leftarrow Operand2`$ | Register or immediate move. |
-| MOVW | `MOVW Rd, #imm16` | $`Rd[15{:}0] \leftarrow imm16`$ | Write low halfword (high cleared). |
-| MOVT | `MOVT Rd, #imm16` | $`Rd[31{:}16] \leftarrow imm16`$ | Write high halfword (low preserved). |
+| AND | `AND Rd, Rn, Operand2` | $Rd \leftarrow Rn \,\&\, Operand2$ | Bitwise AND. |
+| ORR | `ORR Rd, Rn, Operand2` | $Rd \leftarrow Rn \,|\, Operand2$ | Bitwise OR. |
+| EOR | `EOR Rd, Rn, Operand2` | $Rd \leftarrow Rn \oplus Operand2$ | Bitwise XOR. |
+| BIC | `BIC Rd, Rn, Operand2` | $Rd \leftarrow Rn \,\&\, \neg Operand2$ | Bit clear. |
+| MVN | `MVN Rd, Operand2` | $Rd \leftarrow \neg Operand2$ | Bitwise NOT of operand. |
+| MOV | `MOV Rd, Operand2` | $Rd \leftarrow Operand2$ | Register or immediate move. |
+| MOVW | `MOVW Rd, #imm16` | $Rd[15{:}0] \leftarrow imm16$ | Write low halfword (high cleared). |
+| MOVT | `MOVT Rd, #imm16` | $Rd[31{:}16] \leftarrow imm16$ | Write high halfword (low preserved). |
 
 *Logical and Move Instructions*
 
-*Note:* $`C`$ denotes the carry flag in `xPSR`. *Operand2* may be an immediate or a shifted register depending on the encoding.
+*Note:* $C$ denotes the carry flag in `xPSR`. *Operand2* may be an immediate or a shifted register depending on the encoding.
 
 In this experiment, you will work with bitwise logical instructions to manipulate individual bits within registers. Such operations are fundamental in microcontroller programming, where control and status registers often contain multiple configuration fields packed into a single 32-bit word. Understanding how to set, clear, toggle, or test specific bits without altering the rest of the register is essential for safely modifying hardware configurations and controlling peripherals.
 
@@ -117,11 +117,11 @@ To check whether certain bits are set or cleared, you can use the `AND` instruct
 
 | **Instr.** | **Syntax** | **Operation** | **Description** |
 |:---|:---|:---|:---|
-| LSL | `LSL Rd, Rm, #shRs` | $`Rd \leftarrow Rm \ll sh`$ | Logical left shift by immediate or by register. |
-| LSR | `LSR Rd, Rm, #shRs` | $`Rd \leftarrow Rm \gg sh`$ | Logical right shift (zero fill). |
-| ASR | `ASR Rd, Rm, #shRs` | $`Rd \leftarrow Rm \gg sh`$ | Arithmetic right shift (sign fill). |
-| ROR | `ROR Rd, Rm, #shRs` | $`Rd \leftarrow \mathrm{ROR}(Rm, sh)`$ | Rotate right by immediate or by register. |
-| RRX | `RRX Rd, Rm` | $`Rd \leftarrow \mathrm{ROR}_{C}(Rm, 1)`$ | Rotate right 1 bit through carry (uses $`C`$ as incoming bit 31, outgoing bit 0 $`\rightarrow C`$). |
+| LSL | `LSL Rd, Rm, #shRs` | $Rd \leftarrow Rm \ll sh$ | Logical left shift by immediate or by register. |
+| LSR | `LSR Rd, Rm, #shRs` | $Rd \leftarrow Rm \gg sh$ | Logical right shift (zero fill). |
+| ASR | `ASR Rd, Rm, #shRs` | $Rd \leftarrow Rm \gg sh$ | Arithmetic right shift (sign fill). |
+| ROR | `ROR Rd, Rm, #shRs` | $Rd \leftarrow \mathrm{ROR}(Rm, sh)$ | Rotate right by immediate or by register. |
+| RRX | `RRX Rd, Rm` | $Rd \leftarrow \mathrm{ROR}_{C}(Rm, 1)$ | Rotate right 1 bit through carry (uses $C$ as incoming bit 31, outgoing bit 0 $\rightarrow C$). |
 
 *Shift and Rotate Instructions*
 
@@ -221,21 +221,21 @@ The directive `YPTR DCD YVAL` reserves a 32-bit word at the label `YPTR` and ini
 In ARM assembly, it is important to distinguish between loading a *value* from memory and loading the *address* of a label. Although these instructions look similar, their behavior and purpose differ depending on how the assembler interprets them.
 
 - **`LDR Rn, label`** Loads the 32-bit *value* stored at the memory address identified by `label` into register `Rn`. The CPU performs a direct memory read:
-  ``` math
+  $$
   \texttt{Rn} \leftarrow [\texttt{label}]
-  ```
+  $$
   Example: `LDR R0, XVAL` loads the contents of `XVAL` (e.g., `0x12345678`) into `R0`.
 
 - **`LDR Rn, =label`** Loads the *address* of `label` into `Rn`, rather than the data stored at that address. The assembler generates this by either constructing the address using `MOVW/MOVT` instructions or placing it in a nearby *literal pool* for PC-relative loading.[^1]
-  ``` math
+  $$
   \texttt{Rn} \leftarrow \texttt{\&label}
-  ```
+  $$
   Example: `LDR R0, =XVAL` places the address of `XVAL` in `R0`.
 
-- **`ADR Rn, label`** Loads the *address* of `label` into `Rn` by computing it relative to the current program counter. This method requires no literal pool or memory access but only works for nearby addresses (about $`\pm`$4 KB in Thumb mode):
-  ``` math
+- **`ADR Rn, label`** Loads the *address* of `label` into `Rn` by computing it relative to the current program counter. This method requires no literal pool or memory access but only works for nearby addresses (about ±4 KB in Thumb mode):
+  $$
   \texttt{Rn} \leftarrow \texttt{PC} + \texttt{offset(label)}
-  ```
+  $$
 
 ### Addressing Modes
 
@@ -247,7 +247,7 @@ Addressing modes define how the effective address or operand value is obtained b
 | Register Direct | `MOV R0, R1` | Operand is taken directly from a register. |
 | Register Indirect | `LDR R0, [R1]` | Register holds the address of the operand in memory. |
 | Register Offset | `LDR R0, [R1, R2]` | Effective address = base register + offset register. |
-| Scaled Register Offset | `LDR R0, [R1, R2, LSL #2]` | Effective address = base register + (offset register shifted); common for indexing arrays of words (`LSL #2` = $`\times 4`$). |
+| Scaled Register Offset | `LDR R0, [R1, R2, LSL #2]` | Effective address = base register + (offset register shifted); common for indexing arrays of words (`LSL #2` = $\times 4$). |
 | Immediate Offset | `LDR R0, [R1, #4]` | Effective address = base register + constant offset. |
 | Pre-indexed | `LDR R0, [R1, #4]!` | Base updated first, then memory access. |
 | Post-indexed | `LDR R0, [R1], #4` | Memory access first, then base register updated. |

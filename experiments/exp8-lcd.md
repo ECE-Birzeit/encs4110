@@ -137,13 +137,13 @@ The initialization sequence must account for the fact that the LCD powers up in 
 1.  **Wait for power-on stabilization**: Delay at least 40 ms after VDD rises to 4.5V
 2.  **Initial function set (8-bit interface)**: Send `0x30` (upper nibble only) three times:
 
-    - First time: Wait $`>`$ 4.1 ms
+    - First time: Wait > 4.1 ms
 
-    - Second time: Wait $`>`$ 100 $`\mu`$s
+    - Second time: Wait > 100 μs
 
-    - Third time: Wait $`>`$ 100 $`\mu`$s
+    - Third time: Wait > 100 μs
 
-3.  **Switch to 4-bit mode**: Send `0x20` (upper nibble only), wait $`>`$ 100 $`\mu`$s
+3.  **Switch to 4-bit mode**: Send `0x20` (upper nibble only), wait > 100 μs
 4.  **Configure display parameters**: Now send full 8-bit commands in two nibbles:
 
     - `0x28`: Function set — 4-bit mode, 2 lines, 5x8 font
@@ -213,13 +213,13 @@ $$
 
 ### Timing Requirements
 
-The HD44780 datasheet specifies minimum pulse widths and setup/hold times (e.g., enable pulse width $`\geq`$450 ns, enable cycle $`\geq`$1 $`\mu`$s, RS/data setup and hold times of tens of nanoseconds) that are far shorter than anything achievable with a simple software delay loop — in practice, the driver below uses generously-rounded, safe delays instead of hitting those minimums precisely:
+The HD44780 datasheet specifies minimum pulse widths and setup/hold times (e.g., enable pulse width ≥450 ns, enable cycle ≥1 μs, RS/data setup and hold times of tens of nanoseconds) that are far shorter than anything achievable with a simple software delay loop — in practice, the driver below uses generously-rounded, safe delays instead of hitting those minimums precisely:
 
-- **Around each enable pulse** (`LCD_EnablePulse()`): a $`\sim`$1 $`\mu`$s `delay_us()` before and after toggling E, comfortably covering the enable pulse width/cycle and RS/data setup-hold requirements together.
-- **After most commands**: $`\sim`$1-2 ms (datasheet minimum is $`\sim`$40 $`\mu`$s).
-- **After `Clear Display` (`0x01`) or `Return Home` (`0x02`)**: $`\sim`$2 ms (datasheet minimum is $`\sim`$1.6 ms), since these two commands take noticeably longer than other commands.
+- **Around each enable pulse** (`LCD_EnablePulse()`): a ~1 μs `delay_us()` before and after toggling E, comfortably covering the enable pulse width/cycle and RS/data setup-hold requirements together.
+- **After most commands**: ~1-2 ms (datasheet minimum is ~40 μs).
+- **After `Clear Display` (`0x01`) or `Return Home` (`0x02`)**: ~2 ms (datasheet minimum is ~1.6 ms), since these two commands take noticeably longer than other commands.
 
-We implement these delays using the SysTick timer (at 50 MHz, 1 $`\mu`$s = 50 clock cycles) for precise, non-blocking-free timing.
+We implement these delays using the SysTick timer (at 50 MHz, 1 μs = 50 clock cycles) for precise, non-blocking-free timing.
 
 ### LCD Driver Implementation Strategy
 

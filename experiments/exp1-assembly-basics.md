@@ -42,7 +42,7 @@ holds the current state of the processor, including condition flags (Negative, Z
 
 ##### How the flags are set
 
-For an `S`-suffixed instruction such as `ADDS`/`SUBS`: **Z** is set when the result is exactly zero; **N** mirrors the sign (bit 31) of the result; for **addition**, **V** (signed overflow) is set when two operands of the *same* sign produce a result of the *opposite* sign (e.g., adding two large positive numbers wraps into a negative result), and **C** is set on an unsigned carry out of bit 31; for **subtraction**, `SUBS Rd, Rn, Op2` is computed as `Rn + (~Op2) + 1`, so **C** is set when *no borrow* was needed (i.e. `Rn` $`\geq`$ `Op2` unsigned) and cleared when a borrow occurred. Example 1 below asks you to predict exactly these outcomes.
+For an `S`-suffixed instruction such as `ADDS`/`SUBS`: **Z** is set when the result is exactly zero; **N** mirrors the sign (bit 31) of the result; for **addition**, **V** (signed overflow) is set when two operands of the *same* sign produce a result of the *opposite* sign (e.g., adding two large positive numbers wraps into a negative result), and **C** is set on an unsigned carry out of bit 31; for **subtraction**, `SUBS Rd, Rn, Op2` is computed as `Rn + (~Op2) + 1`, so **C** is set when *no borrow* was needed (i.e. `Rn` ≥ `Op2` unsigned) and cleared when a borrow occurred. Example 1 below asks you to predict exactly these outcomes.
 
 #### Memory Mapping
 

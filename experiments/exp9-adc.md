@@ -40,11 +40,11 @@ Analog-to-Digital Converters (ADCs) are essential components in embedded systems
 
 #### ADC Resolution and Sampling
 
-ADCs are characterized by their **resolution**, which indicates the number of discrete levels they can represent, typically expressed in bits. For instance, a 12-bit ADC can represent $`2^{12} = 4096`$ discrete levels. The resolution determines the smallest detectable change in the analog input, known as the **least significant bit (LSB)**. The voltage corresponding to one LSB is calculated as:
+ADCs are characterized by their **resolution**, which indicates the number of discrete levels they can represent, typically expressed in bits. For instance, a 12-bit ADC can represent $2^{12} = 4096$ discrete levels. The resolution determines the smallest detectable change in the analog input, known as the **least significant bit (LSB)**. The voltage corresponding to one LSB is calculated as:
 $$
 \text{LSB Voltage} = \frac{V_{\text{REFP}} - V_{\text{REFN}}}{2^{\text{Resolution}}}
 $$
-where $`V_{\text{REFP}}`$ is the positive reference voltage, $`V_{\text{REFN}}`$ is the negative reference voltage, and is the number of bits.
+where $V_{\text{REFP}}$ is the positive reference voltage, $V_{\text{REFN}}$ is the negative reference voltage, and is the number of bits.
 
 ### TM4C123 ADC Architecture
 
@@ -63,7 +63,7 @@ The ADC modules offer the following capabilities:
 - **Sample Sequencers**: Four programmable sequencers per module (SS0-SS3) with depths of 8, 4, 4, and 1 samples
 - **Hardware Averaging**: Automatic averaging of up to 64 samples for noise reduction
 - **Digital Comparators**: Eight digital comparators per module for threshold detection
-- **DMA Support**: Dedicated $`\mu`$DMA channels for efficient data transfer with burst requests
+- **DMA Support**: Dedicated μDMA channels for efficient data transfer with burst requests
 - **Isolated Power**: Separate analog power and ground pins for improved signal integrity
 
 #### ADC Input Channels

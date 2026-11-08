@@ -125,7 +125,7 @@ The TM4C123GH6PM provides **eight UART modules** (UART0-UART7) with the followin
 - **Full-Duplex Operation**: Simultaneous transmission and reception
 - **Error Detection**: Framing, parity, overrun, and break detection
 - **Interrupt Generation**: Configurable interrupts for TX, RX, and error conditions
-- **DMA Support**: $`\mu`$DMA channels for high-speed data transfer
+- **DMA Support**: μDMA channels for high-speed data transfer
 - **IrDA and ISO 7816**: Optional infrared and smart card support
 - **9-Bit Mode**: For RS-485 multi-drop networks
 
