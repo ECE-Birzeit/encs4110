@@ -5,17 +5,17 @@ __main  PROC
         BL      PF_Init                  ; Initialize Port F
         LDR     R1, =0x40025038          ; Masked DATA address for PF1-PF3
 loop    
-        MOV     R0, #0x02                ; Turn ON red LED (PF1)
+        MOV     R0, #(1<<1)              ; Turn ON red LED (PF1)
         STR     R0, [R1]                 ; Write to GPIODATA	
         LDR     R0, =10000000            ; Load delay count
         BL      DELAY                    ; Call delay
 
-        MOV     R0, #0x04                ; Turn ON blue LED (PF2)
+        MOV     R0, #(1<<2)              ; Turn ON blue LED (PF2)
         STR     R0, [R1]
         LDR     R0, =10000000
         BL      DELAY
 
-        MOV     R0, #0x08                ; Turn ON green LED (PF3)
+        MOV     R0, #(1<<3)              ; Turn ON green LED (PF3)
         STR     R0, [R1]
         LDR     R0, =10000000
         BL      DELAY
@@ -31,7 +31,7 @@ DELAY   PROC
 PF_Init PROC
         LDR     R1, =0x400FE608          ; RCGCGPIO address
         LDR     R0, [R1]                 ; Read current value
-        ORR     R0, R0, #0x20            ; Enable Port F clock
+        ORR     R0, R0, #(1<<5)          ; Enable Port F clock
         STR     R0, [R1]
         NOP                              ; Small delay
         NOP
