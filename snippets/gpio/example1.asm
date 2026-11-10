@@ -5,24 +5,24 @@
 __main  PROC
         LDR     R1, =0x400FE608          ; RCGCGPIO address
         LDR     R0, [R1]                 ; Read current value
-        ORR     R0, R0, #0x20            ; Enable Port F clock
+        ORR     R0, R0, #(1<<5)          ; Enable Port F clock
         STR     R0, [R1]                 ; Write back
         NOP                              ; Small delay
         NOP
 
         LDR     R1, =0x40025400          ; GPIODIR address
         LDR     R0, [R1]                 ; Read current value
-        ORR     R0, R0, #0x02            ; Set PF1 as output
+        ORR     R0, R0, #(1<<1)          ; Set PF1 as output
         STR     R0, [R1]                 ; Write back
 
         LDR     R1, =0x4002551C          ; GPIODEN address
         LDR     R0, [R1]                 ; Read current value
-        ORR     R0, R0, #0x02            ; Enable digital function for PF1
+        ORR     R0, R0, #(1<<1)          ; Enable digital function for PF1
         STR     R0, [R1]                 ; Write back
 
         LDR     R1, =0x40025008          ; Masked DATA address for PF1
 loop
-        MOV     R0, #0x02                ; Turn ON red LED (PF1)
+        MOV     R0, #(1<<1)              ; Turn ON red LED (PF1)
         STR     R0, [R1]                 ; Write to GPIODATA
 
         LDR     R0, =1000000             ; Load delay count
