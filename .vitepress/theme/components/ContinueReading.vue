@@ -100,7 +100,7 @@ if (props.mode === 'track') {
       <span class="continue-kicker">Continue where you left off</span>
       <span class="continue-title">Exp {{ last.n }} · {{ last.title }}</span>
       <span v-if="last.section" class="continue-section">{{ last.section }}</span>
-      <span class="continue-arrow" aria-hidden="true">→</span>
+      <svg class="continue-arrow" viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
   </div>
 </template>
@@ -150,7 +150,6 @@ if (props.mode === 'track') {
   grid-column: 2;
   grid-row: 1 / span 3;
   align-self: center;
-  font-size: 20px;
   color: var(--vp-c-brand-1);
 }
 @media (max-width: 959px) {

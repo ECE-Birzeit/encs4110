@@ -41,8 +41,8 @@ function go(e: MouseEvent) {
 
 <template>
   <div v-if="target || manual" class="jump-row">
-    <a v-if="manual" class="jump alt" :href="manual" target="_blank" rel="noopener">Lab manual (PDF) <span aria-hidden="true">↗</span></a>
-    <a v-if="target" class="jump" :href="'#' + target.id" @click="go">Jump to the procedure <span aria-hidden="true">↓</span></a>
+    <a v-if="manual" class="jump alt" :href="manual" target="_blank" rel="noopener">Lab manual (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <a v-if="target" class="jump" :href="'#' + target.id" @click="go">Jump to the procedure <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
 </template>
 
@@ -56,8 +56,9 @@ function go(e: MouseEvent) {
 .jump:hover { background: var(--vp-c-brand-1); color: var(--vp-c-bg) }
 .jump.alt { border-color: var(--vp-c-divider); color: var(--vp-c-text-2) }
 .jump.alt:hover { border-color: var(--vp-c-text-1); background: transparent; color: var(--vp-c-text-1) }
-.jump span { transition: transform .3s }
-.jump:hover span { transform: translateY(2px) }
+.jump .icon { flex: none; transition: transform .3s }
+.jump:hover .icon { transform: translateY(2px) }
+.jump.alt:hover .icon { transform: translate(1px, -1px) }
 .jump.alt:hover span { transform: translate(2px, -2px) }
 @media (prefers-reduced-motion: reduce) { .jump span { transition: none } }
 </style>
