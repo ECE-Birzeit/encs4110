@@ -102,7 +102,7 @@ In Experiment 7 the prescaler (`TAPR`) *divided* the clock. **In PWM mode it doe
 | `TAMATCHR` | 15:0 | Low 16 bits of the match value |
 | `TAPMR` | 23:16 | High 8 bits of the match value |
 
-With 16 bits alone, the longest period at 50 MHz is $65{,}536 / 50{,}000{,}000 \approx 1.31$ ms (763 Hz minimum). With the extension the counter has 24 bits, up to $2^{24} / 50{,}000{,}000 \approx 335$ ms. A 1 kHz signal fits in 16 bits; a 50 Hz servo signal needs the extension (see [Lab work 3](#lab-work-3-servo-motor-position)).
+With 16 bits alone, the longest period at 50 MHz is $65{,}536 / 50{,}000{,}000 \approx 1.31$ ms (763 Hz minimum). With the extension the counter has 24 bits, up to $2^{24} / 50{,}000{,}000 \approx 335$ ms. A 1 kHz signal fits in 16 bits; a 50 Hz servo signal needs the extension: its period is $50{,}000{,}000 / 50 = 1{,}000{,}000$ counts, a start value of $999{,}999$ = `0x0F423F`, so `TAPR = 0x0F` and `TAILR = 0x423F`.
 
 ### PWM Registers
 
@@ -361,19 +361,28 @@ Use the two LaunchPad buttons to set the blue LED's brightness: **SW1** (PF4) ma
 
 **Extra:** Replace the linear steps with a 10-entry lookup table that looks evenly spaced to the eye (for example 1, 2, 4, 7, 11, 18, 28, 43, 66, 99) and compare.
 
-### Lab work 3: Servo Motor Position
+### Lab work 3: Color Knob with the ADC
 
-A hobby servo (such as the SG90) expects a **50 Hz** signal (20 ms period) whose high time sets its angle: about **1 ms** for one end, **1.5 ms** for the middle, and **2 ms** for the other end. Generate this signal on PF2 and move the servo through its range.
+Turn a potentiometer to pick the RGB LED's color: as the knob goes from one end to the other, the LED should move smoothly from red to green to blue and back toward red.
 
 **Requirements:**
-- Calculate the 24-bit period and match values at 50 MHz, and split each into its `TAPR`/`TAILR` and `TAPMR`/`TAMATCHR` parts.
-- Move the servo to the two ends and the middle, holding each position for one second.
-- Check the signal on the oscilloscope before connecting the servo.
+- Reuse the three PWM outputs and `set_color()` from Lab work 1.
+- Read the potentiometer on **AIN0 (PE3)** with sample sequencer 3, by polling, as in [Experiment 9, Example 1](./exp9-adc#example-1-single-adc-channel-reading-polling-method). Take a new reading every 20 ms, timed with SysTick.
+- Map the 12-bit reading (0 to 4095) to a color as described in the hint, and update the LED after every reading.
+- Add the ADC reading and the three percentages to the Watch window, and check they change as you turn the knob.
 
-**Wiring:** servo signal (orange or yellow) to PF2, servo ground (brown) to the LaunchPad GND, and servo power (red) to **VBUS** (5 V). Don't power the servo from the 3.3 V pin.
+**Wiring:** the potentiometer's two outer pins to **3.3 V** and **GND**, and its middle pin (the wiper) to **PE3**, as in Experiment 9.
 
-::: details Check your values for 1.5 ms
-The period is $50{,}000{,}000 / 50 = 1{,}000{,}000$ counts, so the start value is $999{,}999$ = `0x0F423F`: `TAPR = 0x0F`, `TAILR = 0x423F`.
+::: details Hint: mapping the knob to a color
+Split the knob's range into three equal parts. In each part, one color fades out while the next fades in:
 
-1.5 ms is $75{,}000$ counts high, so the match value is $999{,}999 - 75{,}000 = 924{,}999$ = `0x0E1D47`: `TAPMR = 0x0E`, `TAMATCHR = 0x1D47`.
+| Reading | Red | Green | Blue |
+|:---|:---|:---|:---|
+| 0 to 1365 | 99% to 0% | 0% to 99% | 0% |
+| 1366 to 2730 | 0% | 99% to 0% | 0% to 99% |
+| 2731 to 4095 | 0% to 99% | 0% | 99% to 0% |
+
+With `v` as the reading, `part = (v * 3) / 4096` gives which third you're in (0, 1 or 2), and `f = ((v * 3) % 4096) * 99 / 4096` how far through it you are (0 to 98). In part 0, red is `99 - f` and green is `f`; parts 1 and 2 follow the same pattern. Let `set_color()` clamp anything below 1% to 1%, as `pwm_set()` does.
 :::
+
+**Extra:** Replace the potentiometer with the internal temperature sensor from [Experiment 9, Example 2](./exp9-adc#example-2-reading-internal-temperature-sensor), and show the temperature as a color: blue when cool, red when warm. Warm the chip with your finger to see it change.
