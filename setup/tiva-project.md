@@ -109,7 +109,7 @@ Right-click **Source Group 1** → **Add New Item to Group 'Source Group 1'…**
 "Add New Item to Group 'Source Group 1'" dialog with "C File (.c)" selected and "main.c" as the name.
 </Screenshot>
 
-Paste one of these test programs and save with <kbd>Ctrl</kbd>+<kbd>S</kbd>. Both drive the red LED on **PF1**:
+Paste one of these test programs and save with <kbd>Ctrl</kbd>+<kbd>S</kbd>. Both blink the red LED on **PF1**:
 
 ::: code-group
 
@@ -156,9 +156,14 @@ __main  PROC
         STR     R0, [R1]
 
         LDR     R1, =0x40025008     ; GPIOF DATA, masked to PF1 only
-        MOV     R0, #0x02
-        STR     R0, [R1]            ; Red LED on
-STOP    B       STOP
+LOOP    LDR     R0, [R1]
+        EOR     R0, R0, #0x02       ; Toggle the red LED
+        STR     R0, [R1]
+
+        LDR     R2, =1000000        ; Wait a bit
+WAIT    SUBS    R2, R2, #1
+        BNE     WAIT
+        B       LOOP
         ENDP
         END
 ```
@@ -226,7 +231,7 @@ Verify OK.
 Build Output after pressing Download (F8): "Erase Done. Programming Done. Verify OK." Highlight the LOAD toolbar button.
 </Screenshot>
 
-Now press the **RESET** button on the board (next to the DEBUG USB port). **The red LED should start blinking** (or, for the assembly version, stay on).
+Now press the **RESET** button on the board (next to the DEBUG USB port). **The red LED should start blinking**, with either version.
 
 The program stays in flash: unplug and replug the board and it runs again.
 
