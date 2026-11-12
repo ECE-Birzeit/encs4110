@@ -4,7 +4,7 @@ description: "This experiment introduces analog-to-digital conversion using the 
 outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.9"
-datasheet: 799
+datasheet: "/datasheets/tm4c123gh6pm.pdf#page=799"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 

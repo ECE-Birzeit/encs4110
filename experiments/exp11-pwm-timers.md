@@ -4,7 +4,7 @@ short: "PWM with Timers"
 description: "Generate pulse-width modulated signals in hardware with the TM4C123's General-Purpose Timers in PWM mode: set the frequency and duty cycle, route the output to a pin, and dim and fade the LaunchPad LEDs."
 outline: deep
 lastUpdated: true
-datasheet: 704
+datasheet: "/datasheets/tm4c123gh6pm.pdf#page=704"
 part: "Part 3: Advanced Peripherals"
 ---
 

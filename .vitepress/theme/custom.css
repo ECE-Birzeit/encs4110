@@ -222,7 +222,7 @@
   font-style: italic;
 }
 
-/* "Datasheet p. N" on register headings and the Background heading */
+/* "Datasheet p. N" on register headings */
 .vp-doc .ds-ref {
   margin-left: 8px;
   padding: 1px 8px;

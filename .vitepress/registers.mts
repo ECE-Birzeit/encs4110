@@ -8,8 +8,8 @@
 //
 // datasheetRefs: a ### or #### heading that names a register (GPTMCTL, (STCTRL), ADCSSMUXn, or a
 //   **Register:** `RCGCGPIO` line right under it) gets a "Datasheet p. N" link to that register's
-//   page in the local datasheet copy. The page's front matter `datasheet: <page>` adds the same link
-//   to its "Background" heading, for the chapter as a whole. Page numbers come from
+//   page in the local datasheet copy. (The chapter as a whole is the "Datasheet (PDF)" button at the
+//   top of the page, from front matter `datasheet:`; see JumpToProcedure.vue.) Page numbers come from
 //   datasheet-pages.json (scripts/datasheet-pages.py); printed page numbers equal PDF page indexes.
 import type MarkdownIt from 'markdown-it'
 
@@ -131,15 +131,10 @@ export function datasheetRefs(md: MarkdownIt, o: DatasheetOptions) {
   md.core.ruler.push('datasheet_refs', (state) => {
     if (!/^experiments\/exp\d+-/.test(state.env?.relativePath ?? '')) return
     const t = state.tokens
-    const chapter = Number(state.env?.frontmatter?.datasheet)
     for (let i = 0; i < t.length; i++) {
       if (t[i].type !== 'heading_open') continue
       const inline = t[i + 1]
       const text = inline.content
-      if (t[i].tag === 'h2' && /^background$/i.test(text.trim()) && chapter) {
-        inline.children!.push(badge(state, chapter, `${o.name}, page ${chapter}: the chapter this experiment uses`))
-        continue
-      }
       if (t[i].tag !== 'h3' && t[i].tag !== 'h4') continue
       let hit = find(text)
       // "#### Step 1 — Enable the GPIO Port Clock" followed by "**Register:** `RCGCGPIO` — ..."

@@ -2,7 +2,8 @@
 // Buttons at the top of an experiment page: "Jump to the procedure" (the first section after
 // Background: Examples, Configuration Steps, ...) and "Lab manual (PDF)": the page's own `manual:`
 // link (its chapter) or, failing that, the lab's whole manual (themeConfig.lab.manual, set by
-// lab-template's config). Same component on every lab site.
+// lab-template's config). Same component on every lab site. "Datasheet (PDF)" appears when the
+// page's front matter has `datasheet:`, a link to the chapter the experiment uses.
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
 
@@ -14,6 +15,10 @@ const isExperiment = computed(() => /\/experiments\/exp\d+-/.test(route.path))
 const manual = computed(() => {
   const link = frontmatter.value.manual || theme.value.lab?.manual
   return isExperiment.value && link ? withBase(link) : ''
+})
+const datasheet = computed(() => {
+  const link = frontmatter.value.datasheet
+  return isExperiment.value && typeof link === 'string' ? withBase(link) : ''
 })
 
 function find() {
@@ -40,8 +45,9 @@ function go(e: MouseEvent) {
 </script>
 
 <template>
-  <div v-if="target || manual" class="jump-row">
+  <div v-if="target || manual || datasheet" class="jump-row">
     <a v-if="manual" class="jump alt" :href="manual" target="_blank" rel="noopener">Lab manual (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <a v-if="datasheet" class="jump alt" :href="datasheet" target="_blank" rel="noopener">Datasheet (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a v-if="target" class="jump" :href="'#' + target.id" @click="go">Jump to the procedure <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
 </template>

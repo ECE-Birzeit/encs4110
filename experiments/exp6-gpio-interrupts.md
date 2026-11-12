@@ -4,7 +4,7 @@ description: "This experiment extends GPIO functionality to inputs and introduce
 outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.6"
-datasheet: 649
+datasheet: "/datasheets/tm4c123gh6pm.pdf#page=649"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
@@ -50,27 +50,7 @@ A **pull-up** connects the pin weakly to $V_{CC}$, so the idle level is logic 1
 
 A **pull-down** connects the pin weakly to GND, so the idle level is logic 0. Pressing the switch drives the pin to $V_{CC}$ → logic 1.
 
-(0, 4) node\[above\] $V_{CC}$ coordinate (VCC_PU) to\[R, l=$R_{PU}$\] (0, 2.5) coordinate (Input_PU);
-
-(Input_PU) – ++(1.5, 0) node\[right\] $\substack{\text{MCU Input} \\ \text{(Default High)}}$;
-
-(Input_PU) to\[short, \*-\] (-1.5, 2.5) coordinate (SW_Top); (SW_Top) to\[nopb, l=SW\] (-1.5, 0) coordinate (SW_Bottom); (SW_Bottom) – (0, 0) node\[ground\] node\[below\] ;
-
-at (0, 5.2) **A) Pull-Up Configuration**;
-
-(0, 4) node\[above\] $V_{CC}$ coordinate (VCC_PD);
-
-(VCC_PD) to\[short, \*-\] (-1.5, 4) coordinate (SW_Top); (SW_Top) to\[nopb, l=SW\] (-1.5, 1.5) coordinate (SW_Bottom);
-
-(SW_Bottom) to\[short, \*-\] (0, 1.5) coordinate (Input_PD);
-
-(Input_PD) to\[R, l\_=$R_{PD}$\] (0, 0) node\[ground\] node\[below\] ;
-
-(Input_PD) – ++(1.5, 0) node\[right\] $\substack{\text{MCU Input} \\ \text{(Default Low)}}$;
-
-at (0, 5.2) **B) Pull-Down Configuration**;
-
-Pull-Up and Pull-Down Resistor Configurations for Switch Inputs
+![Pull-up: a resistor from VCC to the input and a switch to ground, so the input reads 1 when released and 0 when pressed. Pull-down: a switch from VCC and a resistor to ground, so the input reads 0 when released and 1 when pressed](/images/exp6/pull-up-down.svg)
 
 ##### Internal Resistors (TM4C123)
 

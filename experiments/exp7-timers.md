@@ -4,7 +4,7 @@ description: "This experiment introduces precise timing control using the TM4C12
 outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.7"
-datasheet: 704
+datasheet: "/datasheets/tm4c123gh6pm.pdf#page=704"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
