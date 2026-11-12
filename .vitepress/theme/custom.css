@@ -160,3 +160,84 @@
 @media (min-width: 960px) {
   .VPHero .image-src { max-width: 15rem; max-height: 15rem; }
 }
+
+/* Register bit diagrams, drawn at build time from | Bits | Field | tables (.vitepress/registers.mts).
+   Inline SVG coloured from theme variables, so one drawing serves light and dark mode. Each comes
+   in two layouts: 16 bits per row, and 8 per row for phones, where 16 would be too small to read. */
+.vp-doc .reg-diagram {
+  margin: 12px 0 20px;
+}
+
+.vp-doc .reg-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--vp-font-family-mono);
+}
+
+.vp-doc .reg-diagram .narrow {
+  display: none;
+}
+
+@media (max-width: 559px) {
+  .vp-doc .reg-diagram .wide {
+    display: none;
+  }
+
+  .vp-doc .reg-diagram .narrow {
+    display: block;
+    max-width: 400px;
+  }
+}
+
+.vp-doc .reg-diagram text {
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.vp-doc .reg-diagram .n {
+  font-size: 10px;
+  fill: var(--vp-c-text-3);
+}
+
+.vp-doc .reg-diagram .f {
+  fill: var(--vp-c-bg);
+  stroke: var(--vp-c-text-2);
+  stroke-width: 1;
+}
+
+.vp-doc .reg-diagram .r {
+  fill: var(--vp-c-default-soft);
+  stroke: var(--vp-c-text-2);
+  stroke-width: 1;
+}
+
+.vp-doc .reg-diagram .l {
+  fill: var(--vp-c-text-1);
+  font-weight: 600;
+}
+
+.vp-doc .reg-diagram .lr {
+  fill: var(--vp-c-text-3);
+  font-style: italic;
+}
+
+/* "Datasheet p. N" on register headings and the Background heading */
+.vp-doc .ds-ref {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  font-family: var(--vp-font-family-base);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+}
+
+.vp-doc .ds-ref:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}

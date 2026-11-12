@@ -4,6 +4,7 @@ description: "This experiment extends GPIO functionality to inputs and introduce
 outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.6"
+datasheet: 649
 part: "Part 2: TM4C123 LaunchPad"
 ---
 

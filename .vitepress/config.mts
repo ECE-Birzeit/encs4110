@@ -7,6 +7,7 @@ import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-i
 import { withPwa } from '@vite-pwa/vitepress'
 import { linkPreviews } from "./og.mts"
 import { all, redirects, experimentEdges, sidebar } from "./lab.mts"
+import { registerDiagrams, datasheetRefs } from "./registers.mts"
 
 const srcDir = fileURLToPath(new URL("..", import.meta.url))
 
@@ -25,6 +26,12 @@ const cProgramSvg = readFileSync(
   "utf8",
 );
 const cProgramIcon = cProgramSvg.slice(cProgramSvg.indexOf("<svg"));
+
+// Register -> page in the local datasheet copy (scripts/datasheet-pages.py)
+const DATASHEET = "/datasheets/tm4c123gh6pm.pdf"
+const datasheetPages: Record<string, number> = JSON.parse(
+  readFileSync(fileURLToPath(new URL("./datasheet-pages.json", import.meta.url)), "utf8"),
+);
 
 // Addresses from before the pages moved (2026-11-08), so bookmarks and shared links still work.
 // /setup itself needs no entry: GitHub Pages sends /setup to /setup/ on its own.
@@ -47,6 +54,14 @@ export default withPwa(defineConfig({
   markdown: {
     config(md) {
       md.use(groupIconMdPlugin)
+      md.use(registerDiagrams)
+      md.use(datasheetRefs, {
+        pdf: DATASHEET,
+        name: "TM4C123GH6PM datasheet",
+        pages: datasheetPages,
+        // Names the pages use that aren't the datasheet's own mnemonic
+        alias: { NVIC_ISER: "EN0", GPIO_CR: "GPIOCR", STLOAD: "STRELOAD" },
+      })
     },
     math: true,
     // Shiki has no "h" grammar, so C headers fell back to plain text.
@@ -145,7 +160,9 @@ export default withPwa(defineConfig({
           { text: "Full Lab Manual (PDF)", link: "/manual/encs4110_manual.pdf", target: "_blank" },
       ],
       docs: [
-          { text: "TM4C123GH6PM Datasheet", link: "https://www.ti.com/lit/ds/spms376e/spms376e.pdf" },
+          // A local copy so it's cached with the site and opens offline. target '_blank' keeps the
+          // router out of it, as for the manual PDF.
+          { text: "TM4C123GH6PM Datasheet", link: DATASHEET, target: "_blank" },
           { text: "EK-TM4C123GXL LaunchPad User's Guide", link: "https://www.ti.com/lit/ug/spmu296/spmu296.pdf" },
           { text: "Arm Cortex-M4 Generic User Guide", link: "https://developer.arm.com/documentation/dui0553/latest/" },
           {
@@ -193,7 +210,8 @@ export default withPwa(defineConfig({
       // The site links only the full manual; the per-experiment PDFs from the submodule are unused.
       // Link-preview images are for chat apps and search engines, not for reading offline.
       globIgnores: ["manual/encs4110_[0-9]*.pdf", "og/**"],
-      maximumFileSizeToCacheInBytes: 5000000,
+      // The datasheet is 8.7 MB; precaching it is what makes it open offline.
+      maximumFileSizeToCacheInBytes: 10000000,
     },
     experimental: {
       includeAllowlist: true,

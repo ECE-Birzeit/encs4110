@@ -5,6 +5,7 @@ outline: deep
 lastUpdated: true
 short: "UART"
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.10"
+datasheet: 893
 part: "Part 2: TM4C123 LaunchPad"
 ---
 

@@ -4,6 +4,7 @@ description: "This experiment introduces LCD interfacing using the HD44780-based
 outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.8"
+datasheet: 649
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
