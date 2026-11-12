@@ -385,4 +385,4 @@ Split the knob's range into three equal parts. In each part, one color fades out
 With `v` as the reading, `part = (v * 3) / 4096` gives which third you're in (0, 1 or 2), and `f = ((v * 3) % 4096) * 99 / 4096` how far through it you are (0 to 98). In part 0, red is `99 - f` and green is `f`; parts 1 and 2 follow the same pattern. Let `set_color()` clamp anything below 1% to 1%, as `pwm_set()` does.
 :::
 
-**Extra:** Replace the potentiometer with the internal temperature sensor from [Experiment 9, Example 2](./exp9-adc#example-2-reading-internal-temperature-sensor), and show the temperature as a color: blue when cool, red when warm. Warm the chip with your finger to see it change.
+**Extra:** Replace the potentiometer with a **TMP36** temperature sensor on PE3, as in [Experiment 9, Lab work 1](./exp9-adc#lab-work-1-timer-based-temperature-measurement), and show the temperature as a color: blue at 20 °C, red at 35 °C. The TMP36 outputs 10 mV per °C with 500 mV at 0 °C, so $T = (V_{\text{mV}} - 500) / 10$. Pinch the sensor between two fingers to warm it and watch the color shift.
