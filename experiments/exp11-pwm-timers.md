@@ -384,5 +384,3 @@ Split the knob's range into three equal parts. In each part, one color fades out
 
 With `v` as the reading, `part = (v * 3) / 4096` gives which third you're in (0, 1 or 2), and `f = ((v * 3) % 4096) * 99 / 4096` how far through it you are (0 to 98). In part 0, red is `99 - f` and green is `f`; parts 1 and 2 follow the same pattern. Let `set_color()` clamp anything below 1% to 1%, as `pwm_set()` does.
 :::
-
-**Extra:** Replace the potentiometer with a **light-dependent resistor (LDR)**. Wire it as a voltage divider: the LDR from 3.3 V to PE3, and a 10 k$\Omega$ resistor from PE3 to GND, so more light gives a higher reading. The reading won't reach 0 or 4095, so first note it with the LDR covered by your hand and under your phone's flashlight, then scale that range to 0 to 4095 before mapping it to a color. Cover and uncover the LDR to sweep through the colors.
