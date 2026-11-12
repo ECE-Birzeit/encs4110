@@ -112,6 +112,23 @@ Only the registers that are new or behave differently in PWM mode are listed her
 
 **Register:** `TIMERx->TAMR` — GPTM Timer A Mode (`Base + 0x004`)
 
+**GPTMTAMR Register — Timer A Mode**
+
+| Bits | Field |
+| --- | --- |
+| 31–12 | reserved |
+| 11 | TAPLO |
+| 10 | TAMRSU |
+| 9 | TAPWMIE |
+| 8 | TAILD |
+| 7 | TASNAPS |
+| 6 | TAWOT |
+| 5 | TAMIE |
+| 4 | TACDIR |
+| 3 | TAAMS |
+| 2 | TACMR |
+| 1–0 | TAMR |
+
 Three fields select PWM mode:
 
 | Bits | Field | Value for PWM | Meaning |
@@ -126,17 +143,58 @@ Together: `TIMERx->TAMR = 0x0A`. For Timer B, the same fields are in `TBMR` (`TI
 
 **Register:** `TIMERx->TAMATCHR` — GPTM Timer A Match (`Base + 0x030`)
 
-The low 16 bits of the value at which the output goes low. Timer B uses `TBMATCHR` (`Base + 0x034`).
+**GPTMTAMATCHR Register — Timer A Match**
+
+| Bits | Field |
+| --- | --- |
+| 31–16 | unused in 16-bit mode |
+| 15–0 | TAMATCHR[15:0] |
+
+The low 16 bits of the value at which the output goes low; PWM mode always runs the timer as a 16-bit half, so bits 31:16 play no part. Timer B uses `TBMATCHR` (`Base + 0x034`).
 
 #### GPTMTAPR and GPTMTAPMR — Prescaler and Prescale Match
 
 **Registers:** `TIMERx->TAPR` (`Base + 0x038`) and `TIMERx->TAPMR` (`Base + 0x040`)
+
+**GPTMTAPR Register — Timer A Prescale** (in PWM mode: start value bits 23:16)
+
+| Bits | Field |
+| --- | --- |
+| 31–8 | reserved |
+| 7–0 | TAPSR |
+
+**GPTMTAPMR Register — Timer A Prescale Match** (in PWM mode: match value bits 23:16)
+
+| Bits | Field |
+| --- | --- |
+| 31–8 | reserved |
+| 7–0 | TAPSMR |
+
 
 In PWM mode, bits 7:0 of these registers extend the start value and the match value to 24 bits, as described above. Write 0 to both when the period fits in 16 bits. Timer B uses `TBPR` and `TBPMR`.
 
 #### GPTMCTL — Output Level
 
 **Register:** `TIMERx->CTL` — GPTM Control (`Base + 0x00C`)
+
+**GPTMCTL Register — Timer Control**
+
+| Bits | Field |
+| --- | --- |
+| 31–15 | reserved |
+| 14 | TBPWML |
+| 13 | TBOTE |
+| 12 | reserved |
+| 11–10 | TBEVENT |
+| 9 | TBSTALL |
+| 8 | TBEN |
+| 7 | reserved |
+| 6 | TAPWML |
+| 5 | TAOTE |
+| 4 | RTCEN |
+| 3–2 | TAEVENT |
+| 1 | TASTALL |
+| 0 | TAEN |
 
 Besides `TAEN` (bit 0), PWM mode uses:
 
@@ -153,11 +211,40 @@ A pin can be plain GPIO (driven by `DATA`) or connected to one of several periph
 
 **Register:** `GPIOx->AFSEL` (`Base + 0x420`)
 
+**GPIOAFSEL Register (Port x) — Alternate Function Select**
+
+| Bits | Field |
+| --- | --- |
+| 31–8 | reserved |
+| 7 | Px7 |
+| 6 | Px6 |
+| 5 | Px5 |
+| 4 | Px4 |
+| 3 | Px3 |
+| 2 | Px2 |
+| 1 | Px1 |
+| 0 | Px0 |
+
 Setting bit *n* hands pin *n* to a peripheral. Writing `DATA` no longer changes the pin.
 
 #### GPIOPCTL — Port Control
 
 **Register:** `GPIOx->PCTL` (`Base + 0x52C`)
+
+**GPIOPCTL Register (Port x) — Port Control**
+
+| Bits | Field |
+| --- | --- |
+| 31–28 | PMC7 |
+| 27–24 | PMC6 |
+| 23–20 | PMC5 |
+| 19–16 | PMC4 |
+| 15–12 | PMC3 |
+| 11–8 | PMC2 |
+| 7–4 | PMC1 |
+| 3–0 | PMC0 |
+
+`PMCn` selects the peripheral for pin *n*.
 
 Each pin has a 4-bit field (pin *n* uses bits $4n+3$ to $4n$) that chooses **which** peripheral drives it. For the timer CCP pins on Port F, the value is **7**. Always change only your pin's field:
 
