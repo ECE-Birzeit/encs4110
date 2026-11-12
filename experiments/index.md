@@ -28,6 +28,14 @@ Follow the experiments in order as they build from processor fundamentals to com
 | 09 | Analog-to-Digital Conversion (ADC) | [Open](./exp9-adc) | <a href="/manual/encs4110_manual.pdf#nameddest=chapter.9" target="_blank">Chapter 9</a> |
 | 10 | UART Serial Communication | [Open](./exp10-uart) | <a href="/manual/encs4110_manual.pdf#nameddest=chapter.10" target="_blank">Chapter 10</a> |
 
+## Advanced Peripherals (in development)
+
+New experiments we are writing. They aren't in the lab manual yet, so the online guide is the only reference.
+
+| # | Experiment | Online Guide | Status |
+|---|------------|--------------|--------|
+| 11 | PWM with General-Purpose Timers | [Open](./exp11-pwm-timers) | Draft |
+
 
 ::: tip Lab Manual
 The complete laboratory manual contains the theoretical background, hardware details, experiment objectives, and full procedures.
