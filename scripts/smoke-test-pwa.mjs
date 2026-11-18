@@ -52,6 +52,12 @@ if (swSource) {
   }
 }
 
+// ---- Cached pages must be found whatever query string a shared link carries ----
+// ignoreURLParametersMatching: [/.*/] compiles to this; without it "/?igsh=..." 404s offline.
+if (swSource && !swSource.includes("ignoreURLParametersMatching:[/.*/]")) {
+  fail("sw.js no longer ignores query strings when looking up cached pages -- links with tracking parameters 404 offline.");
+}
+
 // ---- Manifest: must be valid, installable JSON ----
 const manifestSource = requireFile("manifest.webmanifest");
 if (manifestSource) {
