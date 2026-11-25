@@ -1,15 +1,15 @@
 #include "TM4C123.h"   
 
-#define GREEN_LED 0x08
-#define SW1 0x10
-#define SW2 0x01
+#define GREEN_LED 1 << 3
+#define SW1 1 << 4
+#define SW2 1 << 0
 
 int main(void) 
 { 
     SYSCTL->RCGCGPIO |= (1<<5);             // Enable clock to GPIOF
 
     GPIOF->LOCK = 0x4C4F434B;               // unlock commit register
-    GPIOF->CR = 0x01;                       // make PORTF0 configurable
+    GPIOF->CR = SW2;                       // make PORTF0 configurable
 
 
     // PINS Configurations
