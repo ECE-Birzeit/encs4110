@@ -1,7 +1,7 @@
 #include "TM4C123.h" 
 
-#define RED_LED 0x02
-#define SWITCH 0x10
+#define RED_LED 1 << 1
+#define SWITCH 1 << 4
 
 int main(void) { 
     unsigned int state;      
