@@ -241,3 +241,10 @@
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
 }
+
+/* Highlighted code lines (e.g. a starter program's TODO lines): VitePress's default tint is
+   faint, so use the brand colour with a bar on the left, visible in both themes */
+.vp-doc div[class*='language-'] .line.highlighted {
+  background-color: color-mix(in srgb, var(--vp-c-brand-1) 16%, transparent);
+  box-shadow: inset 3px 0 0 var(--vp-c-brand-1);
+}

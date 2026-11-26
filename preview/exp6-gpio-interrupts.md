@@ -686,23 +686,41 @@ It follows the [Configuration Workflow](#configuration-workflow):
 
 ## Task
 
-Build a **combination lock**. The secret code is a sequence of four button presses, for example **SW1, SW2, SW2, SW1**. Enter four presses: if they match the code, the LED turns **green**; if not, **red**. The next press after a result starts a new attempt.
+Build the controller of a **vending machine**. A drink costs two coins: **SW1** inserts a coin, and **SW2** is the machine's one button. The LED shows what the machine is doing.
 
-**Requirements:**
-- While a code is being entered, show progress on the LED: **blue** after the first press, then off and blue again with each press so each one is visible. Off means ready for a new attempt.
-- Store the secret code in a `const` array, so it can be changed in one place.
-- Write the lock as a **state machine**: a variable holds how many presses have been entered and whether they still match. The handler updates it on each press; the result is decided on the fourth.
-- Wrong presses shouldn't reveal where the mistake was: always wait for all four before showing red.
-- Both buttons are now **events**, so give SW2 a falling-edge interrupt too, in the same handler as SW1: this is where the `MIS` check matters.
-- **Debounce** both buttons, so a single press can never count twice (see the hint). Without it, bounce makes the lock fail at random.
-- Add the state variables to the Watch window and check each step of a right and a wrong attempt.
+A vending machine is a **state machine**: it is always in exactly one **state**, and each button press moves it to a next state that depends on *both* the state and the button. That's why SW2 means *refund* with one coin in, but *dispense* with two: same button, different state, different result.
 
-::: details Hint: debouncing without a timer
-Experiment 7 debounces with a timer; here, the main loop can do it. In the handler, after handling a press, **mask** that switch (clear its bit in `IM`) and set a flag. The main loop waits for the flag, waits about 20 ms with a delay loop like Experiment 5's, clears the switch's flag in `ICR` (bounce set it again in the meantime), and unmasks it in `IM`. Bounce during those 20 ms changes nothing, because the masked switch can't interrupt.
+![State diagram of the vending machine. Idle, LED off: SW1 goes to One coin; SW2 stays in Idle. One coin, blue: SW1 goes to Ready; SW2 refunds and goes back to Idle. Ready, green: SW2 dispenses and goes to Vend; SW1 stays in Ready, the coin is refused. Vend, white: SW1 goes to One coin; SW2 goes to Idle.](/images/exp6/vending-machine.svg)
 
-A delay loop for 20 ms at 50 MHz: `for (volatile uint32_t i = 0; i < 200000; i++);` (about 5 cycles per pass; check it with the debugger's time display if you want to be exact).
+Each circle is a state, filled with the colour the LED shows in it. Each arrow is a button press: follow the arrows that leave the current state to see where each button takes the machine. An arrow that loops back to the same circle means that button changes nothing there. A purchase is SW1, SW1, SW2: Idle, One coin, Ready, Vend.
+
+### The starter program
+
+Start from this program. It compiles and runs as it is: the pins, the interrupts, and the **debouncing** are done, and only the state machine is left to write.
+
+<<< @/snippets/preview/exp6/task.c{c}
+
+**The provided part: how the debouncing works.** Each press reaches the state machine exactly once:
+
+1. The first falling edge of a press interrupts. `GPIOF_Handler` notes which button it was in `button`, then **masks both buttons** in `IM`. The bounces that follow can't interrupt any more.
+2. `main` sees `button`, runs one step of the state machine with `next_state()`, and shows the new state.
+3. `debounce()` waits about 40 ms for the press bounce to die out, waits until the button is released, and waits another 40 ms for the release bounce. Then it clears the flags those bounces left in `ICR` and **unmasks** the buttons for the next press.
+
+Don't change the provided part. If a press ever seems to count twice, ask your instructor before touching it.
+
+::: details What to write: the three TODOs
+The TODO lines are highlighted in the starter program: each one sits exactly where its code goes.
+
+1. **TODO 1:** add the two missing states, `READY` and `VEND`, to the `enum`.
+2. **TODO 2:** in `next_state()`, add a `case` for `ONE_COIN`, `READY`, and `VEND`. In each, check which button was pressed and return the state its arrow points to in the diagram, as the `IDLE` case does. A button that loops back to the same state falls through to `return s`.
+3. **TODO 3:** in `show()`, add a `case` for `READY` and `VEND`, setting `led` to the colour of its circle in the diagram. White is all three LEDs: `LEDS`.
+
+The compiler warns about every state a `switch` doesn't handle yet ("enumeration value not handled in switch"). The starter already shows one for `ONE_COIN` in `next_state()`: when the warnings are gone, every state has its case.
 :::
 
-::: details Hint: the state machine
-Two variables are enough: `count`, the presses so far (0 to 4), and `ok`, 1 while every press has matched. On a press: if `count` was 4, start over (`count = 0`, `ok = 1`). Then compare the button with `code[count]`, clear `ok` on a mismatch, and add one to `count`. When `count` reaches 4, show green if `ok` is still 1, red otherwise.
-:::
+**Check:** build and flash, and add `state` and `button` to the Watch window.
+
+- **A purchase:** SW1, SW1, SW2. The LED goes blue, green, white, and `state` goes `ONE_COIN`, `READY`, `VEND`. Then SW2 again: off, `IDLE`.
+- **A refund:** SW1, then SW2: blue, then off.
+- **A refused coin:** SW1, SW1, SW1: the third coin leaves the LED green.
+- **The next customer:** from white (Vend), SW1 goes straight to blue.
