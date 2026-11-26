@@ -1,0 +1,370 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2200 1050" width="2200" height="1050">
+<rect width="2200" height="1050" fill="#ffffff"/>
+<text x="60.0" y="62.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="34" font-weight="800" fill="#1f2328" text-anchor="start" dominant-baseline="central">EK-TM4C123GXL LaunchPad</text>
+<text x="60.0" y="98.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="16" font-weight="600" fill="#4b5158" text-anchor="start" dominant-baseline="central">TM4C123GH6PM · BoosterPack headers J1-J4, bottom view (solder side)</text>
+<text x="2140.0" y="62.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="22" font-weight="800" fill="#dc2626" text-anchor="end" dominant-baseline="central">ENCS4110</text>
+<text x="2140.0" y="92.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="600" fill="#4b5158" text-anchor="end" dominant-baseline="central">encs4110.birzeit.me/setup/pinout</text>
+<rect x="534.0" y="202.0" width="52.0" height="396" rx="6" fill="#2b2f36"/>
+<text x="547.0" y="182.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J2</text>
+<text x="573.0" y="182.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J4</text>
+<rect x="540.0" y="213.0" width="14" height="14" fill="#d9a400"/>
+<text x="547.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">1</text>
+<rect x="566.0" y="213.0" width="14" height="14" fill="#d9a400"/>
+<text x="573.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">1</text>
+<rect x="462.0" y="209.0" width="62.0" height="22" rx="11.0" fill="#1f2328"/>
+<text x="493.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">GND</text>
+<rect x="596.0" y="209.0" width="62.0" height="22" rx="11.0" fill="#0f8f80"/>
+<text x="627.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PF2</text>
+<rect x="664.0" y="210.0" width="74.0" height="20" rx="4" fill="#d7f1ec" stroke="#0f8f80" stroke-width="1.5"/>
+<text x="701.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#0b5f55" text-anchor="middle" dominant-baseline="central">BLUE LED</text>
+<rect x="744.0" y="210.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="774.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T1CCP0</text>
+<circle cx="547.0" cy="260" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">2</text>
+<circle cx="573.0" cy="260" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">2</text>
+<rect x="462.0" y="249.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB2</text>
+<rect x="596.0" y="249.0" width="62.0" height="22" rx="11.0" fill="#0f8f80"/>
+<text x="627.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PF3</text>
+<rect x="389.0" y="250.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="422.5" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C0SCL</text>
+<rect x="323.0" y="250.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="353.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T3CCP0</text>
+<rect x="664.0" y="250.0" width="82.0" height="20" rx="4" fill="#d7f1ec" stroke="#0f8f80" stroke-width="1.5"/>
+<text x="705.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#0b5f55" text-anchor="middle" dominant-baseline="central">GREEN LED</text>
+<rect x="752.0" y="250.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="782.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T1CCP1</text>
+<circle cx="547.0" cy="300" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">3</text>
+<circle cx="573.0" cy="300" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">3</text>
+<rect x="462.0" y="289.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PE0</text>
+<rect x="596.0" y="289.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB3</text>
+<rect x="411.0" y="290.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="433.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN3</text>
+<rect x="360.0" y="290.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="382.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U7Rx</text>
+<rect x="664.0" y="290.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="697.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C0SDA</text>
+<rect x="737.0" y="290.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="767.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T3CCP1</text>
+<circle cx="547.0" cy="340" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">4</text>
+<circle cx="573.0" cy="340" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">4</text>
+<rect x="462.0" y="329.0" width="62.0" height="22" rx="11.0" fill="#0f8f80"/>
+<text x="493.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PF0</text>
+<rect x="596.0" y="329.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PC4</text>
+<rect x="418.0" y="330.0" width="38.0" height="20" rx="4" fill="#d7f1ec" stroke="#0f8f80" stroke-width="1.5"/>
+<text x="437.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#0b5f55" text-anchor="middle" dominant-baseline="central">SW2</text>
+<rect x="352.0" y="330.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="382.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T0CCP0</text>
+<rect x="286.0" y="330.0" width="60.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="316.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">locked</text>
+<rect x="664.0" y="330.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="686.5" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">IDX1</text>
+<rect x="715.0" y="330.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="737.5" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U4Rx</text>
+<circle cx="547.0" cy="380" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">5</text>
+<circle cx="573.0" cy="380" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">5</text>
+<rect x="462.0" y="369.0" width="62.0" height="22" rx="11.0" fill="#8d6e63"/>
+<text x="493.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">RST</text>
+<rect x="596.0" y="369.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PC5</text>
+<rect x="664.0" y="370.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="686.5" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">PhA1</text>
+<rect x="715.0" y="370.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="737.5" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U4Tx</text>
+<circle cx="547.0" cy="420" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">6</text>
+<circle cx="573.0" cy="420" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">6</text>
+<rect x="462.0" y="409.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB7</text>
+<rect x="596.0" y="409.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PC6</text>
+<rect x="396.0" y="410.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="426.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T0CCP1</text>
+<rect x="294.0" y="410.0" width="96.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="342.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">= PD1 (R10)</text>
+<rect x="664.0" y="410.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="686.5" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">PhB1</text>
+<rect x="715.0" y="410.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="737.5" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U3Rx</text>
+<circle cx="547.0" cy="460" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">7</text>
+<circle cx="573.0" cy="460" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">7</text>
+<rect x="462.0" y="449.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB6</text>
+<rect x="596.0" y="449.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PC7</text>
+<rect x="396.0" y="450.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="426.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T0CCP0</text>
+<rect x="301.0" y="450.0" width="89.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="345.5" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">= PD0 (R9)</text>
+<rect x="664.0" y="450.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="686.5" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U3Tx</text>
+<rect x="715.0" y="450.0" width="67.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="748.5" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">WT1CCP1</text>
+<circle cx="547.0" cy="500" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">8</text>
+<circle cx="573.0" cy="500" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">8</text>
+<rect x="462.0" y="489.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PA4</text>
+<rect x="596.0" y="489.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PD6</text>
+<rect x="396.0" y="490.0" width="60.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="426.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">SSI0Rx</text>
+<rect x="664.0" y="490.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="686.5" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">PhA0</text>
+<rect x="715.0" y="490.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="737.5" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U2Rx</text>
+<circle cx="547.0" cy="540" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">9</text>
+<circle cx="573.0" cy="540" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">9</text>
+<rect x="462.0" y="529.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PA3</text>
+<rect x="596.0" y="529.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="627.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PD7</text>
+<rect x="389.0" y="530.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="422.5" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">SSI0Fss</text>
+<rect x="664.0" y="530.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="686.5" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">PhB0</text>
+<rect x="715.0" y="530.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="737.5" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U2Tx</text>
+<rect x="766.0" y="530.0" width="60.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="796.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">locked</text>
+<circle cx="547.0" cy="580" r="6.5" fill="#d9a400"/>
+<text x="547.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">10</text>
+<circle cx="573.0" cy="580" r="6.5" fill="#d9a400"/>
+<text x="573.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">10</text>
+<rect x="462.0" y="569.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="493.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PA2</text>
+<rect x="596.0" y="569.0" width="62.0" height="22" rx="11.0" fill="#0f8f80"/>
+<text x="627.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PF4</text>
+<rect x="389.0" y="570.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="422.5" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">SSI0Clk</text>
+<rect x="664.0" y="570.0" width="38.0" height="20" rx="4" fill="#d7f1ec" stroke="#0f8f80" stroke-width="1.5"/>
+<text x="683.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#0b5f55" text-anchor="middle" dominant-baseline="central">SW1</text>
+<rect x="708.0" y="570.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="738.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T2CCP0</text>
+<rect x="1614.0" y="202.0" width="52.0" height="396" rx="6" fill="#2b2f36"/>
+<text x="1627.0" y="182.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J3</text>
+<text x="1653.0" y="182.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="17" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J1</text>
+<rect x="1620.0" y="213.0" width="14" height="14" fill="#d9a400"/>
+<text x="1627.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">1</text>
+<rect x="1646.0" y="213.0" width="14" height="14" fill="#d9a400"/>
+<text x="1653.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">1</text>
+<rect x="1542.0" y="209.0" width="62.0" height="22" rx="11.0" fill="#c62828"/>
+<text x="1573.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">5V</text>
+<rect x="1676.0" y="209.0" width="62.0" height="22" rx="11.0" fill="#c62828"/>
+<text x="1707.0" y="220.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">3.3V</text>
+<circle cx="1627.0" cy="260" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">2</text>
+<circle cx="1653.0" cy="260" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">2</text>
+<rect x="1542.0" y="249.0" width="62.0" height="22" rx="11.0" fill="#1f2328"/>
+<text x="1573.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">GND</text>
+<rect x="1676.0" y="249.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB5</text>
+<rect x="1744.0" y="250.0" width="52.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1770.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN11</text>
+<rect x="1802.0" y="250.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="1832.0" y="260.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T1CCP1</text>
+<circle cx="1627.0" cy="300" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">3</text>
+<circle cx="1653.0" cy="300" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">3</text>
+<rect x="1542.0" y="289.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PD0</text>
+<rect x="1676.0" y="289.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB0</text>
+<rect x="1491.0" y="290.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN7</text>
+<rect x="1418.0" y="290.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1451.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C3SCL</text>
+<rect x="1323.0" y="290.0" width="89.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="1367.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">= PB6 (R9)</text>
+<rect x="1744.0" y="290.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1766.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U1Rx</text>
+<rect x="1795.0" y="290.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="1825.0" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T2CCP0</text>
+<rect x="1861.0" y="290.0" width="89.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="1905.5" y="300.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">3.3 V only</text>
+<circle cx="1627.0" cy="340" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">4</text>
+<circle cx="1653.0" cy="340" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">4</text>
+<rect x="1542.0" y="329.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PD1</text>
+<rect x="1676.0" y="329.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB1</text>
+<rect x="1491.0" y="330.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN6</text>
+<rect x="1418.0" y="330.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1451.5" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C3SDA</text>
+<rect x="1316.0" y="330.0" width="96.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="1364.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">= PB7 (R10)</text>
+<rect x="1744.0" y="330.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1766.5" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U1Tx</text>
+<rect x="1795.0" y="330.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="1825.0" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T2CCP1</text>
+<rect x="1861.0" y="330.0" width="89.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="1905.5" y="340.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">3.3 V only</text>
+<circle cx="1627.0" cy="380" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">5</text>
+<circle cx="1653.0" cy="380" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">5</text>
+<rect x="1542.0" y="369.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PD2</text>
+<rect x="1676.0" y="369.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PE4</text>
+<rect x="1491.0" y="370.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN5</text>
+<rect x="1744.0" y="370.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1766.5" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN9</text>
+<rect x="1795.0" y="370.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1828.5" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C2SCL</text>
+<circle cx="1627.0" cy="420" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">6</text>
+<circle cx="1653.0" cy="420" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">6</text>
+<rect x="1542.0" y="409.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PD3</text>
+<rect x="1676.0" y="409.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PE5</text>
+<rect x="1491.0" y="410.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN4</text>
+<rect x="1440.0" y="410.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="1462.5" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">IDX0</text>
+<rect x="1744.0" y="410.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1766.5" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN8</text>
+<rect x="1795.0" y="410.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1828.5" y="420.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C2SDA</text>
+<circle cx="1627.0" cy="460" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">7</text>
+<circle cx="1653.0" cy="460" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">7</text>
+<rect x="1542.0" y="449.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PE1</text>
+<rect x="1676.0" y="449.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PB4</text>
+<rect x="1491.0" y="450.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN2</text>
+<rect x="1440.0" y="450.0" width="45.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1462.5" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">U7Tx</text>
+<rect x="1744.0" y="450.0" width="52.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1770.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN10</text>
+<rect x="1802.0" y="450.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="1832.0" y="460.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T1CCP0</text>
+<circle cx="1627.0" cy="500" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">8</text>
+<circle cx="1653.0" cy="500" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">8</text>
+<rect x="1542.0" y="489.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PE2</text>
+<rect x="1676.0" y="489.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PA5</text>
+<rect x="1491.0" y="490.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN1</text>
+<rect x="1744.0" y="490.0" width="60.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1774.0" y="500.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">SSI0Tx</text>
+<circle cx="1627.0" cy="540" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">9</text>
+<circle cx="1653.0" cy="540" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">9</text>
+<rect x="1542.0" y="529.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1573.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PE3</text>
+<rect x="1676.0" y="529.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PA6</text>
+<rect x="1491.0" y="530.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="1513.5" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN0</text>
+<rect x="1744.0" y="530.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1777.5" y="540.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C1SCL</text>
+<circle cx="1627.0" cy="580" r="6.5" fill="#d9a400"/>
+<text x="1627.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">10</text>
+<circle cx="1653.0" cy="580" r="6.5" fill="#d9a400"/>
+<text x="1653.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="7.5" font-weight="800" fill="#2b2f36" text-anchor="middle" dominant-baseline="central">10</text>
+<rect x="1542.0" y="569.0" width="62.0" height="22" rx="11.0" fill="#0f8f80"/>
+<text x="1573.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PF1</text>
+<rect x="1676.0" y="569.0" width="62.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="1707.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">PA7</text>
+<rect x="1469.0" y="570.0" width="67.0" height="20" rx="4" fill="#d7f1ec" stroke="#0f8f80" stroke-width="1.5"/>
+<text x="1502.5" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#0b5f55" text-anchor="middle" dominant-baseline="central">RED LED</text>
+<rect x="1403.0" y="570.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="1433.0" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T0CCP1</text>
+<rect x="1744.0" y="570.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1777.5" y="580.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C1SDA</text>
+<rect x="900.0" y="160.0" width="400.0" height="520.0" rx="10" fill="#efe4e4" stroke="#c99a9a" stroke-width="1.5" stroke-dasharray="8 6"/>
+<text x="1100.0" y="116.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">board, bottom view (to scale)</text>
+<rect x="1144.8" y="146.0" width="64.0" height="34" rx="4" fill="#9aa4ae"/>
+<text x="1176.8" y="194.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="10.5" font-weight="700" fill="#1f2328" text-anchor="middle" dominant-baseline="central">DEBUG USB</text>
+<rect x="1274.0" y="290.0" width="36.0" height="60" rx="4" fill="#9aa4ae"/>
+<text x="1244.0" y="320.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="10.5" font-weight="700" fill="#1f2328" text-anchor="end" dominant-baseline="central">DEVICE USB</text>
+<rect x="1271.0" y="390.0" width="18.0" height="200.0" rx="3" fill="#2b2f36"/>
+<rect x="1275.0" y="395.0" width="10" height="10" fill="#d9a400"/>
+<text x="1280.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J1</text>
+<rect x="1251.0" y="390.0" width="18.0" height="200.0" rx="3" fill="#2b2f36"/>
+<rect x="1255.0" y="395.0" width="10" height="10" fill="#d9a400"/>
+<text x="1260.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J3</text>
+<rect x="931.0" y="390.0" width="18.0" height="200.0" rx="3" fill="#2b2f36"/>
+<rect x="935.0" y="395.0" width="10" height="10" fill="#d9a400"/>
+<text x="940.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J4</text>
+<rect x="911.0" y="390.0" width="18.0" height="200.0" rx="3" fill="#2b2f36"/>
+<rect x="915.0" y="395.0" width="10" height="10" fill="#d9a400"/>
+<text x="920.0" y="380.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" font-weight="800" fill="#1f2328" text-anchor="middle" dominant-baseline="central">J2</text>
+<text x="1100.0" y="410.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">Seen from below,</text>
+<text x="1100.0" y="432.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">flipped left-to-right:</text>
+<text x="1100.0" y="454.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">J2 and J4 on the left,</text>
+<text x="1100.0" y="476.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">J3 and J1 on the right.</text>
+<text x="1100.0" y="498.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central"></text>
+<text x="1100.0" y="520.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">Pin 1 is still at</text>
+<text x="1100.0" y="542.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">the USB end.</text>
+<text x="1100.0" y="564.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central"></text>
+<text x="1100.0" y="586.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">LEDs, buttons, and</text>
+<text x="1100.0" y="608.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">chips are on the</text>
+<text x="1100.0" y="630.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" font-weight="600" fill="#4b5158" text-anchor="middle" dominant-baseline="central">other side.</text>
+<rect x="0" y="690" width="2200" height="360" fill="#f3f5f7"/>
+<rect x="60.0" y="719.0" width="46.0" height="22" rx="11.0" fill="#1f2328"/>
+<text x="122.0" y="730.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Ground</text>
+<rect x="60.0" y="757.0" width="46.0" height="22" rx="11.0" fill="#c62828"/>
+<text x="122.0" y="768.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Power</text>
+<rect x="60.0" y="795.0" width="46.0" height="22" rx="11.0" fill="#f08c00"/>
+<text x="122.0" y="806.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Free GPIO</text>
+<rect x="390.0" y="719.0" width="46.0" height="22" rx="11.0" fill="#0f8f80"/>
+<text x="452.0" y="730.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO wired on the board</text>
+<rect x="390.0" y="757.0" width="46.0" height="22" rx="11.0" fill="#8d6e63"/>
+<text x="452.0" y="768.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Reset</text>
+<rect x="760.0" y="720.0" width="67.0" height="20" rx="4" fill="#d7f1ec" stroke="#0f8f80" stroke-width="1.5"/>
+<text x="793.5" y="730.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#0b5f55" text-anchor="middle" dominant-baseline="central">RED LED</text>
+<text x="841.0" y="730.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">On-board part</text>
+<rect x="760.0" y="758.0" width="45.0" height="20" rx="4" fill="#fde9a8" stroke="#d9a400" stroke-width="1.5"/>
+<text x="782.5" y="768.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#6b5100" text-anchor="middle" dominant-baseline="central">AIN0</text>
+<text x="819.0" y="768.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">ADC input</text>
+<rect x="760.0" y="796.0" width="60.0" height="20" rx="4" fill="#ffffff" stroke="#f08c00" stroke-width="1.5"/>
+<text x="790.0" y="806.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#a35e00" text-anchor="middle" dominant-baseline="central">T1CCP0</text>
+<text x="834.0" y="806.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Timer pin (PWM, capture)</text>
+<rect x="1200.0" y="720.0" width="67.0" height="20" rx="4" fill="#e6e3fb" stroke="#7b6fd6" stroke-width="1.5"/>
+<text x="1233.5" y="730.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#40368f" text-anchor="middle" dominant-baseline="central">I2C0SDA</text>
+<text x="1281.0" y="730.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">UART / I2C / SSI</text>
+<rect x="1200.0" y="758.0" width="45.0" height="20" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="1222.5" y="768.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#1e3a8a" text-anchor="middle" dominant-baseline="central">PhA1</text>
+<text x="1259.0" y="768.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Quadrature encoder</text>
+<rect x="1200.0" y="796.0" width="60.0" height="20" rx="4" fill="#fde2e1" stroke="#c62828" stroke-width="1.5"/>
+<text x="1230.0" y="806.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" font-weight="600" fill="#8e1b1b" text-anchor="middle" dominant-baseline="central">locked</text>
+<text x="1274.0" y="806.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="15" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Take care</text>
+<text x="60.0" y="860.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Pin 1 of each header is at the USB end. Pin names are also printed on the board.</text>
+<text x="60.0" y="890.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">PB6/PD0 and PB7/PD1 are joined by R9/R10: use only one of each pair, or remove the resistor.</text>
+<text x="60.0" y="920.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">PF0 and PD7 are locked (NMI): unlock with GPIO LOCK and CR before changing them.</text>
+<text x="60.0" y="950.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIOs are 3.3 V. Inputs tolerate 5 V, except PB0, PB1, PD4 and PD5 (3.6 V max).</text>
+<text x="60.0" y="1020.0" font-family="ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" font-weight="500" fill="#6b7178" text-anchor="start" dominant-baseline="central">Source: TI SPMU296 (EK-TM4C123GXL user&#x27;s guide), BoosterPack connector tables. Drawn for ENCS4110, Birzeit University.</text>
+</svg>
