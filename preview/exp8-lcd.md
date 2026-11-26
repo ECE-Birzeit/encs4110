@@ -128,7 +128,7 @@ In this experiment, we use 4-bit mode with the following connections:
 - **PB0** → RS (Register Select)
 - **PB2** → E (Enable)
 - **PB4-PB7** → D4-D7 (Data pins)
-- **RW** → Ground (write-only operation)
+- **PB1** → RW (the code holds it low: write only)
 
 ### LCD Initialization Sequence
 
@@ -257,7 +257,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 ### Step 1: Wire the LCD
 
-![Wiring the 16x2 LCD: VSS, RW and K to GND; VDD and A to VBUS; V0 to the wiper of a 10 kΩ potentiometer between 5 V and GND; RS to PB0, E to PB2, D4 to D7 to PB4 to PB7; D0 to D3 not connected](/images/exp8/lcd-wiring.svg)
+![Wiring the 16x2 LCD: a 5 V rail from VBUS and a GND rail; VSS and K to GND, VDD and A to 5 V; a 10 kilo-ohm contrast potentiometer with its outer pins on 5 V and GND and its middle pin to V0; RS, RW and E to PB0, PB1 and PB2; D4 to D7 to PB4 to PB7; D0 to D3 not connected](/images/exp8/lcd-wiring.svg)
 
 | LCD pin | Connect to | Why |
 | --- | --- | --- |
@@ -265,7 +265,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 | VDD (2), A (15) | **VBUS** (5 V) | Supply and the backlight's anode |
 | V0 (3) | Wiper of a 10 kΩ potentiometer between 5 V and GND | Contrast |
 | RS (4) | **PB0** | Command or character |
-| RW (5) | **GND** | Write only (the code also holds PB1 low) |
+| RW (5) | **PB1** | Write only: the code holds it low (RW straight to GND works too) |
 | E (6) | **PB2** | Enable |
 | D4 to D7 (11 to 14) | **PB4 to PB7** | Data, 4 bits at a time |
 
@@ -323,7 +323,7 @@ Add `main` at the end of the file:
 | --- | --- |
 | Nothing at all, no boxes | Contrast: turn the potentiometer on V0. If it still shows nothing, check VDD on 5 V and VSS on GND. |
 | Boxes on line 1 stay after the program starts | The initialization didn't reach the LCD: check E on **PB2**, RS on **PB0**, and D4-D7 in order on PB4-PB7. Swapped data wires are the usual cause. |
-| Random characters | A nibble is lost: the delays in `LCD_Init()` are too short, or RW isn't on GND. |
+| Random characters | A nibble is lost: the delays in `LCD_Init()` are too short, or RW isn't held low (PB1 low, or RW on GND). |
 | Text appears, then the screen goes blank | A `CMD_CLEAR` with no 2 ms wait after it, so the next command arrives while the LCD is still clearing. |
 | Numbers leave old digits behind (`109` after `99`) | Not a problem when the number only grows; a number that can shrink needs spaces printed after it. |
 

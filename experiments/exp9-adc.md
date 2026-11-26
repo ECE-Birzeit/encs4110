@@ -487,7 +487,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 This section demonstrates how to configure and use the ADC module on the TM4C123 microcontroller using both polling and interrupt-driven sampling methods. A potentiometer is used as a controllable analog input source by wiring its terminals to 3.3 V and ground, with the adjustable rotor connected to an ADC input such as AIN0 (PE3). Rotating the potentiometer varies the rotor voltage between 0 V and 3.3 V, allowing you to generate different analog levels and observe the corresponding ADC conversion results.
 
-![ADC Connection Diagram](/images/adc-connection.jpg)
+![The potentiometer on the LaunchPad: one outer pin to 3.3V (J1 pin 1), the middle pin (wiper) to PE3, which is AIN0 (J3 pin 9), and the other outer pin to GND (J3 pin 2)](/images/exp9/pot-wiring.svg)
 
 ### Example 1: Single ADC Channel Reading (Polling Method)
 

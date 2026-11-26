@@ -51,7 +51,7 @@ A UART transmission consists of a **data frame** that includes:
 
 The most common configuration is **8N1**: 8 data bits, No parity, 1 stop bit.
 
-![The character A (0x41) as one 8N1 frame: idle high, a low start bit, D0 to D7 least significant first, a high stop bit; each bit lasts 8.68 µs at 115200 baud](/images/exp10/uart-frame.svg)
+![UART 8N1 frame: a low start bit, data bits D0 to D7 least significant first, then a high stop bit](/images/manual/uart-frame.svg)
 
 *UART frame structure (8N1 format)*
 
@@ -392,8 +392,8 @@ The code is split into three files:
 <<< @/snippets/uart/uart.h
 :::
 
-`UART0_Init` initializes the UART0 module. `UART0_WriteChar` and `UART0_ReadChar` transmit and receive single characters, and `UART0_WriteString`/`UART0_ReadString` build on them to handle whole lines. The main loop prints a greeting, then echoes back every line it receives, prefixed with `Received: `. To communicate with the microcontroller, use a terminal program on your PC such as [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) to send and receive data over the serial port. Make sure the baud rate and other parameters match the configuration in your code. The figure shows the path the bytes take, and the settings to choose in PuTTY (**Session**, connection type **Serial**):
+`UART0_Init` initializes the UART0 module. `UART0_WriteChar` and `UART0_ReadChar` transmit and receive single characters, and `UART0_WriteString`/`UART0_ReadString` build on them to handle whole lines. The main loop prints a greeting, then echoes back every line it receives, prefixed with `Received: `. To communicate with the microcontroller, use a terminal program on your PC such as [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) to send and receive data over the serial port. Make sure the baud rate and other parameters match the configuration in your code. The following image shows how to set up the serial connection in PuTTY:
 
-![UART0's path to the PC: PA0 and PA1 connect on the board to the ICDI debug chip, which carries the bytes over the debug USB cable to a virtual COM port; the terminal opens it at 115200 baud, 8 data bits, no parity, 1 stop bit](/images/exp10/uart-path.svg)
+![PuTTY serial configuration](/putty.png)
 
 Replace the `COM` port with the one assigned to your TM4C123G LaunchPad. You can find it in Device Manager under Ports (COM & LPT). The baud rate must match the one set in your code (e.g., 115200).

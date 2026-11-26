@@ -116,7 +116,7 @@ In this experiment, we use 4-bit mode with the following connections:
 - **PB0** → RS (Register Select)
 - **PB2** → E (Enable)
 - **PB4-PB7** → D4-D7 (Data pins)
-- **RW** → Ground (write-only operation)
+- **PB1** → RW (the code holds it low: write only)
 
 ### LCD Initialization Sequence
 
@@ -243,11 +243,11 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 **Target device:** TM4C123GH6PM
 
-![Wiring the 16x2 LCD: VSS, RW and K to GND; VDD and A to VBUS; V0 to the wiper of a 10 kΩ potentiometer between 5 V and GND; RS to PB0, E to PB2, D4 to D7 to PB4 to PB7; D0 to D3 not connected](/images/exp8/lcd-wiring.svg)
+![Wiring the 16x2 LCD: a 5 V rail from VBUS and a GND rail; VSS and K to GND, VDD and A to 5 V; a 10 kilo-ohm contrast potentiometer with its outer pins on 5 V and GND and its middle pin to V0; RS, RW and E to PB0, PB1 and PB2; D4 to D7 to PB4 to PB7; D0 to D3 not connected](/images/exp8/lcd-wiring.svg)
 
 The figure above shows the complete wiring diagram for connecting the 16×2 LCD module to the TM4C123 microcontroller using 4-bit mode. The connections are:
-- **Power**: VDD to VBus, VSS to Ground, V0 to contrast potentiometer
-- **Control**: RS to PB0, E to PB2, RW to Ground (write-only)
+- **Power**: VDD to VBUS, VSS to Ground, V0 to the middle pin of the contrast potentiometer, whose outer pins go to VBUS and Ground
+- **Control**: RS to PB0, RW to PB1 (held low by the code: write only), E to PB2
 - **Data**: D4-D7 to PB4-PB7 respectively
 - **Backlight**: A to VBus, K to Ground
 

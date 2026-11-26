@@ -472,7 +472,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 Use **3.3V**, not VBUS: the ADC measures 0 to 3.3 V, and PE3 must never see more.
 
-![Potentiometer wiring: outer pins to 3.3 V and GND, wiper to PE3](/images/adc-connection.jpg)
+![The potentiometer on the LaunchPad: one outer pin to 3.3V (J1 pin 1), the middle pin (wiper) to PE3, which is AIN0 (J3 pin 9), and the other outer pin to GND (J3 pin 2)](/images/exp9/pot-wiring.svg)
 
 ### Step 2: Add the definitions
 
