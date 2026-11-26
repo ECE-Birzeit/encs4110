@@ -1,6 +1,7 @@
 """Draws figures for Experiments 6, 8 and 9 as SVGs (white background, the site frames them on a card).
 
   exp6/vending-machine.svg  the Experiment 6 Task's state machine: four states, the two buttons
+  exp7/reaction-game.svg    the Experiment 7 Task's state machine: three states, buttons and a timer
 
   exp8/lcd-wiring.svg     the 16x2 LCD: 5 V and GND rails, the contrast potentiometer, and every
                           signal straight up to its LaunchPad pin (header locations: setup/pinout)
@@ -173,84 +174,110 @@ def pot_wiring(path):
     s.save(path)
 
 
-# ------------------------------------------------------------------ Experiment 6: the vending machine
-def vending_machine(path):
+# ------------------------------------------------------------------ state diagrams (Experiments 6 and 7)
+SW1C, SW2C, TIMC = '#c2410c', '#7c3aed', '#0f766e'   # an arrow colour per kind of event
+
+def state_diagram(path, w, h, label, nodes, edges, loops=(), start=None, key=()):
+    """nodes: key -> (x, y, name, led text, fill, text colour, stroke)
+    edges: (from, to, colour, label, bend, label dx, label dy, anchor, box)
+    loops: (node, side, colour, label, anchor);  start: (node, side);  key: (colour, text) pairs"""
     import math
-    SW1C, SW2C = '#c2410c', '#7c3aed'           # one colour per button, for arrows and labels
-    s = Svg(1000, 600, 'State diagram of the vending machine. Idle, LED off: SW1 goes to One coin; SW2 stays in Idle. One coin, blue: SW1 goes to Ready; SW2 refunds and goes back to Idle. Ready, green: SW2 dispenses and goes to Vend; SW1 stays in Ready, the coin is refused. Vend, white: SW1 goes to One coin; SW2 goes to Idle.')
+    s = Svg(w, h, label)
+    R = 64
+
     def head(ex, ey, tx, ty, color):
-        """A filled arrowhead with its tip at (ex, ey), pointing along the direction (tx, ty)."""
         L = math.hypot(tx, ty); ux, uy = tx / L, ty / L
         bx, by = ex - ux * 14, ey - uy * 14
         s.add(f"<polygon points='{ex:.1f},{ey:.1f} {bx - uy * 7:.1f},{by + ux * 7:.1f} {bx + uy * 7:.1f},{by - ux * 7:.1f}' fill='{color}'/>")
-    R = 64
-    N = {'idle': (230, 170), 'one': (710, 170), 'ready': (710, 450), 'vend': (230, 450)}
-    def edge(a, b, color, marker, bend=0.0):
-        (x1, y1), (x2, y2) = N[a], N[b]
-        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+
+    def tag(x, y, text, color, anchor='middle', box=True):
+        if box:
+            tw = len(text) * 7.4 + 14
+            x0 = x - tw / 2 if anchor == 'middle' else (x if anchor == 'start' else x - tw)
+            s.rect(x0, y - 12, tw, 24, '#ffffff', r=4)
+        s.text(x, y, text, 13, color, anchor=anchor, weight='700')
+
+    for a, b, color, text, bend, ldx, ldy, anchor, box in edges:
+        x1, y1 = nodes[a][:2]; x2, y2 = nodes[b][:2]
         dx, dy = x2 - x1, y2 - y1
         L = math.hypot(dx, dy)
-        cx, cy = mx - dy / L * bend, my + dx / L * bend          # control point, off to one side
-        def trim(px, py, qx, qy):                               # move from p toward q by R (+ a gap)
+        cx, cy = (x1 + x2) / 2 - dy / L * bend, (y1 + y2) / 2 + dx / L * bend
+        def trim(px, py, qx, qy):
             d = math.hypot(qx - px, qy - py)
             return px + (qx - px) / d * (R + 4), py + (qy - py) / d * (R + 4)
-        sx, sy = trim(x1, y1, cx, cy)
-        ex, ey = trim(x2, y2, cx, cy)
+        sx, sy = trim(x1, y1, cx, cy); ex, ey = trim(x2, y2, cx, cy)
         s.add(f"<path d='M{sx:.1f},{sy:.1f} Q{cx:.1f},{cy:.1f} {ex:.1f},{ey:.1f}' fill='none' stroke='{color}' stroke-width='3'/>")
         head(ex, ey, ex - cx, ey - cy, color)
-        return (sx + 2 * cx + ex) / 4, (sy + 2 * cy + ey) / 4    # the curve's midpoint, for its label
-    def loop(n, side, color, marker):
-        x, y = N[n]
-        a = {'top': -90, 'right': 0}[side]
-        p = lambda deg, r: (x + r * math.cos(math.radians(deg)), y + r * math.sin(math.radians(deg)))
-        sx, sy = p(a - 28, R + 2); ex, ey = p(a + 28, R + 6)
-        c1x, c1y = p(a - 34, R + 92); c2x, c2y = p(a + 34, R + 92)
+        tag((sx + 2 * cx + ex) / 4 + ldx, (sy + 2 * cy + ey) / 4 + ldy, text, color, anchor, box)
+
+    for n, side, color, text, anchor in loops:
+        x, y = nodes[n][:2]
+        a = {'top': -90, 'right': 0, 'bottom': 90, 'left': 180}[side]
+        pt = lambda deg, r: (x + r * math.cos(math.radians(deg)), y + r * math.sin(math.radians(deg)))
+        sx, sy = pt(a - 28, R + 2); ex, ey = pt(a + 28, R + 6)
+        c1x, c1y = pt(a - 34, R + 92); c2x, c2y = pt(a + 34, R + 92)
         s.add(f"<path d='M{sx:.1f},{sy:.1f} C{c1x:.1f},{c1y:.1f} {c2x:.1f},{c2y:.1f} {ex:.1f},{ey:.1f}' fill='none' stroke='{color}' stroke-width='3'/>")
         head(ex, ey, ex - c2x, ey - c2y, color)
-        return p(a, R + 82)
-    def label(x, y, btn, what, color, anchor='middle', box=True):
-        t = f'{btn}' + (f': {what}' if what else '')
-        if box:
-            w = len(t) * 7.4 + 14
-            x0 = x - w / 2 if anchor == 'middle' else (x if anchor == 'start' else x - w)
-            s.rect(x0, y - 12, w, 24, '#ffffff', r=4)
-        s.text(x if anchor != 'middle' else x, y, t, 13, color, anchor=anchor, weight='700')
+        lx, ly = pt(a, R + 82)
+        tag(lx + (2 if anchor == 'start' else 0), ly - (2 if side == 'top' else 0), text, color, anchor, box=(anchor == 'middle'))
 
-    # Start arrow into Idle
-    x, y = N['idle']
-    s.add(f"<line x1='{x - R - 90}' y1='{y}' x2='{x - R - 10}' y2='{y}' stroke='#57606a' stroke-width='3'/>")
-    head(x - R - 4, y, 1, 0, '#57606a')
-    s.text(x - R - 96, y, 'start', 13, DIM, anchor='end', weight='700')
+    if start:
+        n, side = start
+        x, y = nodes[n][:2]
+        sgn = -1 if side == 'left' else 1
+        s.add(f"<line x1='{x + sgn * (R + 90)}' y1='{y}' x2='{x + sgn * (R + 10)}' y2='{y}' stroke='#57606a' stroke-width='3'/>")
+        head(x + sgn * (R + 4), y, -sgn, 0, '#57606a')
+        s.text(x + sgn * (R + 96), y, 'start', 13, DIM, anchor='end' if sgn < 0 else 'start', weight='700')
 
-    mx, my = edge('idle', 'one', SW1C, 'm1', bend=-60);  label(mx, my - 4, 'SW1', 'coin', SW1C)
-    mx, my = edge('one', 'idle', SW2C, 'm2', bend=-60);  label(mx, my + 4, 'SW2', 'refund', SW2C)
-    mx, my = edge('one', 'ready', SW1C, 'm1');           label(mx + 14, my, 'SW1', 'coin', SW1C, anchor='start')
-    mx, my = edge('ready', 'vend', SW2C, 'm2');          label(mx, my, 'SW2', 'dispense', SW2C)
-    mx, my = edge('vend', 'idle', SW2C, 'm2');           label(mx - 14, my, 'SW2', 'drink taken', SW2C, anchor='end')
-    mx, my = edge('vend', 'one', SW1C, 'm1');            label(mx, my, 'SW1', "next customer's coin", SW1C)
-    lx, ly = loop('idle', 'top', SW2C, 'm2');            label(lx, ly - 2, 'SW2', 'nothing to refund', SW2C)
-    lx, ly = loop('ready', 'right', SW1C, 'm1');         label(lx + 2, ly, 'SW1', 'coin refused', SW1C, anchor='start', box=False)
-
-    # The states, filled with their LED colour
-    for key, name, led, fill, fg, stroke in (
-            ('idle', 'Idle', 'LED off', '#3a3f47', '#ffffff', '#1f2328'),
-            ('one', 'One coin', 'blue', '#2563eb', '#ffffff', '#1e40af'),
-            ('ready', 'Ready', 'green', '#16a34a', '#ffffff', '#166534'),
-            ('vend', 'Vend', 'white', '#ffffff', INK, '#57606a')):
-        x, y = N[key]
+    for n, (x, y, name, led, fill, fg, stroke) in nodes.items():
         s.add(f"<circle cx='{x}' cy='{y}' r='{R}' fill='{fill}' stroke='{stroke}' stroke-width='2.5'/>")
         s.text(x, y - 9, name, 16, fg, weight='800')
         s.text(x, y + 14, led, 12.5, fg)
 
-    # Key
-    s.add(f"<line x1='40' y1='572' x2='74' y2='572' stroke='{SW1C}' stroke-width='3'/>"); head(82, 572, 1, 0, SW1C)
-    s.text(90, 572, 'SW1: insert a coin', 13, INK, anchor='start')
-    s.add(f"<line x1='290' y1='572' x2='324' y2='572' stroke='{SW2C}' stroke-width='3'/>"); head(332, 572, 1, 0, SW2C)
-    s.text(340, 572, 'SW2: the button', 13, INK, anchor='start')
-    s.text(520, 572, 'Each circle is a state, filled with its LED colour.', 13, DIM, anchor='start')
+    kx = 40
+    for color, text in key:
+        s.add(f"<line x1='{kx}' y1='{h - 28}' x2='{kx + 34}' y2='{h - 28}' stroke='{color}' stroke-width='3'/>")
+        head(kx + 42, h - 28, 1, 0, color)
+        s.text(kx + 52, h - 28, text, 13, INK, anchor='start')
+        kx += 72 + len(text) * 7.6
+    s.text(kx + 10, h - 28, 'Each circle is a state, filled with its LED colour.', 13, DIM, anchor='start')
     s.save(path)
 
 
+OFF = ('#3a3f47', '#ffffff', '#1f2328')
+
+def vending_machine(path):
+    nodes = {'idle': (230, 170, 'Idle', 'LED off', *OFF),
+             'one': (710, 170, 'One coin', 'blue', '#2563eb', '#ffffff', '#1e40af'),
+             'ready': (710, 450, 'Ready', 'green', '#16a34a', '#ffffff', '#166534'),
+             'vend': (230, 450, 'Vend', 'white', '#ffffff', INK, '#57606a')}
+    edges = [('idle', 'one', SW1C, 'SW1: coin', -60, 0, -4, 'middle', True),
+             ('one', 'idle', SW2C, 'SW2: refund', -60, 0, 4, 'middle', True),
+             ('one', 'ready', SW1C, 'SW1: coin', 0, 14, 0, 'start', True),
+             ('ready', 'vend', SW2C, 'SW2: dispense', 0, 0, 0, 'middle', True),
+             ('vend', 'idle', SW2C, 'SW2: drink taken', 0, -14, 0, 'end', True),
+             ('vend', 'one', SW1C, "SW1: next customer's coin", 0, 0, 0, 'middle', True)]
+    loops = [('idle', 'top', SW2C, 'SW2: nothing to refund', 'middle'),
+             ('ready', 'right', SW1C, 'SW1: coin refused', 'start')]
+    state_diagram(path, 1000, 600, 'State diagram of the vending machine. Idle, LED off: SW1 goes to One coin; SW2 stays in Idle. One coin, blue: SW1 goes to Ready; SW2 refunds and goes back to Idle. Ready, green: SW2 dispenses and goes to Vend; SW1 stays in Ready, the coin is refused. Vend, white: SW1 goes to One coin; SW2 goes to Idle.',
+                  nodes, edges, loops, start=('idle', 'left'),
+                  key=((SW1C, 'SW1: insert a coin'), (SW2C, 'SW2: the button')))
+
+
+def reaction_game(path):
+    nodes = {'idle': (230, 330, 'Idle', 'off, red or blue', *OFF),
+             'wait': (560, 150, 'Waiting', 'LED off', *OFF),
+             'go': (890, 330, 'Go', 'green', '#16a34a', '#ffffff', '#166534')}
+    edges = [('idle', 'wait', SW1C, 'SW1: start the random wait', -50, -30, -10, 'middle', True),
+             ('wait', 'idle', SW2C, 'SW2 too early: false start, red', -50, 30, 14, 'middle', True),
+             ('wait', 'go', TIMC, 'Timer1A runs out: green, note ms', -40, 40, -8, 'middle', True),
+             ('go', 'idle', SW2C, 'SW2: reaction = ms - go_ms, blue', 0, 0, 0, 'middle', True)]
+    state_diagram(path, 1120, 470, 'State diagram of the reaction game. Idle: SW1 starts a random wait and goes to Waiting. Waiting, LED off: when Timer1A runs out the LED turns green and the game goes to Go; SW2 before that is a false start: red, back to Idle. Go, green: SW2 stores the reaction time, turns the LED blue for a success, and goes back to Idle. Presses not shown are ignored.',
+                  nodes, edges, start=('idle', 'left'),
+                  key=((SW1C, 'SW1: start'), (SW2C, 'SW2: react'), (TIMC, 'Timer1A time-out')))
+
+
 vending_machine('public/images/exp6/vending-machine.svg')
+reaction_game('public/images/exp7/reaction-game.svg')
 lcd_wiring('public/images/exp8/lcd-wiring.svg')
 pot_wiring('public/images/exp9/pot-wiring.svg')

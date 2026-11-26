@@ -708,15 +708,28 @@ Start from this program. It compiles and runs as it is: the pins, the interrupts
 
 Don't change the provided part. If a press ever seems to count twice, ask your instructor before touching it.
 
-::: details What to write: the three TODOs
-The TODO lines are highlighted in the starter program: each one sits exactly where its code goes.
+:::: details What to write: the three TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3**.
 
-1. **TODO 1:** add the two missing states, `READY` and `VEND`, to the `enum`.
-2. **TODO 2:** in `next_state()`, add a `case` for `ONE_COIN`, `READY`, and `VEND`. In each, check which button was pressed and return the state its arrow points to in the diagram, as the `IDLE` case does. A button that loops back to the same state falls through to `return s`.
-3. **TODO 3:** in `show()`, add a `case` for `READY` and `VEND`, setting `led` to the colour of its circle in the diagram. White is all three LEDs: `LEDS`.
+::: details TODO 1: the states (in `enum State`)
+- Add `READY` (two coins in) and `VEND` (the drink is out). `IDLE` and `ONE_COIN` are already there.
 
-The compiler warns about every state a `switch` doesn't handle yet ("enumeration value not handled in switch"). The starter already shows one for `ONE_COIN` in `next_state()`: when the warnings are gone, every state has its case.
 :::
+
+::: details TODO 2: the arrows (`next_state()`, after `case IDLE`)
+- Add one `case` each for `ONE_COIN`, `READY`, and `VEND`.
+- In each case, look at the arrows leaving that circle in the diagram: for each button with an arrow, `if (pressed == ...) return` the state it points to. Copy the shape of the `IDLE` case.
+- A button whose arrow loops back to the same circle needs no code: it falls through to `return s`, and the state stays the same.
+
+:::
+
+::: details TODO 3: the LED (`show()`, after `case ONE_COIN`)
+- Add a `case` for `READY` (`GREEN_LED`) and for `VEND` (white is all three: `LEDS`).
+
+:::
+
+**The compiler helps:** it warns about every state a `switch` doesn't handle yet ("enumeration value not handled in switch"). The starter already shows one, for `ONE_COIN` in `next_state()`. When the warnings are gone, every state has its case.
+::::
 
 **Check:** build and flash, and add `state` and `button` to the Watch window.
 
