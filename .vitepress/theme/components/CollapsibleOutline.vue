@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // The "On this page" outline, with every heading that has subheadings folding away.
-// Replaces VitePress's VPDocAsideOutline through an alias in config.mts (encs4110 only).
+// Replaces VitePress's VPDocAsideOutline through a Vite alias in config.mts. Same component on
+// every lab site; it works on VitePress 1 and 2 (getHeaders and resolveTitle are in both).
 //
 // The group holding the heading you're reading opens by itself, so the marker always has a
 // visible link to sit on; the others stay folded unless you open them with the chevron.
