@@ -20,7 +20,7 @@ head:
 
 This experiment extends GPIO functionality to inputs and introduces interrupt-driven programming. You will configure GPIO pins to read mechanical switches using both polling and interrupt approaches, implement software debouncing techniques, write interrupt service routines, and enable GPIO interrupts in the NVIC. By the end of this lab, you will understand how to implement both polling and interrupt-driven input handling, and write responsive embedded applications that react to external events in real time.
 
-::: warning Preview: new format
+::: warning Reworked version: in testing
 This is the reworked version of [Experiment 6](/experiments/exp6-gpio-interrupts), shared for TAs to test. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp6-gpio-interrupts)** until this one replaces it.
 :::
 

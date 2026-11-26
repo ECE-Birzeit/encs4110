@@ -5,7 +5,6 @@ outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.9"
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=799"
-preview: "/preview/exp9-adc"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 

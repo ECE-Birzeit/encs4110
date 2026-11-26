@@ -20,7 +20,7 @@ head:
 
 This experiment introduces precise timing control using the TM4C123’s SysTick timer and General-Purpose Timer Modules (GPTM). You will configure SysTick for periodic interrupts and millisecond timing, explore GPTM’s 16-bit and 32-bit modes with prescalers, and implement multiple independent timing tasks. By the end of this lab, you will understand how to select and configure timers for different timing requirements and implement timer-based interrupt-driven applications.
 
-::: warning Preview: new format
+::: warning Reworked version: in testing
 This is the reworked version of [Experiment 7](/experiments/exp7-timers), shared for TAs to test. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp7-timers)** until this one replaces it.
 :::
 

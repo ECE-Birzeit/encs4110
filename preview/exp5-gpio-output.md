@@ -20,7 +20,7 @@ head:
 
 This experiment introduces the TM4C123 microcontroller architecture and digital I/O interfacing through GPIO ports. You will explore the internal structure including the ARM Cortex-M4 core, memory regions, and peripheral interconnect, then write Assembly programs to control the on-board LEDs connected to PORTF. By the end of this lab, you will understand how peripheral registers are memory-mapped, be able to initialize and configure GPIO ports, and control external hardware through register manipulation—forming the foundation for subsequent experiments with interrupts, timers, and analog peripherals.
 
-::: warning Preview: new format
+::: warning Reworked version: in testing
 This is the reworked version of [Experiment 5](/experiments/exp5-gpio-output), shared for TAs to test. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp5-gpio-output)** until this one replaces it.
 :::
 

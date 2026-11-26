@@ -31,7 +31,7 @@ export function previewGroup(srcDir: string, items: Item[]): Item[] {
       return { text: `${m[1]}. ${name}`, link: `/preview/${m[0].replace(/\.md$/, '')}` }
     })
   if (!pages.length) return items
-  const group: Item = { text: 'Preview: new format', collapsed: false, items: pages }
+  const group: Item = { text: 'Reworked experiments (testing)', collapsed: false, items: pages }
   const at = items.findIndex((i) => i.text === 'Downloads')
   const out = items.slice()
   out.splice(at === -1 ? out.length : at, 0, group)
