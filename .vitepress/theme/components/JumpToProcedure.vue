@@ -4,6 +4,8 @@
 // link (its chapter) or, failing that, the lab's whole manual (themeConfig.lab.manual, set by
 // lab-template's config). Same component on every lab site. "Datasheet (PDF)" appears when the
 // page's front matter has `datasheet:`, a link to the chapter the experiment uses.
+// encs4110 only: `preview:` (on a current experiment) and `current:` (on a page in preview/) link the
+// two versions of a reworked experiment to each other; see .vitepress/preview.mts.
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
 
@@ -11,7 +13,14 @@ const route = useRoute()
 const { frontmatter, theme } = useData()
 const target = ref<{ id: string } | null>(null)
 const IDS = ['procedure', 'examples', 'example', 'lab-work', 'tasks']
-const isExperiment = computed(() => /\/experiments\/exp\d+-/.test(route.path))
+const isExperiment = computed(() => /\/(experiments|preview)\/exp\d+-/.test(route.path))
+const other = computed(() => {
+  const fm = frontmatter.value
+  if (!isExperiment.value) return null
+  if (typeof fm.preview === 'string') return { href: withBase(fm.preview), text: 'New version (preview)' }
+  if (typeof fm.current === 'string') return { href: withBase(fm.current), text: 'Current version' }
+  return null
+})
 const manual = computed(() => {
   const link = frontmatter.value.manual || theme.value.lab?.manual
   return isExperiment.value && link ? withBase(link) : ''
@@ -45,7 +54,8 @@ function go(e: MouseEvent) {
 </script>
 
 <template>
-  <div v-if="target || manual || datasheet" class="jump-row">
+  <div v-if="target || manual || datasheet || other" class="jump-row">
+    <a v-if="other" class="jump alt" :href="other.href">{{ other.text }} <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a v-if="manual" class="jump alt" :href="manual" target="_blank" rel="noopener">Lab manual (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a v-if="datasheet" class="jump alt" :href="datasheet" target="_blank" rel="noopener">Datasheet (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a v-if="target" class="jump" :href="'#' + target.id" @click="go">Jump to the procedure <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>

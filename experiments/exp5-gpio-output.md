@@ -5,6 +5,7 @@ outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.5"
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=649"
+preview: "/preview/exp5-gpio-output"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 

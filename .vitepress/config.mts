@@ -8,6 +8,8 @@ import { withPwa } from '@vite-pwa/vitepress'
 import { linkPreviews } from "./og.mts"
 import { all, redirects, experimentEdges, sidebar } from "./lab.mts"
 import { registerDiagrams, datasheetRefs } from "./registers.mts"
+import { previewGroup } from "./preview.mts"
+import { asmRegions } from "./asm-regions.mts"
 
 const srcDir = fileURLToPath(new URL("..", import.meta.url))
 
@@ -54,6 +56,7 @@ export default withPwa(defineConfig({
   markdown: {
     config(md) {
       md.use(groupIconMdPlugin)
+      md.use(asmRegions, srcDir)
       md.use(registerDiagrams)
       md.use(datasheetRefs, {
         pdf: DATASHEET,
@@ -148,7 +151,8 @@ export default withPwa(defineConfig({
     ],
 
     // Built from the pages (see lab.mts): adding an experiment or a setup page is the only step
-    sidebar: sidebar(srcDir, {
+    // Preview pages (preview.mts) go in their own group above Downloads
+    sidebar: previewGroup(srcDir, sidebar(srcDir, {
       downloads: [
           { text: "Keil MDK (uVision5)", link: "https://www.keil.com/demo/eval/arm.htm" },
           { text: "Keil TM4C Device Pack", link: "https://keilpack.azureedge.net/pack/Keil.TM4C_DFP.1.1.0.pack" },
@@ -172,7 +176,7 @@ export default withPwa(defineConfig({
           { text: "armasm User Guide (directives)", link: "https://developer.arm.com/documentation/dui0473/latest/" },
           { text: "HD44780 LCD Datasheet", link: "https://www.sparkfun.com/datasheets/LCD/HD44780.pdf" },
       ],
-    }),
+    })),
 
     outline: { level: [2, 3] },
 

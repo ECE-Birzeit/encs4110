@@ -5,6 +5,7 @@ outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.7"
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=704"
+preview: "/preview/exp7-timers"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
