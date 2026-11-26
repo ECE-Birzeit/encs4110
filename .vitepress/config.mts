@@ -71,6 +71,15 @@ export default withPwa(defineConfig({
     languageAlias: { h: 'c' },
   },
   vite: {
+    resolve: {
+      alias: [
+        // "On this page" with foldable sections (theme/components/CollapsibleOutline.vue)
+        {
+          find: /^.*\/VPDocAsideOutline\.vue$/,
+          replacement: fileURLToPath(new URL("./theme/components/CollapsibleOutline.vue", import.meta.url)),
+        },
+      ],
+    },
     plugins: [
       groupIconVitePlugin({
         customIcon: {
