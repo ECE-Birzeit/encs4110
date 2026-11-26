@@ -8,6 +8,7 @@ import RegisterSW from './components/RegisterSW.vue'
 import JumpToProcedure from './components/JumpToProcedure.vue'
 import ContinueReading from './components/ContinueReading.vue'
 import Screenshot from './components/Screenshot.vue'
+import PinoutPanel from './components/PinoutPanel.vue'
 
 export default {
   extends: DefaultTheme,
@@ -15,7 +16,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       'home-hero-actions-after': () => h(ContinueReading, { lab: 'encs4110', mode: 'card' }),
       'doc-before': () => h(JumpToProcedure),
-      'layout-bottom': () => [h(RegisterSW), h(ContinueReading, { lab: 'encs4110', mode: 'track' })],
+      'layout-bottom': () => [h(RegisterSW), h(ContinueReading, { lab: 'encs4110', mode: 'track' }), h(PinoutPanel, { boards: [{ key: 'launchpad', label: 'LaunchPad' }], width: 2200 })],
     })
   },
   enhanceApp({ app }) {

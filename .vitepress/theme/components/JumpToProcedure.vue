@@ -8,6 +8,8 @@
 // two versions of a reworked experiment to each other; see .vitepress/preview.mts.
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
+import { pinoutOpen } from '../pinout'
+const openPinout = () => { pinoutOpen.value = true }
 
 const route = useRoute()
 const { frontmatter, theme } = useData()
@@ -55,6 +57,7 @@ function go(e: MouseEvent) {
 
 <template>
   <div v-if="target || manual || datasheet || other" class="jump-row">
+    <button v-if="isExperiment" type="button" class="jump alt" aria-haspopup="dialog" @click="openPinout">Pinout <svg class="icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <a v-if="other" class="jump alt" :href="other.href">{{ other.text }} <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a v-if="manual" class="jump alt" :href="manual" target="_blank" rel="noopener">Lab manual (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a v-if="datasheet" class="jump alt" :href="datasheet" target="_blank" rel="noopener">Datasheet (PDF) <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
