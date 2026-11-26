@@ -201,7 +201,7 @@ Besides `TAEN` (bit 0), PWM mode uses:
 - **Bit 6 (TAPWML)**: PWM output level. 0 = as described above (high, then low at the match); 1 = inverted (low, then high at the match).
 - **Bit 14 (TBPWML)**: the same for Timer B.
 
-The examples leave `TAPWML` at 0.
+The activity leaves `TAPWML` at 0.
 
 ### Routing the Timer to a Pin
 
@@ -266,115 +266,93 @@ The three LEDs happen to sit on timer CCP pins, so every LED can be dimmed in ha
 
 CCP**0** is always Timer **A** and CCP**1** Timer **B**. Because PWM mode needs the timer split into 16-bit halves (`CFG = 0x4`), Timer1 can drive the blue and green LEDs at the same time, each with its own duty cycle.
 
-### Configuration Steps
 
-To output PWM on a pin with Timer *x*, half A:
+## Activity
 
-1. Enable the clocks: `SYSCTL->RCGCGPIO` for the port and `SYSCTL->RCGCTIMER` for the timer, then wait a few cycles.
-2. Hand the pin to the timer: set its bit in `GPIOx->AFSEL`, write 7 into its `GPIOx->PCTL` field, and set its bit in `GPIOx->DEN`.
-3. Disable the timer half: clear `TAEN` in `TIMERx->CTL`.
-4. Select 16-bit mode: `TIMERx->CFG = 0x4`.
-5. Select PWM, periodic: `TIMERx->TAMR = 0x0A`.
-6. Write the period: `TIMERx->TAILR` (and `TIMERx->TAPR` for periods above 16 bits).
-7. Write the match: `TIMERx->TAMATCHR` (and `TIMERx->TAPMR`).
-8. Enable the timer half: set `TAEN` in `TIMERx->CTL`.
-
-To change the duty cycle later, write a new value to `TAMATCHR`; there's no need to stop the timer.
-
-| **Register** | **Purpose** | **Value in Example 1** |
-|:---|:---|:---|
-| `GPIOF->AFSEL` | Hand PF2 to a peripheral | bit 2 set |
-| `GPIOF->PCTL` | Choose T1CCP0 for PF2 | bits 11:8 = 7 |
-| `TIMER1->CFG` | 16-bit mode | `0x4` |
-| `TIMER1->TAMR` | PWM, periodic | `0x0A` |
-| `TIMER1->TAILR` | Period | `49,999` (1 kHz) |
-| `TIMER1->TAMATCHR` | Where the pin goes low | `37,499` (25%) |
-| `TIMER1->CTL` | Start | `TAEN = 1` |
-
-*GPTM PWM Configuration Summary*
-
-## Examples
+Make the blue LED **breathe**: fade in over about a second, then out again, forever. Timer1A generates a 1 kHz PWM signal on PF2 by itself, and a SysTick interrupt every 10 ms moves its duty cycle one percent up or down. You write `main.c` in three parts, top to bottom.
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works. All the code goes in that project's `main.c`.
 :::
 
-**Target device:** TM4C123GH6PM
+Nothing needs wiring: the blue LED is on the board. The code assumes the 50 MHz system clock set by `SystemInit`, as in Experiment 7.
 
-Both examples assume the 50 MHz system clock set by `SystemInit`, as in Experiment 7.
+## Step 1: Add the definitions
 
-### Example 1: Dimming an LED
+Replace the contents of `main.c` with the include and the definitions. Every pin, register bit, and number the program uses gets a name here, so the code below reads as what it does rather than as hex values.
 
-This example sets up Timer1A in PWM mode at 1 kHz with a 25% duty cycle on PF2, so the blue LED glows at a quarter of its brightness. Try changing `DUTY` to 5, 50, and 95 and re-flashing.
+<<< @/snippets/pwm/main.c#defines{c}
 
-<<< @/snippets/pwm/example1.c
+- **`PCTL_PF2_MASK`** and **`PCTL_PF2_T1CCP0`** are PF2's 4-bit field in `PCTL` (bits 11:8, from the table in [Routing the Timer to a Pin](#routing-the-timer-to-a-pin)) and the value 7 shifted into it.
+- **`TAMR_PWM`** is the three fields from the [TAMR table](#gptmtamr-—-timer-a-mode-register) combined: `TAAMS = 1`, `TACMR = 0`, `TAMR = 2`.
+- **`PERIOD`** is $N = \text{TAILR} + 1$: 50,000 counts at 50 MHz is 1 ms, a 1 kHz signal.
 
-**Explanation:**
-- `GPIOF->AFSEL` and `GPIOF->PCTL` disconnect PF2 from `GPIOF->DATA` and connect it to T1CCP0, Timer1A's output.
-- `TIMER1->CFG = 0x4` splits Timer1 into two 16-bit halves; PWM mode only works on a half.
-- `TIMER1->TAMR = 0x0A` sets `TAAMS = 1` (PWM), `TACMR = 0`, and `TAMR = 2` (periodic).
-- `TIMER1->TAILR = 49,999` gives $50{,}000$ counts per period: 1 ms, or 1 kHz.
-- `TIMER1->TAMATCHR = 37,499`: the pin is high for $49{,}999 - 37{,}499 = 12{,}500$ counts, 25% of the period.
-- The `while (1)` loop is empty and no interrupt is used: the timer generates the signal on its own.
+## Step 2: Add `pwm_set()` and the SysTick handler
+
+Add these after the definitions:
+
+<<< @/snippets/pwm/main.c#functions{c}
+
+- **`pwm_set()`** turns a percentage into a match value with the formula from [How GPTM PWM mode works](#how-gptm-pwm-mode-works). The pin is high from `TAILR` down to the match, so a **bigger** duty cycle means a **smaller** match value. The clamp keeps the match strictly inside the period.
+- **`SysTick_Handler()`** runs every 10 ms once `main` starts SysTick. It moves `level` one percent and writes it with `pwm_set()`: 98 steps each way, about 2 seconds per breath. It never touches the timer's configuration, only its match value, which takes effect from the next period.
+- `level` and `step` are `volatile` because the interrupt handler changes them.
+
+## Step 3: Write `main`
+
+Add `main` at the end of the file:
+
+<<< @/snippets/pwm/main.c#main{c}
+
+It does three things, in order:
+
+1. **Hands PF2 to Timer1A.** Turn on both clocks and wait on the **peripheral ready** registers `PRGPIO` and `PRTIMER` instead of the `NOP`s of earlier experiments. Then `AFSEL` disconnects PF2 from `GPIOF->DATA`, and `PCTL` (with a mask, so the other pins keep their fields) picks T1CCP0 to drive it.
+2. **Starts Timer1A in PWM mode,** with the settings from [How GPTM PWM mode works](#how-gptm-pwm-mode-works): stop, 16-bit, PWM mode, period, match, start. `TAPR` is cleared because a 1 kHz period fits in 16 bits.
+3. **Starts SysTick** with an interrupt every 10 ms, as in Experiment 7, which begins the fade.
+
+**Check:** build, flash, and run. The LED should fade in and out, one breath about every 2 seconds. Add `level` to the Watch window: it sweeps between 1 and 99.
+
+**Then try** the PWM signal on its own: comment out the `SysTick_Config` line and re-flash. The LED now glows steadily at `DUTY`, 25%. Change `DUTY` to 5, 50, and 95: the brightness changes, with no flicker, because 1 kHz is far too fast for the eye. In the debugger, **Peripherals → System Viewer → GPIOF** shows `AFSEL = 0x04` and `PCTL = 0x00000700`.
 
 ::: tip See it on the oscilloscope
-Probe **PF2** on the LaunchPad header (ground on any GND pin). You should see a 1 kHz square wave that is high for 250 µs of every 1 ms. Changing `DUTY` changes the width of the high part, not the frequency.
+Probe **PF2** on the LaunchPad header (ground on any GND pin). With SysTick off and `DUTY` at 25, you should see a 1 kHz square wave, high for 250 µs of every 1 ms. Changing `DUTY` changes the width of the high part, not the frequency. With SysTick back on, the high part grows and shrinks as you watch.
 :::
 
-### Example 2: Fading an LED with SysTick
-
-This example keeps the PWM setup from Example 1 and adds a SysTick interrupt every 10 ms. Each interrupt moves the duty cycle one percent up or down, so the blue LED "breathes": it fades in over about a second, then out again.
-
-<<< @/snippets/pwm/example2.c
-
-**Explanation:**
-- `pwm_set()` converts a percentage into a match value and clamps it to 1–99%, keeping the match strictly inside the period.
-- `SysTick_Config(SystemCoreClock / 100)` gives a 10 ms tick, as in Experiment 7.
-- `SysTick_Handler()` only writes a new `TAMATCHR`. The timer keeps running; the new duty cycle takes effect from the next period.
-- Two timers work together: Timer1A makes the fast 1 kHz signal, and SysTick changes it slowly.
+::: details The complete program
+<<< @/snippets/pwm/main.c#full{c}
+:::
 
 ::: info Why does the fade look uneven?
-The eye's response to brightness isn't linear: the change from 1% to 10% looks much bigger than from 60% to 70%. Real dimmers correct for this with a lookup table (a "gamma curve"). You can try it in the lab work.
+The eye's response to brightness isn't linear: the change from 1% to 10% looks much bigger than from 60% to 70%. Real dimmers correct for this with a lookup table, a "gamma curve". Try replacing `pwm_set(level)` with a lookup in a table such as `1, 2, 4, 7, 11, 18, 28, 43, 66, 99`.
 :::
 
-## Lab work
+## Common problems
 
-### Lab work 1: RGB Color Mixing
+| Symptom | Cause and fix |
+| --- | --- |
+| LED stays off | `TAEN` was never set, `RCGCTIMER` bit 1 is missing, or `PCTL` holds the wrong value (7 for T1CCP0). Check `TIMER1->CTL` and `GPIOF->PCTL` in the System Viewer. |
+| LED fully on whatever `DUTY` is | `TAMR` is not `0x0A`, so the timer isn't in PWM mode, or `TAMATCHR` is outside 0 to `TAILR`. |
+| Brightness right, but it flickers | The period is too long: check `PERIOD` and that `TAPR` is 0. |
+| Brighter when `DUTY` goes down | `TAPWML` (bit 6 of `CTL`) is set and the output is inverted. Leave it at 0. |
+| Program stops in `HardFault_Handler` | A Timer1 register was written before its clock was ready: keep the `PRTIMER` wait. |
+| No fade, LED stays at 25% | `SysTick_Config` is missing or commented out, or the handler's name is misspelled: it must be exactly `SysTick_Handler`. |
 
-Drive all three LEDs with PWM to mix colors: Timer0B on PF1 (red), Timer1A on PF2 (blue), and Timer1B on PF3 (green), all at 1 kHz.
+## Task
 
-**Requirements:**
-- Configure the three outputs using the table in [Which timer drives each LaunchPad LED](#which-timer-drives-each-launchpad-led). Timer B uses `TBMR`, `TBILR`, `TBMATCHR`, and `TBEN` (bit 8 of `CTL`).
-- Write a function `set_color(uint32_t r, uint32_t g, uint32_t b)` that takes three percentages.
-- In the main loop, cycle through at least four colors (for example orange, purple, cyan, and white), holding each for one second. Use SysTick for the delay.
-
-**Hint:** Timer0 and Timer1 each need their own `RCGCTIMER` bit, and Timer1's two halves share one `CFG` and one `CTL` register: configure both halves before enabling either.
-
-### Lab work 2: Button-Controlled Brightness
-
-Use the two LaunchPad buttons to set the blue LED's brightness: **SW1** (PF4) makes it brighter by 10%, **SW2** (PF0) makes it dimmer by 10%, limited to 10–90%.
+Build a **colour knob**: turning a potentiometer moves the RGB LED smoothly from red to green to blue and back toward red, with all three colours made by PWM in hardware.
 
 **Requirements:**
-- Use interrupt-driven input for both buttons, as in [Experiment 6](./exp6-gpio-interrupts). Remember that PF0 is locked and must be unlocked with `GPIOF->LOCK` and `GPIOF->CR` first.
-- Debounce both buttons with a millisecond counter from SysTick, as in [Experiment 7, Lab work 1](./exp7-timers#lab-work-1-debouncing-a-push-button-with-systick).
-- Add the current brightness to the Watch window and check it changes in steps of 10.
-
-**Extra:** Replace the linear steps with a 10-entry lookup table that looks evenly spaced to the eye (for example 1, 2, 4, 7, 11, 18, 28, 43, 66, 99) and compare.
-
-### Lab work 3: Color Knob with the ADC
-
-Turn a potentiometer to pick the RGB LED's color: as the knob goes from one end to the other, the LED should move smoothly from red to green to blue and back toward red.
-
-**Requirements:**
-- Reuse the three PWM outputs and `set_color()` from Lab work 1.
-- Read the potentiometer on **AIN0 (PE3)** with sample sequencer 3, by polling, as in [Experiment 9, Example 1](./exp9-adc#example-1-single-adc-channel-reading-polling-method). Take a new reading every 20 ms, timed with SysTick.
-- Map the 12-bit reading (0 to 4095) to a color as described in the hint, and update the LED after every reading.
+- Drive all three LEDs with PWM at 1 kHz: **Timer0B on PF1** (red), **Timer1A on PF2** (blue), and **Timer1B on PF3** (green), using the table in [Which timer drives each LaunchPad LED](#which-timer-drives-each-launchpad-led). Add `#define`s for the new pins, `PCTL` fields, and Timer B bits, in the style of Step 1.
+- Write `set_color(uint32_t r, uint32_t g, uint32_t b)`, which takes three percentages and clamps each to 1–99, like `pwm_set()`.
+- Read a potentiometer on **AIN0 (PE3)** with sample sequencer 3, by polling, as in [Experiment 9, Example 1](./exp9-adc#example-1-single-adc-channel-reading-polling-method). Take a new reading every 20 ms, timed with SysTick.
+- Map the 12-bit reading (0 to 4095) to a colour as described in the hint, and update the LED after every reading.
 - Add the ADC reading and the three percentages to the Watch window, and check they change as you turn the knob.
 
-**Wiring:** the potentiometer's two outer pins to **3.3 V** and **GND**, and its middle pin (the wiper) to **PE3**, as in Experiment 9.
+**Wiring:** the potentiometer's outer pins to **3.3 V** and **GND**, and its middle pin (the wiper) to **PE3**, as in Experiment 9.
 
-::: details Hint: mapping the knob to a color
-Split the knob's range into three equal parts. In each part, one color fades out while the next fades in:
+**Hint:** Timer B uses `TBMR`, `TBILR`, `TBMATCHR`, `TBPR`, and `TBEN` (bit 8 of `CTL`). Timer0 and Timer1 each need their own `RCGCTIMER` bit, and Timer1's two halves share one `CFG` and one `CTL`: configure both halves before enabling either, and set the enable bits with `|=` so one doesn't clear the other.
+
+::: details Hint: mapping the knob to a colour
+Split the knob's range into three equal parts. In each part, one colour fades out while the next fades in:
 
 | Reading | Red | Green | Blue |
 |:---|:---|:---|:---|
@@ -382,5 +360,9 @@ Split the knob's range into three equal parts. In each part, one color fades out
 | 1366 to 2730 | 0% | 99% to 0% | 0% to 99% |
 | 2731 to 4095 | 0% to 99% | 0% | 99% to 0% |
 
-With `v` as the reading, `part = (v * 3) / 4096` gives which third you're in (0, 1 or 2), and `f = ((v * 3) % 4096) * 99 / 4096` how far through it you are (0 to 98). In part 0, red is `99 - f` and green is `f`; parts 1 and 2 follow the same pattern. Let `set_color()` clamp anything below 1% to 1%, as `pwm_set()` does.
+With `v` as the reading, `part = (v * 3) / 4096` gives which third you're in (0, 1 or 2), and `f = ((v * 3) % 4096) * 99 / 4096` how far through it you are (0 to 98). In part 0, red is `99 - f` and green is `f`; parts 1 and 2 follow the same pattern.
+:::
+
+::: tip Keep this code
+`set_color()` and the three-LED setup come back in the [Experiment 13 Task](./exp13-i2c-lcd#task), where a knob and an LCD menu set each colour.
 :::
