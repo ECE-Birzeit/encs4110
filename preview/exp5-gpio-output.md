@@ -432,25 +432,49 @@ Add `__main` after the subroutines:
 
 Turn the colour cycle into a **light show read from a table in memory**. Instead of one `MOV` and `BL` per colour, `__main` walks through a table of steps, each with a colour and its own duration, and starts again from the top when it reaches the end. Changing the show then means editing the table, not the code.
 
-**Requirements:**
-- Calibrate a subroutine `WAIT_100MS` that waits **100 ms**. Measure it: run a loop of 100 calls (10 s), time it with a phone stopwatch, and adjust its count until it's within half a second.
-- Store the show as a table of bytes in a `DATA` area: each step is a colour byte followed by a duration in tenths of a second. A colour byte of `0xFF` marks the end of the table.
-- `__main` walks the table with post-indexed loads (`LDRB R0, [R5], #1`), shows each colour for its duration, and goes back to the start of the table at the end marker.
-- Write a show of at least eight steps, using at least five different colours and at least three different durations: for example a traffic light (green 3 s, yellow 1 s, red 3 s) followed by a fast white flash.
+### The starter program
 
-::: details Hint: the table
-A table lives in its own area, after the code and before `END`:
+Start from this program in `main.s`. It assembles and runs as it is, but the LED stays off: the names, the setup, the subroutines, and a three-step sample table are done, and the code that plays the table is yours to write.
 
-```asm
-            AREA    SHOWDATA, DATA, READONLY
-TABLE       DCB     GREEN, 30           ; Colour, tenths of a second
-            DCB     YELLOW, 10
-            DCB     RED, 30
-            DCB     0xFF                ; End of the show
-```
+<<< @/snippets/preview/exp5/task.asm
 
-`LDR R5, =TABLE` puts its address in `R5`. Each pass reads two bytes: `LDRB R0, [R5], #1` for the colour (compare it with `0xFF` before using it) and `LDRB R6, [R5], #1` for the duration. Then call `WAIT_100MS` that many times. Pick registers your subroutines don't change, or save them as `SHOW` does.
+**The provided part.** `PF_Init`, `DELAY`, and the colour names are the Activity's. `SET_LEDS` lights the colour in `R0`. `WAIT_100MS` waits about 100 ms once `WAIT_COUNT` is right. Both change only `R0` and `R1`, so `R5` and `R6` keep their values across a call: use them for the table pointer and the duration. Don't change the provided part.
+
+**The table** is a list of bytes in its own `DATA` area: `DCB RED, 10` is two bytes, the colour and then 10 tenths of a second. A colour byte of `END_MARK` (`0xFF`) ends it.
+
+:::: details What to write: the three TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **2, 1, 3**. TODO 2 plays the sample table, TODO 1 uses that to time the steps, and TODO 3 is your own show.
+
+::: details TODO 2: play the table (in `__main`, at `next`)
+- Read the colour byte and move `R5` on: `LDRB R0, [R5], #1`. The `, #1` after the brackets is **post-indexed**, from [Experiment 2](/experiments/exp2-data-processing): load from `R5`, then add 1 to it.
+- Compare `R0` with `END_MARK`. If they're equal, branch to `restart`, which points `R5` at the start of the table again.
+- Read the duration the same way, into `R6`.
+- Show the colour: `BL SET_LEDS` (the colour is still in `R0`).
+- Wait `R6` times 100 ms: a loop that calls `WAIT_100MS`, subtracts 1 from `R6`, and repeats until it reaches 0, as in [Experiment 3](/experiments/exp3-branching-loops).
+- Then `B next` for the next step. The starter's `B next` line can stay where it is.
 :::
+
+**Test now:** the LED should step red, green, blue, about one colour a second, and start again.
+
+::: details TODO 1: time 100 ms (the `WAIT_COUNT` line, near the top)
+- The sample table shows each colour for 10 tenths of a second, so one round of the three colours should take **3 seconds**.
+- Time **ten** rounds with a phone stopwatch: it should be 30 seconds. With the starter's `1000000`, it's a lot less.
+- Scale `WAIT_COUNT` by how far off you are: if ten rounds take 18 s, the new count is `1000000 * 30 / 18`. Rebuild, and time it again until it's within a second.
+- To work it out instead: 100 ms at 50 MHz is 5,000,000 clock cycles, and one count of `DELAY` takes about 3 cycles.
+:::
+
+::: details TODO 3: your own show (in the table, at the bottom)
+- Replace the three sample lines with at least **eight** steps, using at least **five** colours and at least **three** different durations. For example, a traffic light (green 3 s, yellow 1 s, red 3 s) followed by a fast white flash.
+- One step per line: `DCB colour, tenths`. `OFF` is a colour too: `DCB OFF, 5` is half a second dark.
+- Keep the `DCB END_MARK` line last, and don't use a duration of 0: the wait loop subtracts before it checks, so 0 would wait 256 times.
+:::
+::::
+
+**Check:** build, flash, and run.
+
+- Your show plays from the first step to the last, then starts again with no pause or flicker in between.
+- Each step lasts its time: a step of `10` is one second against your stopwatch.
+- In the debugger, put a breakpoint on the `LDRB` that reads the colour and press **Run** (F5) a few times: `R5` goes up by 2 each step and jumps back to `TABLE` after the end marker.
 
 ::: tip What this uses
 The table and the post-indexed loads come from [Experiment 2](/experiments/exp2-data-processing), the loop and the end-marker test from [Experiment 3](/experiments/exp3-branching-loops), and the subroutines from [Experiment 4](/experiments/exp4-procedures-stack).
