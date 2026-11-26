@@ -635,7 +635,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 Nothing needs wiring.
 
-## Step 1: Add the definitions
+### Step 1: Add the definitions
 
 Replace the contents of `main.c` with the include, the definitions, and the variables:
 
@@ -646,7 +646,7 @@ Replace the contents of `main.c` with the include, the definitions, and the vari
 - **`last_edge`** holds the time of SW1's last edge. With `ms`, it's all the debouncing needs.
 - All four variables are `volatile`: the handlers change them.
 
-## Step 2: Add the three interrupt handlers
+### Step 2: Add the three interrupt handlers
 
 Add the handlers after the definitions:
 
@@ -662,7 +662,7 @@ Add the handlers after the definitions:
 The common version, `if (ms - last_press >= 150) { toggle; last_press = ms; }`, times from the last **press**. Hold the button for more than 150 ms and let go: the release bounces include falling edges, the last press was long ago, and the LED toggles on release. Timing from the last **edge** of either kind closes that hole, with no extra code.
 :::
 
-## Step 3: Write `main`
+### Step 3: Write `main`
 
 Add `main` at the end of the file:
 

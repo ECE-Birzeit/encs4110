@@ -226,7 +226,7 @@ Read the HW-040 knob three ways at once: its **position** within one turn (in co
 This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works. All the code goes in that project's `main.c`.
 :::
 
-## Step 1: Wire the encoder
+### Step 1: Wire the encoder
 
 Connect the HW-040 to the LaunchPad with jumper wires:
 
@@ -240,7 +240,7 @@ Connect the HW-040 to the LaunchPad with jumper wires:
 
 PC5 and PC6 are on the J4 header. Double-check you're on **PC**5 and **PC**6, not PB5 and PB6.
 
-## Step 2: Add the definitions
+### Step 2: Add the definitions
 
 Replace the contents of `main.c` with the include, the definitions, and the variables you'll watch in the debugger:
 
@@ -250,7 +250,7 @@ Replace the contents of `main.c` with the include, the definitions, and the vari
 - The **`CTL_`** names are the [QEICTL](#qeictl-—-qei-control) bits this program sets. `RESMODE` and `SIGMODE` stay 0, so they need no names.
 - **`EDGES`** is the number of counts in one turn: 20 pulses, 4 edges each.
 
-## Step 3: Add the speed handler
+### Step 3: Add the speed handler
 
 Add the QEI1 interrupt handler after the definitions:
 
@@ -260,7 +260,7 @@ Add the QEI1 interrupt handler after the definitions:
 - It clears the interrupt first, as with the timer handlers in Experiment 7.
 - `rpm` is the [speed formula](#measuring-speed) with $f_\text{window} = 10$. The multiplications come before the division so integer division doesn't round the result to 0. `SPEED` has no sign, so `DIRECTION` supplies it.
 
-## Step 4: Write `main`
+### Step 4: Write `main`
 
 Add `main` at the end of the file:
 

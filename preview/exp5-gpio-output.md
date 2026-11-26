@@ -376,7 +376,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 Nothing needs wiring: the LED is on the board. `SystemInit` in the startup code sets the clock to 50 MHz before `__main` runs.
 
-## Step 1: Add the definitions
+### Step 1: Add the definitions
 
 Replace the contents of `main.s` with the names and the file header:
 
@@ -387,7 +387,7 @@ Replace the contents of `main.s` with the names and the file header:
 - The colours are sums of the LED bits: yellow is red and green together. They come from the [colour table](#port-f-on-the-launchpad) above.
 - `AREA`, `THUMB`, and `EXPORT __main` are the same header as the project's test program.
 
-## Step 2: Add the subroutines
+### Step 2: Add the subroutines
 
 Add three subroutines after the header:
 
@@ -397,7 +397,7 @@ Add three subroutines after the header:
 - **`DELAY`** is the countdown loop from the project's test program, as a subroutine: the count arrives in `R0`, as in [Experiment 4](/experiments/exp4-procedures-stack).
 - **`SHOW`** writes a colour and waits. It calls `DELAY`, and `BL` overwrites `LR`, so `SHOW` saves its own return address with `PUSH` and returns with `POP {..., PC}`. `R4` is pushed alongside only to keep the stack 8-byte aligned, as the calling convention asks.
 
-## Step 3: Write `__main`
+### Step 3: Write `__main`
 
 Add `__main` after the subroutines:
 

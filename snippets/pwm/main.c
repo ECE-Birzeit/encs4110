@@ -3,16 +3,16 @@
 #include "TM4C123.h"
 
 // Clocks
-#define RCGC_GPIOF       (1 << 5)       // RCGCGPIO bit for Port F
-#define RCGC_TIMER1      (1 << 1)       // RCGCTIMER bit for Timer1
+#define RCGC_GPIOF       (1U << 5)      // RCGCGPIO bit for Port F
+#define RCGC_TIMER1      (1U << 1)      // RCGCTIMER bit for Timer1
 
 // The pin: PF2 is the blue LED and also T1CCP0, Timer1A's output
-#define BLUE_LED         (1 << 2)
-#define PCTL_PF2_MASK    (0xF << 8)     // PF2's field in GPIOF->PCTL: bits 11:8
-#define PCTL_PF2_T1CCP0  (0x7 << 8)     // 7 selects T1CCP0
+#define BLUE_LED         (1U << 2)
+#define PCTL_PF2_MASK    (0xFU << 8)    // PF2's field in GPIOF->PCTL: bits 11:8
+#define PCTL_PF2_T1CCP0  (0x7U << 8)    // 7 selects T1CCP0
 
 // Timer1 register values
-#define CTL_TAEN         (1 << 0)       // CTL: Timer A enable
+#define CTL_TAEN         (1U << 0)      // CTL: Timer A enable
 #define CFG_16BIT        0x4            // CFG: split into two 16-bit timers
 #define TAMR_PWM         0x0A           // TAMR: TAAMS = 1 (PWM), TACMR = 0, TAMR = 2 (periodic)
 
@@ -22,16 +22,17 @@
 // #endregion defines
 
 // #region functions
-volatile uint32_t level = DUTY;         // Brightness now, percent (1 to 99)
-volatile int      step  = 1;            // +1 while getting brighter, -1 while dimming
+volatile int32_t level = DUTY;          // Brightness now, percent (1 to 99)
+volatile int32_t step  = 1;             // +1 while getting brighter, -1 while dimming: signed
 
 
 // Set the duty cycle in percent. The match must stay strictly between 0 and TAILR.
-void pwm_set(uint32_t percent)
+// Signed, so a value that went below 0 clamps to 1, not to 99.
+void pwm_set(int32_t percent)
 {
 	if (percent < 1)  percent = 1;
 	if (percent > 99) percent = 99;
-	TIMER1->TAMATCHR = (PERIOD - 1) - (PERIOD / 100) * percent;
+	TIMER1->TAMATCHR = (PERIOD - 1) - (PERIOD / 100) * (uint32_t)percent;
 }
 
 

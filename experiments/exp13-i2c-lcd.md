@@ -252,7 +252,7 @@ Drive the LCD over I2C: line 1 shows **ENCS4110 Lab** and line 2 counts up twice
 This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works. All the code goes in that project's `main.c`. The code assumes the 50 MHz system clock set by `SystemInit`.
 :::
 
-## Step 1: Wire the LCD
+### Step 1: Wire the LCD
 
 Connect the backpack's four pins to the LaunchPad:
 
@@ -265,7 +265,7 @@ Connect the backpack's four pins to the LaunchPad:
 
 The backlight should light up as soon as the LaunchPad has power, and line 1 shows a row of solid boxes: the LCD has power but hasn't been initialized yet. No boxes at all? Turn the blue contrast trimmer on the back of the backpack.
 
-## Step 2: Add the definitions
+### Step 2: Add the definitions
 
 Replace the contents of `main.c` with the include and the definitions:
 
@@ -275,7 +275,7 @@ Replace the contents of `main.c` with the include and the definitions:
 - The **`MCS_`** names come in two groups because [I2CMCS](#i2cmcs-—-i2c-master-control-status) is two registers at one address: `RUN`, `START`, and `STOP` are written; `BUSY` and `ERROR` are read. `MCS_RUN` and `MCS_BUSY` are both bit 0, with different meanings.
 - The **`LCD_`** bits are the [backpack's wiring](#the-pcf8574-i2c-lcd-backpack): one byte to the PCF8574 sets all eight of them at once.
 
-## Step 3: Add the I2C functions
+### Step 3: Add the I2C functions
 
 Add `I2C0_Init()` and `I2C0_Write()` after the definitions:
 
@@ -285,7 +285,7 @@ Add `I2C0_Init()` and `I2C0_Write()` after the definitions:
 - **`I2C0_Write()`** puts the address in bits 7:1 of `MSA` (shifted left by one; bit 0 = 0 means write) and the byte in `MDR`. Writing `STOP | START | RUN` to `MCS` makes the module do the whole [transfer](#one-transfer) by itself.
 - `BUSY` can take a few cycles to rise after `MCS` is written, so the function waits for it to rise and then to fall. Waiting only for 0 could return before the transfer has even started. Then `ERROR` tells whether the device answered.
 
-## Step 4: Add the LCD functions
+### Step 4: Add the LCD functions
 
 Add the LCD functions after the I2C ones:
 
@@ -293,9 +293,10 @@ Add the LCD functions after the I2C ones:
 
 - **`LCD_SendNibble()`** is the only function that changes from Experiment 8. Instead of writing `GPIOB->DATA`, it builds one byte (the nibble in bits 7:4, then `LCD_BL`, `LCD_EN`, and `RS`) and sends it three times: E low, E high, E low. The LCD latches the nibble when E falls. `LCD_BL` is in every byte because the PCF8574 shows the whole last byte on its outputs: a byte without it would switch the backlight off.
 - **`LCD_Command()`**, **`LCD_Data()`**, and **`LCD_Init()`** are the Experiment 8 functions: two nibbles per byte, RS = 0 for commands and 1 for characters, and the same start-up sequence. There are almost no delays, because one nibble already takes three I2C bytes, about 0.6 ms. Only the power-up and Clear (1.6 ms) still wait.
+- **`LCD_Print()`** takes a `const char *`: it only reads the string, and a string literal such as `"ENCS4110 Lab"` can't be changed.
 - **`LCD_PrintNumber()`** collects the digits from the last one (`n % 10`, then `n /= 10`) and sends them in reverse, so the first digit comes out first.
 
-## Step 5: Write `main`
+### Step 5: Write `main`
 
 Add `main` at the end of the file:
 
@@ -352,7 +353,7 @@ The display looks like this, with the arrow before the colour you're changing an
 Keep the state in a few variables, and let the main loop compare against what's on the screen:
 
 ```c
-volatile uint32_t level[3] = {50, 20, 99};  // R, G, B in percent
+volatile int32_t level[3] = {50, 20, 99};   // R, G, B in percent: signed, like pwm_set()
 uint32_t sel = 0;                           // 0 = R, 1 = G, 2 = B
 ```
 

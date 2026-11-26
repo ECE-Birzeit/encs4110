@@ -3,19 +3,19 @@
 #include "TM4C123.h"
 
 // Clocks
-#define RCGC_GPIOF     (1 << 5)         // RCGCGPIO bit for Port F
-#define RCGC_TIMER1    (1 << 1)         // RCGCTIMER bit for Timer1
+#define RCGC_GPIOF     (1U << 5)        // RCGCGPIO bit for Port F
+#define RCGC_TIMER1    (1U << 1)        // RCGCTIMER bit for Timer1
 
 // Port F pins
-#define RED_LED        (1 << 1)         // PF1: toggled by SW1
-#define BLUE_LED       (1 << 2)         // PF2: heartbeat from Timer1A
-#define SW1            (1 << 4)         // PF4
+#define RED_LED        (1U << 1)        // PF1: toggled by SW1
+#define BLUE_LED       (1U << 2)        // PF2: heartbeat from Timer1A
+#define SW1            (1U << 4)        // PF4
 
 // Timer1 register values
 #define CFG_32BIT      0x0              // CFG: one 32-bit timer
 #define TAMR_PERIODIC  0x2              // TAMR: periodic, counting down
-#define CTL_TAEN       (1 << 0)         // CTL: Timer A enable
-#define TATO           (1 << 0)         // IMR, MIS, ICR: Timer A time-out
+#define CTL_TAEN       (1U << 0)        // CTL: Timer A enable
+#define TATO           (1U << 0)        // IMR, MIS, ICR: Timer A time-out
 
 // Times
 #define HEARTBEAT_MS   500              // Blue LED toggles every 500 ms: 1 Hz blink

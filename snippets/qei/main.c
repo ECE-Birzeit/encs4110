@@ -3,28 +3,28 @@
 #include "TM4C123.h"
 
 // Clocks
-#define RCGC_GPIOC       (1 << 2)       // RCGCGPIO bit for Port C (encoder)
-#define RCGC_GPIOF       (1 << 5)       // RCGCGPIO bit for Port F (LEDs)
-#define RCGC_QEI1        (1 << 1)       // RCGCQEI bit for QEI1
+#define RCGC_GPIOC       (1U << 2)      // RCGCGPIO bit for Port C (encoder)
+#define RCGC_GPIOF       (1U << 5)      // RCGCGPIO bit for Port F (LEDs)
+#define RCGC_QEI1        (1U << 1)      // RCGCQEI bit for QEI1
 
 // The encoder's pins: PC5 = PhA1 (CLK), PC6 = PhB1 (DT)
-#define QEI1_PHA         (1 << 5)
-#define QEI1_PHB         (1 << 6)
-#define PCTL_PC56_MASK   (0xFF << 20)   // PC5's and PC6's fields in GPIOC->PCTL: bits 27:20
-#define PCTL_PC56_QEI    (0x66 << 20)   // 6 selects PhA1 and PhB1
+#define QEI1_PHA         (1U << 5)
+#define QEI1_PHB         (1U << 6)
+#define PCTL_PC56_MASK   (0xFFU << 20)  // PC5's and PC6's fields in GPIOC->PCTL: bits 27:20
+#define PCTL_PC56_QEI    (0x66U << 20)  // 6 selects PhA1 and PhB1
 
 // LEDs
-#define RED_LED          (1 << 1)       // PF1
-#define GREEN_LED        (1 << 3)       // PF3
+#define RED_LED          (1U << 1)      // PF1
+#define GREEN_LED        (1U << 3)      // PF3
 
 // QEI1 register bits
-#define CTL_ENABLE       (1 << 0)       // CTL: start the module (can't be cleared again)
-#define CTL_CAPMODE      (1 << 3)       // CTL: count the edges of both PhA and PhB
-#define CTL_VELEN        (1 << 5)       // CTL: velocity capture on
-#define CTL_FILTEN       (1 << 13)      // CTL: input filter on
-#define CTL_FILTCNT_MAX  (0xF << 16)    // CTL: filter samples every 17 clocks
-#define STAT_DIRECTION   (1 << 1)       // STAT: 1 = last moved in reverse
-#define INT_TIMER        (1 << 1)       // INTEN, RIS, ISC: velocity window ended
+#define CTL_ENABLE       (1U << 0)      // CTL: start the module (can't be cleared again)
+#define CTL_CAPMODE      (1U << 3)      // CTL: count the edges of both PhA and PhB
+#define CTL_VELEN        (1U << 5)      // CTL: velocity capture on
+#define CTL_FILTEN       (1U << 13)     // CTL: input filter on
+#define CTL_FILTCNT_MAX  (0xFU << 16)   // CTL: filter samples every 17 clocks
+#define STAT_DIRECTION   (1U << 1)      // STAT: 1 = last moved in reverse
+#define INT_TIMER        (1U << 1)      // INTEN, RIS, ISC: velocity window ended
 
 // The encoder and the speed measurement
 #define PPR              20             // Pulses per revolution: 20 on the HW-040 (one per click)

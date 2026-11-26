@@ -277,7 +277,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 Nothing needs wiring: the blue LED is on the board. The code assumes the 50 MHz system clock set by `SystemInit`, as in Experiment 7.
 
-## Step 1: Add the definitions
+### Step 1: Add the definitions
 
 Replace the contents of `main.c` with the include and the definitions. Every pin, register bit, and number the program uses gets a name here, so the code below reads as what it does rather than as hex values.
 
@@ -286,8 +286,9 @@ Replace the contents of `main.c` with the include and the definitions. Every pin
 - **`PCTL_PF2_MASK`** and **`PCTL_PF2_T1CCP0`** are PF2's 4-bit field in `PCTL` (bits 11:8, from the table in [Routing the Timer to a Pin](#routing-the-timer-to-a-pin)) and the value 7 shifted into it.
 - **`TAMR_PWM`** is the three fields from the [TAMR table](#gptmtamr-—-timer-a-mode-register) combined: `TAAMS = 1`, `TACMR = 0`, `TAMR = 2`.
 - **`PERIOD`** is $N = \text{TAILR} + 1$: 50,000 counts at 50 MHz is 1 ms, a 1 kHz signal.
+- The bit masks use **`1U`**, an unsigned 1: a plain `1` is a signed `int`, and shifting or inverting signed values is where C's surprises live.
 
-## Step 2: Add `pwm_set()` and the SysTick handler
+### Step 2: Add `pwm_set()` and the SysTick handler
 
 Add these after the definitions:
 
@@ -295,9 +296,9 @@ Add these after the definitions:
 
 - **`pwm_set()`** turns a percentage into a match value with the formula from [How GPTM PWM mode works](#how-gptm-pwm-mode-works). The pin is high from `TAILR` down to the match, so a **bigger** duty cycle means a **smaller** match value. The clamp keeps the match strictly inside the period.
 - **`SysTick_Handler()`** runs every 10 ms once `main` starts SysTick. It moves `level` one percent and writes it with `pwm_set()`: 98 steps each way, about 2 seconds per breath. It never touches the timer's configuration, only its match value, which takes effect from the next period.
-- `level` and `step` are `volatile` because the interrupt handler changes them.
+- `level` and `step` are `volatile` because the interrupt handler changes them, and **signed** (`int32_t`) because `step` is −1 half the time. `pwm_set()` takes a signed value for the same reason: a percentage that went below 0 clamps to 1%, where an unsigned one would wrap to about 4 billion and clamp to 99%.
 
-## Step 3: Write `main`
+### Step 3: Write `main`
 
 Add `main` at the end of the file:
 
@@ -342,7 +343,7 @@ Build a **colour knob**: turning a potentiometer moves the RGB LED smoothly from
 
 **Requirements:**
 - Drive all three LEDs with PWM at 1 kHz: **Timer0B on PF1** (red), **Timer1A on PF2** (blue), and **Timer1B on PF3** (green), using the table in [Which timer drives each LaunchPad LED](#which-timer-drives-each-launchpad-led). Add `#define`s for the new pins, `PCTL` fields, and Timer B bits, in the style of Step 1.
-- Write `set_color(uint32_t r, uint32_t g, uint32_t b)`, which takes three percentages and clamps each to 1–99, like `pwm_set()`.
+- Write `set_color(int32_t r, int32_t g, int32_t b)`, which takes three percentages and clamps each to 1–99, like `pwm_set()`.
 - Read a potentiometer on **AIN0 (PE3)** with sample sequencer 3, by polling, as in [Experiment 9, Example 1](./exp9-adc#example-1-single-adc-channel-reading-polling-method). Take a new reading every 20 ms, timed with SysTick.
 - Map the 12-bit reading (0 to 4095) to a colour as described in the hint, and update the LED after every reading.
 - Add the ADC reading and the three percentages to the Watch window, and check they change as you turn the knob.

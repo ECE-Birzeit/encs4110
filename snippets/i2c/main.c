@@ -3,33 +3,33 @@
 #include "TM4C123.h"
 
 // Clocks
-#define RCGC_GPIOB       (1 << 1)       // RCGCGPIO bit for Port B (I2C0 pins)
-#define RCGC_GPIOF       (1 << 5)       // RCGCGPIO bit for Port F (LED)
-#define RCGC_I2C0        (1 << 0)       // RCGCI2C bit for I2C0
+#define RCGC_GPIOB       (1U << 1)      // RCGCGPIO bit for Port B (I2C0 pins)
+#define RCGC_GPIOF       (1U << 5)      // RCGCGPIO bit for Port F (LED)
+#define RCGC_I2C0        (1U << 0)      // RCGCI2C bit for I2C0
 
 // I2C0's pins
-#define I2C0SCL          (1 << 2)       // PB2
-#define I2C0SDA          (1 << 3)       // PB3
-#define PCTL_PB23_MASK   (0xFF << 8)    // PB2's and PB3's fields in GPIOB->PCTL: bits 15:8
-#define PCTL_PB23_I2C0   (0x33 << 8)    // 3 selects I2C0SCL and I2C0SDA
+#define I2C0SCL          (1U << 2)      // PB2
+#define I2C0SDA          (1U << 3)      // PB3
+#define PCTL_PB23_MASK   (0xFFU << 8)   // PB2's and PB3's fields in GPIOB->PCTL: bits 15:8
+#define PCTL_PB23_I2C0   (0x33U << 8)   // 3 selects I2C0SCL and I2C0SDA
 
-#define RED_LED          (1 << 1)       // PF1: on if the LCD doesn't answer
+#define RED_LED          (1U << 1)      // PF1: on if the LCD doesn't answer
 
 // I2C0 register bits
-#define MCR_MFE          (1 << 4)       // MCR: master function enable
+#define MCR_MFE          (1U << 4)      // MCR: master function enable
 #define MTPR_100KHZ      24             // MTPR: 50 MHz / (2 * (6 + 4) * 100 kHz) - 1
-#define MCS_RUN          (1 << 0)       // MCS written: send
-#define MCS_START        (1 << 1)       // MCS written: START first
-#define MCS_STOP         (1 << 2)       // MCS written: STOP after
-#define MCS_BUSY         (1 << 0)       // MCS read: transfer in progress
-#define MCS_ERROR        (1 << 1)       // MCS read: no ACK
+#define MCS_RUN          (1U << 0)      // MCS written: send
+#define MCS_START        (1U << 1)      // MCS written: START first
+#define MCS_STOP         (1U << 2)      // MCS written: STOP after
+#define MCS_BUSY         (1U << 0)      // MCS read: transfer in progress
+#define MCS_ERROR        (1U << 1)      // MCS read: no ACK
 
 // The LCD backpack: its address, and what each bit of the PCF8574 drives
 #define LCD_ADDR         0x27
-#define LCD_RS           (1 << 0)       // P0: 0 = command, 1 = character
-#define LCD_RW           (1 << 1)       // P1: always 0 (write)
-#define LCD_EN           (1 << 2)       // P2: enable, the LCD latches on its falling edge
-#define LCD_BL           (1 << 3)       // P3: backlight
+#define LCD_RS           (1U << 0)      // P0: 0 = command, 1 = character
+#define LCD_RW           (1U << 1)      // P1: always 0 (write)
+#define LCD_EN           (1U << 2)      // P2: enable, the LCD latches on its falling edge
+#define LCD_BL           (1U << 3)      // P3: backlight
                                         // P4 to P7: D4 to D7
 
 #define CYCLES_PER_US    (SystemCoreClock / 1000000u)
@@ -70,7 +70,7 @@ int I2C0_Write(uint8_t addr, uint8_t data)
 
 
 // #region lcd
-void delay_us(int us)							// Busy-wait with SysTick, as in Experiment 8
+void delay_us(uint32_t us)							// Busy-wait with SysTick, as in Experiment 8
 {
 	SysTick->LOAD = CYCLES_PER_US * us - 1;
 	SysTick->VAL  = 0;
@@ -79,7 +79,7 @@ void delay_us(int us)							// Busy-wait with SysTick, as in Experiment 8
 	SysTick->CTRL = 0;
 }
 
-void delay_ms(int ms)
+void delay_ms(uint32_t ms)
 {
 	while (ms--)
 		delay_us(1000);
@@ -136,7 +136,7 @@ void LCD_SetCursor(uint8_t row, uint8_t col)
 	LCD_Command((row == 0 ? 0x80 : 0xC0) + col);
 }
 
-void LCD_Print(char *str)
+void LCD_Print(const char *str)						// const: a string literal can't be changed
 {
 	while (*str)
 		LCD_Data(*str++);

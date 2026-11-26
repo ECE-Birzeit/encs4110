@@ -620,7 +620,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 Nothing needs wiring: the buttons and the LED are on the board.
 
-## Step 1: Add the definitions
+### Step 1: Add the definitions
 
 Replace the contents of `main.c` with the include, the definitions, and the variables:
 
@@ -631,7 +631,13 @@ Replace the contents of `main.c` with the include, the definitions, and the vari
 - **`colors`** is the colour table from Experiment 5 as an array, in the order SW1 steps through it. It's `const`, so it stays in flash.
 - **`color_index`** and **`presses`** are `volatile` because the interrupt handler changes them while `main` (and the debugger) read them.
 
-## Step 2: Add the interrupt handler
+::: info Choosing the types
+- **Bit masks are unsigned:** `1U << 4`, not `1 << 4`. A plain `1` is a signed `int`, so `~SW1` would be a negative number, and `1 << 31` on a signed `int` is undefined behaviour in C.
+- **`colors` is `uint8_t`:** each entry is a pattern for Port F's 8 pins, so a byte holds it. Writing it into the 32-bit `DATA` register simply fills the upper bits with 0, so the table doesn't need the register's width.
+- **Counters and indices are `uint32_t`:** 32 bits is the Cortex-M4's own word size. A smaller type saves nothing for a single variable, and can cost an extra instruction each time the value has to be cut back to its size.
+:::
+
+### Step 2: Add the interrupt handler
 
 Add `GPIOF_Handler` after the definitions:
 
@@ -642,7 +648,7 @@ Add `GPIOF_Handler` after the definitions:
 - The flag is cleared by writing a 1 to SW1's bit in **`ICR`**. A flag left set would call the handler again as soon as it returns, forever ([Why Clear the Interrupt Flag?](#why-clear-the-interrupt-flag)).
 - The handler **only changes the state**, `color_index`. It doesn't touch the LED: the main loop owns the output. Keeping handlers this short is a habit worth having, because while one runs, the rest of the program waits.
 
-## Step 3: Write `main`
+### Step 3: Write `main`
 
 Add `main` at the end of the file:
 

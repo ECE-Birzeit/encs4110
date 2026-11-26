@@ -2,21 +2,22 @@
 // #region defines
 #include "TM4C123.h"
 
-#define RCGC_GPIOF   (1 << 5)           // RCGCGPIO bit for Port F
+#define RCGC_GPIOF   (1U << 5)          // RCGCGPIO bit for Port F
 
 // Port F pins
-#define SW2          (1 << 0)           // PF0, locked at reset (it can be the NMI input)
-#define RED_LED      (1 << 1)           // PF1
-#define BLUE_LED     (1 << 2)           // PF2
-#define GREEN_LED    (1 << 3)           // PF3
-#define SW1          (1 << 4)           // PF4
+#define SW2          (1U << 0)          // PF0, locked at reset (it can be the NMI input)
+#define RED_LED      (1U << 1)          // PF1
+#define BLUE_LED     (1U << 2)          // PF2
+#define GREEN_LED    (1U << 3)          // PF3
+#define SW1          (1U << 4)          // PF4
 #define LEDS         (RED_LED | BLUE_LED | GREEN_LED)
 #define SWITCHES     (SW1 | SW2)
 
 #define GPIO_UNLOCK  0x4C4F434B         // "LOCK" in ASCII: written to GPIOF->LOCK to unlock CR
 
-// The seven colours, in the order SW1 steps through them
-const uint32_t colors[7] = {
+// The seven colours, in the order SW1 steps through them. uint8_t: each is a pattern
+// for Port F's 8 pins, so it fits in a byte.
+const uint8_t colors[7] = {
 	RED_LED, RED_LED | GREEN_LED, GREEN_LED, GREEN_LED | BLUE_LED,
 	BLUE_LED, RED_LED | BLUE_LED, LEDS
 };
