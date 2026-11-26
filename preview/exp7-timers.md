@@ -626,8 +626,10 @@ To configure a GPTM timer in periodic mode:
 Run three things at once, each from its own interrupt, with an empty main loop:
 
 - **SysTick** ticks every millisecond and keeps a clock, `ms`.
-- **Timer1A** blinks the blue LED once a second, a "heartbeat" that shows the program is alive.
-- **SW1** toggles the red LED, **debounced** with the millisecond clock: one press is always exactly one toggle, fixing the skipped colours you saw in [Experiment 6](/preview/exp6-gpio-interrupts).
+- **Timer1A** blinks the LED once a second, a "heartbeat" that shows the program is alive.
+- **SW1** steps the LED's colour, red, green, blue, and round again, **debounced** with the millisecond clock: one press is always exactly one colour, fixing the skipped colours you saw in [Experiment 6](/preview/exp6-gpio-interrupts).
+
+The three LEDs on the board are one RGB LED, so only one colour is ever lit: the heartbeat blinks whichever colour SW1 last chose.
 
 ::: info Setting up the project
 This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, choosing **C**, and make sure its blinking-LED test works. All the code goes in that project's `main.c`. `SystemInit` sets the clock to 50 MHz before `main` runs.
@@ -643,19 +645,24 @@ Replace the contents of `main.c` with the include, the definitions, and the vari
 
 - **`CFG_32BIT`** and **`TAMR_PERIODIC`** are the [GPTMCFG](#gptmcfg-—-timer-configuration-register) and [GPTMTAMR](#gptmtamr-—-timer-a-mode-register) values for a 32-bit timer that reloads itself. A 32-bit timer needs no prescaler for 500 ms.
 - **`TATO`** is the time-out bit. It's at the same position in `IMR` (enable), `MIS` (status), and `ICR` (clear), so one name serves all three.
+- **`HEARTBEAT_LOAD`** is the timer's load value for 500 ms. It's a macro because two places use it: `main` starts the timer with it, and a press restarts the timer with it.
+- **`DEBOUNCE_MS`** is 50. Textbooks often say 20 ms, but the LaunchPad's switches still bounced at 20 ms in testing, and 50 ms is still far shorter than any human press.
 - **`last_edge`** holds the time of SW1's last edge. With `ms`, it's all the debouncing needs.
-- All four variables are `volatile`: the handlers change them.
+- The variables are `volatile`: the handlers change them.
 
-### Step 2: Add the three interrupt handlers
+### Step 2: Add the interrupt handlers
 
-Add the handlers after the definitions:
+Add `show()` and the handlers after the definitions:
 
 <<< @/snippets/preview/exp7/main.c#handlers{c}
 
-- **`TIMER1A_Handler`** is the simplest: clear the time-out flag, toggle blue. It runs every 500 ms, so the LED blinks at 1 Hz.
+- **`show()`** lights the current colour if the heartbeat has the LED on, and nothing otherwise. It writes the whole colour each time instead of toggling bits, so changing the colour can never leave the old one lit.
+- **`TIMER1A_Handler`** clears the time-out flag, flips `led_on`, and calls `show()`. It runs every 500 ms, so the LED blinks at 1 Hz.
 - **`SysTick_Handler`** adds one to `ms` every millisecond, and that's all: a running clock, like Arduino's `millis()`. SysTick needs no flag cleared: the core clears its pending interrupt when the handler starts.
 - **`GPIOF_Handler`** debounces SW1 with a **quiet-time** rule. The interrupt fires on **every** edge, both directions, bounces included. A falling edge counts as a press only if the line was quiet for `DEBOUNCE_MS` before it. Every edge, counted or not, restarts the quiet time by updating `last_edge`.
-- Follow one press: the first falling edge comes after a long quiet spell, so it toggles the LED **at once**. The bounces that follow arrive within 20 ms of each other, so they're ignored. On release, the first edge is **rising** (the pin reads 1, so it isn't a press), and the release bounces fall inside the quiet time it just started.
+- Follow one press: the first falling edge comes after a long quiet spell, so it counts **at once**. The bounces that follow arrive within 50 ms of each other, so they're ignored. On release, the first edge is **rising** (the pin reads 1, so it isn't a press), and the release bounces fall inside the quiet time it just started.
+- **A press restarts the heartbeat.** If you pressed while the LED was off, you'd wait up to half a second to see the new colour. So the handler turns the LED on at once and writes `HEARTBEAT_LOAD` back into `TAILR`. With `TAILD` 0 in [GPTMTAMR](#gptmtamr-—-timer-a-mode-register), the default, the timer loads a new `TAILR` value on the next clock cycle: the countdown starts over, and the new colour stays on for a full 500 ms.
+- Both `GPIOF_Handler` and `TIMER1A_Handler` call `show()`. Interrupts at the same priority never interrupt each other, and these two have the same (default) priority, so one can't cut into the other's write to `GPIOF->DATA`.
 - **`ms - last_edge`** is unsigned subtraction, so it stays correct when `ms` wraps from 0xFFFFFFFF to 0 after 49 days: the difference is still the number of milliseconds between the two.
 
 ::: info Why not "time since the last press"?
@@ -674,14 +681,15 @@ Add `main` at the end of the file:
 
 **Check:** build, flash, and run.
 
-- The blue LED blinks once a second, by itself.
+- The LED blinks red once a second, by itself.
 - Add `ms` to the Watch window: it goes up by about 1000 every second.
-- Press SW1 ten times, slowly and quickly, short and long: the red LED toggles exactly once per press, and never on release. Add `presses` and `edges`: `presses` is 10, and `edges` is well above 20. Each press and each release is at least one edge, and every bounce is one more.
+- Press SW1: the colour changes **immediately**, even if the LED was off, and stays on for half a second before blinking on. Press ten times, slowly and quickly, short and long: red, green, blue, red..., exactly one step per press, never on release. Add `presses` and `edges`: `presses` is 10, and `edges` is well above 20. Each press and each release is at least one edge, and every bounce is one more.
 
 **Then try:**
 
-- Set `DEBOUNCE_MS` to 0 and press SW1 a few times: some presses toggle two or three times, as in Experiment 6. Then try 200 and press quickly: fast double presses now count as one, because the second comes inside the quiet time. 20 ms is long enough for the bounce and short enough for any human. Put it back to 20.
-- Change `HEARTBEAT_MS` to 100: the blue LED blinks five times faster, while the button still works the same. The two timers are independent.
+- Set `DEBOUNCE_MS` to 0 and press SW1 a few times: some presses skip a colour, as in Experiment 6. Then try 200 and press quickly: fast double presses now count as one, because the second comes inside the quiet time. Put it back to 50.
+- Remove the `TIMER1->TAILR = HEARTBEAT_LOAD;` line and press SW1 several times: now the new colour sometimes flashes for an instant and goes off, because the old countdown was about to end. Put it back.
+- Change `HEARTBEAT_MS` to 100: the LED blinks five times faster, while the button still works the same.
 
 ::: details The complete program
 <<< @/snippets/preview/exp7/main.c#full{c}
@@ -691,35 +699,74 @@ Add `main` at the end of the file:
 
 | Symptom | Cause and fix |
 | --- | --- |
-| Blue LED doesn't blink | `TAEN`, `IMR`, or `NVIC_EnableIRQ(TIMER1A_IRQn)` is missing, or the handler isn't named exactly `TIMER1A_Handler`. |
-| Blue LED stays on and the board freezes | `TIMER1->ICR = TATO` is missing from the handler, so it runs again and again. |
+| LED doesn't blink | `TAEN`, `IMR`, or `NVIC_EnableIRQ(TIMER1A_IRQn)` is missing, or the handler isn't named exactly `TIMER1A_Handler`. |
+| LED stays on and the board freezes | `TIMER1->ICR = TATO` is missing from the handler, so it runs again and again. |
 | `ms` doesn't change | `SysTick_Config` is missing, or the handler isn't named exactly `SysTick_Handler`. |
-| Red LED toggles on release too | `IBE` isn't set, so releases don't restart the quiet time; or `last_edge = ms` is inside the `if` instead of after it. |
-| A press sometimes toggles twice | `DEBOUNCE_MS` is too short, or the `(GPIOF->DATA & SW1) == 0` check is missing, so a rising edge counts as a press. |
+| The colour also changes on release | `IBE` isn't set, so releases don't restart the quiet time; or `last_edge = ms` is inside the `if` instead of after it. |
+| A press sometimes skips a colour | `DEBOUNCE_MS` is too short for your switch: keep it at 50 or more. Or the `(GPIOF->DATA & SW1) == 0` check is missing, so a rising edge counts as a press. |
+| Two colours lit at once (purple, yellow, ...) | The LED is being toggled with `^=` somewhere. Write the whole colour through `show()`. |
+| A press changes the colour, but it only appears later | The press doesn't set `led_on` and call `show()`. |
 | Program stops in `HardFault_Handler` | A Timer1 register was written before its clock was ready: keep the `PRTIMER` wait. |
 
 ## Task
 
-Build a **reaction-time game**. Press SW1 to start a round: the LEDs go off, and after a random wait of 1 to 3 seconds the green LED comes on. Press SW2 as fast as you can: your reaction time in milliseconds is stored, and the best one so far is kept. Pressing SW2 before green is a **false start**: the red LED comes on and the round is lost.
+Build a **reaction-time game**. Press **SW1** to start a round: the LED goes off, and after a random wait of 1 to 3 seconds it turns green. Press **SW2** as fast as you can: the LED turns **blue** for a success, and your reaction time in milliseconds is stored, along with the best one so far. Pressing SW2 before green is a **false start**: the LED turns red and the round is lost.
 
-**Requirements:**
-- Time the random wait with **Timer1A in one-shot mode** (`TAMR = 0x1`): load it with the wait and start it; when it times out, its handler turns green on and records `ms`. One-shot mode stops after one time-out, so there's nothing to turn off.
-- Make the wait random by using the time the round was started: for example `1000 + ms % 2000` milliseconds. People never press at exactly the same millisecond.
-- Measure the reaction as `ms` at the SW2 press minus `ms` when green came on, using the 1 ms SysTick clock from the Activity.
-- Debounce both buttons as in the Activity. SW2 is on PF0: unlock it as in Experiment 6.
-- Keep `reaction`, `best`, and the number of false starts in variables, and check them in the Watch window over at least five rounds.
-- Ignore SW2 between rounds, and ignore SW1 while a round is running.
+Like the vending machine in [Experiment 6](/preview/exp6-gpio-interrupts), the game is a state machine, but this time a **timer** moves it too, not only buttons:
 
-::: details Hint: the states
-The game is in one of three states: **idle** (waiting for SW1), **waiting** (Timer1A is running, green is off), and **go** (green is on, waiting for SW2). Keep the state in a `volatile` variable, and let each handler act only in the states where its event means something:
+![State diagram of the reaction game. Idle: SW1 starts a random wait and goes to Waiting. Waiting, LED off: when Timer1A runs out the LED turns green and the game goes to Go; SW2 before that is a false start: red, back to Idle. Go, green: SW2 stores the reaction time, turns the LED blue for a success, and goes back to Idle. Presses not shown are ignored.](/images/exp7/reaction-game.svg)
 
-| Event | Idle | Waiting | Go |
-|:---|:---|:---|:---|
-| SW1 press | Start Timer1A, go to waiting | Ignore | Ignore |
-| Timer1A time-out | | Green on, note `ms`, go to go | |
-| SW2 press | Ignore | Red on: false start, stop Timer1A, go to idle | Green off, store the reaction, go to idle |
+A press with no arrow from the current state is ignored: SW2 in Idle, and SW1 once a round has started.
+
+### The starter program
+
+Start from this program. It compiles and runs as it is, but does nothing yet: the pins, the 1 ms clock, and the debouncing are done, and the game is yours to write. This time there's more to write than in Experiment 6, and fewer worked examples: a whole interrupt handler, and the timer's setup.
+
+<<< @/snippets/preview/exp7/task.c{c}
+
+**The provided part.** `GPIOF_Handler` is the Activity's quiet-time debounce, applied to both buttons: each has its own `last_edge`, and a real press of either calls `on_press()` exactly once, with the button that was pressed. `SysTick_Handler` keeps the `ms` clock. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
+
+:::: details What to write: the five TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 5, 4, 2**, then **3**. That way you can test halfway: after TODO 2, SW1 already makes the LED turn green after a random wait.
+
+::: details TODO 1: the states (in `enum State`)
+- Add `WAITING` (the random wait, LED off) and `GO` (green).
+
 :::
 
-::: details Hint: one-shot Timer1A
-Configure it once in `main` (32-bit, `TAMR = 0x1`, interrupt enabled) but don't start it. To start a round, write the wait to `TAILR` (`(SystemCoreClock / 1000) * wait_ms - 1`) and set `TAEN`. To cancel it on a false start, clear `TAEN`.
+::: details TODO 5: set up Timer1A (in `main`)
+- Stop it (clear `TAEN`), make it 32-bit (`CFG_32BIT`) and one-shot (`TAMR_ONESHOT`), and clear `ICR`.
+- Enable the time-out interrupt in **both** places: `IMR` in the timer, and `NVIC_EnableIRQ(TIMER1A_IRQn)`. Miss either one and `TIMER1A_Handler` never runs: the LED never turns green.
+- Don't set `TAILR` or `TAEN` here: each round loads its own wait and starts the timer, in TODO 2.
+- It's the Activity's Step 3, except one-shot and not started. A one-shot timer stops by itself when it runs out.
+
 :::
+
+::: details TODO 4: the wait is over (the body of `TIMER1A_Handler`)
+- Clear the time-out flag first, as in every timer handler: `TIMER1->ICR = TATO`.
+- Show green, store `ms` in `go_ms`, and go to `GO`.
+
+:::
+
+::: details TODO 2: start a round (`on_press()`, `case IDLE`)
+- Only on **SW1**: check `button == SW1`. Without the check, SW2 in Idle starts a round too.
+- Turn the LED off, load `TAILR` with the random wait in clock cycles, `(SystemCoreClock / 1000) * (1000 + ms % 2000) - 1`, set `TAEN`, and go to `WAITING`.
+- The wait is random because nobody presses SW1 at the same millisecond twice.
+
+:::
+
+**Test now:** SW1 should turn the LED off, then green 1 to 3 seconds later.
+
+::: details TODO 3: end a round (`on_press()`, add `case WAITING` and `case GO`)
+- Both react only to **SW2**: check the button, as in TODO 2.
+- `WAITING`, a false start: stop the timer (clear `TAEN`), show red, add one to `false_starts`, and go back to `IDLE`.
+- `GO`, the reaction: `reaction = ms - go_ms`. If `best` is 0 (the first round) or `reaction` is smaller, make it the new `best`. Show blue for a success, and go back to `IDLE`.
+:::
+::::
+
+**Check:** build and flash, and add `state`, `reaction`, `best`, and `false_starts` to the Watch window.
+
+- **A round:** press SW1. The LED goes off and `state` is `WAITING`. One to three seconds later it turns green (`GO`). Press SW2: the LED turns blue, `state` is `IDLE`, and `reaction` holds your time, typically 200 to 400 ms.
+- **The best time:** play five rounds. `best` is set by the first round and only changes when you beat it.
+- **A false start:** press SW1, then SW2 before green. The LED turns red, `false_starts` goes up by one, and green never comes. Press SW1 to try again.
+- **Ignored presses:** SW2 in Idle does nothing, and SW1 during a round doesn't restart it.
