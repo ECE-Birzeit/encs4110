@@ -243,7 +243,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 **Target device:** TM4C123GH6PM
 
-![LCD Connection Schematic](/image-3.png)
+![Wiring the 16x2 LCD: VSS, RW and K to GND; VDD and A to VBUS; V0 to the wiper of a 10 kΩ potentiometer between 5 V and GND; RS to PB0, E to PB2, D4 to D7 to PB4 to PB7; D0 to D3 not connected](/images/exp8/lcd-wiring.svg)
 
 The figure above shows the complete wiring diagram for connecting the 16×2 LCD module to the TM4C123 microcontroller using 4-bit mode. The connections are:
 - **Power**: VDD to VBus, VSS to Ground, V0 to contrast potentiometer

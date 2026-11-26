@@ -62,7 +62,7 @@ A UART transmission consists of a **data frame** that includes:
 
 The most common configuration is **8N1**: 8 data bits, No parity, 1 stop bit.
 
-![UART 8N1 frame: a low start bit, data bits D0 to D7 least significant first, then a high stop bit](/images/manual/uart-frame.svg)
+![The character A (0x41) as one 8N1 frame: idle high, a low start bit, D0 to D7 least significant first, a high stop bit; each bit lasts 8.68 µs at 115200 baud](/images/exp10/uart-frame.svg)
 
 *UART frame structure (8N1 format)*
 
@@ -378,7 +378,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 1. With the LaunchPad plugged in, open **Device Manager → Ports (COM & LPT)** on Windows and note the number of **Stellaris Virtual Serial Port** (for example `COM5`).
 2. Open [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html), choose **Serial**, enter that COM port, and set **Speed** to **115200**. The other settings stay at their defaults: 8 data bits, no parity, 1 stop bit, no flow control.
 
-![PuTTY serial configuration: connection type Serial, the LaunchPad's COM port, speed 115200](/putty.png)
+![UART0's path to the PC: PA0 and PA1 connect on the board to the ICDI debug chip, which carries the bytes over the debug USB cable to a virtual COM port; the terminal opens it at 115200 baud, 8 data bits, no parity, 1 stop bit](/images/exp10/uart-path.svg)
 
 Keep PuTTY open while you work: Keil can flash the board with the terminal connected.
 

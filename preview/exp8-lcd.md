@@ -257,7 +257,7 @@ This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet
 
 ### Step 1: Wire the LCD
 
-![LCD wiring: VDD and the backlight anode to VBUS, VSS and the backlight cathode to GND, V0 to the contrast potentiometer's wiper, RS to PB0, E to PB2, RW to GND, D4 to D7 to PB4 to PB7](/image-3.png)
+![Wiring the 16x2 LCD: VSS, RW and K to GND; VDD and A to VBUS; V0 to the wiper of a 10 kΩ potentiometer between 5 V and GND; RS to PB0, E to PB2, D4 to D7 to PB4 to PB7; D0 to D3 not connected](/images/exp8/lcd-wiring.svg)
 
 | LCD pin | Connect to | Why |
 | --- | --- | --- |
