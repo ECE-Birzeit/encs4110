@@ -35,6 +35,8 @@ New experiments we are writing. They aren't in the lab manual yet, so the online
 | # | Experiment | Online Guide | Status |
 |---|------------|--------------|--------|
 | 11 | PWM with General-Purpose Timers | [Open](./exp11-pwm-timers) | Draft |
+| 12 | Quadrature Encoder Interface (QEI) | [Open](./exp12-qei) | Draft |
+| 13 | I2C with a 16x2 LCD | [Open](./exp13-i2c-lcd) | Draft |
 
 
 ::: tip Lab Manual
