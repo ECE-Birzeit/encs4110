@@ -405,20 +405,29 @@ Add `__main` after the subroutines:
 
 `__main` initializes Port F once, then shows the seven colours in a loop. Each colour is one `MOV` and one `BL SHOW`. `END` must stay the last line of the file.
 
-**Check:** build, flash, and run. The LED cycles red, yellow, green, cyan, blue, magenta, white, then starts again.
+Build, flash, and run.
 
-**Then try** in the debugger:
+<Checklist id="activity" title="Activity checklist">
 
-- Put a breakpoint on the `STR` in `SHOW` and press **Run** (F5) repeatedly. Watch `R0` in the **Registers** window: 0x02, 0x0A, 0x08, 0x0C, 0x04, 0x06, 0x0E.
-- Open **Peripherals → System Viewer → GPIOF** and watch `DATA` change with each colour.
-- Change `GPIOF_RGB` to `0x40025008`, the address masked to **PF1 only**, and re-flash. Now only the red part of each colour shows: red, yellow, magenta, and white light up red, and the others stay dark. That's the mask at work.
+- Does the LED cycle red, yellow, green, cyan, blue, magenta, white, then start again?
+- With a breakpoint on the `STR` in `SHOW`, did you see `R0` take the values 0x02, 0x0A, 0x08, 0x0C, 0x04, 0x06, 0x0E?
+- In **Peripherals, System Viewer, GPIOF**, did you see `DATA` change with each colour?
+- Can you say why `SHOW` starts with `PUSH {R4, LR}`?
+
+</Checklist>
+
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Change `GPIOF_RGB` to `0x40025008`, the address masked to PF1 only | Only the red part of each colour shows: red, yellow, magenta and white light up red, the others stay dark. That's the mask at work. |
+| Make one LED blink: replace the seven colours in `__main` with `RED`, then `0` (all off) | A single blinking LED, like the old Example 1. Change `DELAY_COUNT` to set the speed. |
+:::
 
 ::: details The complete program
 <<< @/snippets/preview/exp5/main.asm#full
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | `Undefined symbol __main` | `EXPORT __main` is missing, or the label isn't spelt `__main` (two underscores). |
@@ -427,6 +436,7 @@ Add `__main` after the subroutines:
 | Only one colour, never changes | `SHOW` doesn't return to `__main`: check the `PUSH {R4, LR}` and `POP {R4, PC}` pair. |
 | Program stops in `HardFault_Handler` | A register was accessed before `RCGCGPIO` enabled the clock, or the stack is unbalanced (more `PUSH` than `POP`). |
 | Colours change too fast or too slow | Change `DELAY_COUNT`. Each loop of `DELAY` takes about 3 clock cycles. |
+:::
 
 ## Task
 
@@ -434,13 +444,15 @@ Turn the colour cycle into a **light show read from a table in memory**. Instead
 
 ### The starter program
 
-Start from this program in `main.s`. It assembles and runs as it is, but the LED stays off: the names, the setup, the subroutines, and a three-step sample table are done, and the code that plays the table is yours to write.
+Start from this program in `main.s`. It assembles and runs, but the LED stays off: the setup, the subroutines and a three-step sample table are done, and the code that plays the table is yours to write.
 
 <<< @/snippets/preview/exp5/task.asm
 
-**The provided part.** `PF_Init`, `DELAY`, and the colour names are the Activity's. `SET_LEDS` lights the colour in `R0`. `WAIT_100MS` waits about 100 ms once `WAIT_COUNT` is right. Both change only `R0` and `R1`, so `R5` and `R6` keep their values across a call: use them for the table pointer and the duration. Don't change the provided part.
+::: details How the provided part works
+`PF_Init`, `DELAY`, and the colour names are the Activity's. `SET_LEDS` lights the colour in `R0`. `WAIT_100MS` waits about 100 ms once `WAIT_COUNT` is right. Both change only `R0` and `R1`, so `R5` and `R6` keep their values across a call: use them for the table pointer and the duration. Don't change the provided part.
 
-**The table** is a list of bytes in its own `DATA` area: `DCB RED, 10` is two bytes, the colour and then 10 tenths of a second. A colour byte of `END_MARK` (`0xFF`) ends it.
+The table is a list of bytes in its own `DATA` area: `DCB RED, 10` is two bytes, the colour and then 10 tenths of a second. A colour byte of `END_MARK` (`0xFF`) ends it.
+:::
 
 :::: details What to write: the three TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **2, 1, 3**. TODO 2 plays the sample table, TODO 1 uses that to time the steps, and TODO 3 is your own show.
@@ -470,12 +482,17 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 :::
 ::::
 
-**Check:** build, flash, and run.
+Build, flash, and run.
 
-- Your show plays from the first step to the last, then starts again with no pause or flicker in between.
-- Each step lasts its time: a step of `10` is one second against your stopwatch.
-- In the debugger, put a breakpoint on the `LDRB` that reads the colour and press **Run** (F5) a few times: `R5` goes up by 2 each step and jumps back to `TABLE` after the end marker.
+<Checklist id="task" title="Task checklist">
 
-::: tip What this uses
+- Did you time `WAIT_COUNT` yourself, so a step of `10` lasts one second against a stopwatch?
+- Does your show play from the first step to the last, then start again with no pause or flicker?
+- Does it use at least eight steps, five colours and three different durations?
+- With a breakpoint on the `LDRB` that reads the colour, did you see `R5` go up by 2 each step and jump back to `TABLE` after the end marker?
+
+</Checklist>
+
+::: details What this uses
 The table and the post-indexed loads come from [Experiment 2](/experiments/exp2-data-processing), the loop and the end-marker test from [Experiment 3](/experiments/exp3-branching-loops), and the subroutines from [Experiment 4](/experiments/exp4-procedures-stack).
 :::
