@@ -53,7 +53,7 @@ where $V_{\text{REFP}}$ is the positive reference voltage, $V_{\text{REFN}}$ is 
 
 ### TM4C123 ADC Architecture
 
-The TM4C123GH6PM microcontroller features **two identical 12-bit ADC modules** (ADC0 and ADC1) that share 12 analog input channels. These modules provide high-precision conversion of continuous analog voltages to discrete digital numbers. Each module has its own registers (`ADC0->...` and `ADC1->...`), its own clock bit in `RCGCADC`, its own sequencers and its own interrupts, so the two can convert two inputs at the same moment. This lab uses ADC0; a [Then try](#then-try) in the Task adds ADC1.
+The TM4C123GH6PM microcontroller features **two identical 12-bit ADC modules** (ADC0 and ADC1) that share 12 analog input channels. These modules provide high-precision conversion of continuous analog voltages to discrete digital numbers. Each module has its own registers (`ADC0->...` and `ADC1->...`), its own clock bit in `RCGCADC`, its own sequencers and its own interrupts, so the two can convert two inputs at the same moment. This lab uses ADC0; an optional item at the end of the [Task](#task) adds ADC1.
 
 #### Key Features
 
@@ -503,19 +503,30 @@ Add `main` at the end of the file:
 2. **Sequencer 3** is configured while it's off: software trigger, input AIN0, one sample. Then it's enabled.
 3. **The loop** reads, converts, and picks the zone. $\text{mV} = \text{raw} \times 3300 / 4095$, so 0 is 0 mV and 4095 is 3300 mV. The multiplication comes first, so integer division doesn't lose the result.
 
-**Check:** build, flash, and run, and add `raw` and `millivolts` to the Watch window. Turn the knob from one end to the other: `raw` goes from about 0 to about 4095, `millivolts` from 0 to about 3300, and the LED goes red, green, blue.
+Build, flash, and run, and add `raw` and `millivolts` to the Watch window.
 
-**Then try:**
+<Checklist id="activity" title="Activity checklist">
 
-- Turn the knob slowly until the LED sits right at the red-green border, at 1.1 V. The LED flickers between the two colours, and `raw` jumps by a few counts even with your hand off the knob. That's **noise**: every reading is a little different. The Task's [Then try](#then-try) fixes both, with averaging and hysteresis.
-- Read the chip's **internal temperature sensor** instead: add `(1U << 3)` (the `TS0` bit) to the `SSCTL3` write, and compute the temperature in tenths of a degree from the [formula above](#internal-temperature-sensor): `temp_x10 = 1475 - (2475 * raw) / 4096`. Put a finger on the chip and watch it rise slowly.
+- Turning the knob end to end, does `raw` go from about 0 to about 4095?
+- Did you see `millivolts` go from 0 to about 3300 in the Watch window?
+- Does the LED go red, green, then blue as you turn?
+- With your hand off the knob, does `raw` still change by a few counts?
+- Can you say why PE3 needs `DEN` cleared and `AMSEL` set?
+
+</Checklist>
+
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Turn the knob slowly to the red-green border, at 1.1 V | The LED flickers between the two colours, and `raw` jumps by a few counts with your hand off the knob: **noise**. The Task's optional items fix it with averaging and hysteresis. |
+| Read the internal **temperature sensor**: add `(1U << 3)` (the `TS0` bit) to the `SSCTL3` write, and compute `temp_x10 = 1475 - (2475 * raw) / 4096` ([formula](#internal-temperature-sensor)) | The chip's temperature in tenths of a degree, in the Watch window. Put a finger on the chip and watch it rise slowly. |
+:::
 
 ::: details The complete program
 <<< @/snippets/preview/exp9/main.c#full{c}
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | `raw` is stuck at 0 or 4095 | Wiring: the wiper isn't on PE3, or an outer pin is unconnected. |
@@ -526,84 +537,87 @@ Add `main` at the end of the file:
 | Task: `samples` stays at 0 | No trigger reaches the ADC, or the interrupt is off. Check `TAOTE` and `TAEN` on Timer0A, `EMUX` field 0x5, `SS3` in `IM`, and `NVIC_EnableIRQ(ADC0SS3_IRQn)`. |
 | Task: the program never leaves `ADC0SS3_Handler` | `ISC` isn't cleared, so the interrupt fires again the moment the handler returns. |
 | Task: `samples` grows far faster than 100 a second | `TAILR` is wrong: it's `SystemCoreClock / SAMPLE_HZ - 1`, in clock cycles. |
+:::
 
 ## Task
 
-Build a **knob dimmer**: the potentiometer sets the **blue LED's brightness**, from nearly off at one end to full at the other. Two things change from the Activity:
+Build a **knob dimmer**: the potentiometer sets the **blue LED's brightness**, from nearly off to full. Two things change from the Activity:
 
-- **Nobody asks for the samples.** Timer0A runs out 100 times a second, and each time-out starts a conversion by itself (its `TAOTE` bit, and `EMUX` field 0x5, as described under [ADCEMUX](#adcemux-—-adc-event-multiplexer-select)). No code runs at sample time, and there's no `adc_read()` loop.
-- **The result interrupts the CPU.** When the conversion is done, sequencer 3's interrupt runs `ADC0SS3_Handler`, which stores the reading and sets a flag. `main` sees the flag and sets the brightness with Experiment 8's `pwm_set()`. The handler only stores; `main` does the output.
+- **Nobody asks for the samples.** Timer0A runs out 100 times a second, and each time-out starts a conversion by itself (its `TAOTE` bit, and `EMUX` field 0x5, as under [ADCEMUX](#adcemux-—-adc-event-multiplexer-select)).
+- **The result interrupts the CPU.** `ADC0SS3_Handler` stores the reading and sets a flag; `main` sees the flag and sets the brightness with Experiment 8's `pwm_set()`.
 
-The wiring is the Activity's: the potentiometer's wiper on PE3. The blue LED is driven by Timer1A's PWM on PF2, as in [Experiment 8](/preview/exp8-pwm), so it no longer shows colour zones.
+The wiring is the Activity's. The blue LED is driven by Timer1A's PWM on PF2, as in [Experiment 8](/preview/exp8-pwm).
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is, but the LED stays nearly off: the pot pin, the sequencer, and the PWM are done, and the timer trigger and the interrupt are yours to write.
+Start from this program. It compiles and runs, but the LED stays nearly off: the pot pin, the sequencer and the PWM are done, and the timer trigger and the interrupt are yours to write.
 
 <<< @/snippets/preview/exp9/task.c{c}
 
-**The provided part.** `pwm_init()` and `pwm_set()` are Experiment 8's Activity, unchanged: Timer1A makes a 1 kHz PWM signal on PF2, and `pwm_set(percent)` sets its duty cycle, clamped to 1 to 99. In `main`, PE3 and sequencer 3 are set up as in the Activity, except for the trigger. Timer0 is a different timer from Timer1, with its own clock bit, so the trigger and the PWM don't disturb each other. Don't change these.
+::: details How the provided part works
+`pwm_init()` and `pwm_set()` are Experiment 8's Activity, unchanged: Timer1A makes a 1 kHz PWM signal on PF2, and `pwm_set(percent)` sets its duty cycle, clamped to 1 to 99. In `main`, PE3 and sequencer 3 are set up as in the Activity, except for the trigger. Timer0 is a different timer from Timer1, with its own clock bit, so the trigger and the PWM don't disturb each other. Don't change these.
+:::
 
 :::: details What to write: the four TODOs
-Each TODO is highlighted in the starter, exactly where its code goes. Write them in order, **1, 2, 3**, then **4**: after TODO 3 the readings already arrive, before any brightness changes.
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in order, **1, 2, 3**, then **4**: after TODO 3 the readings already arrive.
 
 ::: details TODO 1: Timer0A as the trigger (in `main`)
-- It's [Experiment 7](/preview/exp7-timers)'s periodic timer on `TIMER0`: stop it (clear `TAEN`), make it 32-bit (`CFG_32BIT`) and periodic (`TAMR_PERIODIC`).
-- `TAILR` is the number of clock cycles per sample, minus one: `SystemCoreClock / SAMPLE_HZ - 1`.
-- Start it with **two** bits in one write: `TIMER0->CTL |= CTL_TAOTE | CTL_TAEN;`. Without `TAOTE`, the timer still runs, but the ADC never hears it.
-- No `IMR` and no `NVIC_EnableIRQ(TIMER0A_IRQn)`: the timer's job is only to start conversions. The interrupt you want is the ADC's, in TODO 2.
+- [Experiment 7](/preview/exp7-timers)'s periodic timer, on `TIMER0`: stop it (clear `TAEN`), 32-bit (`CFG_32BIT`), periodic (`TAMR_PERIODIC`).
+- `TAILR` is the clock cycles per sample, minus one: `SystemCoreClock / SAMPLE_HZ - 1`.
+- Start it with `TIMER0->CTL |= CTL_TAOTE | CTL_TAEN;`. Without `TAOTE` the timer runs, but the ADC never hears it.
+- No `IMR` and no `TIMER0A_IRQn`: the interrupt you want is the ADC's.
 
 :::
 
 ::: details TODO 2: the trigger and the interrupt (in `main`, while the sequencer is off)
-- The Activity cleared sequencer 3's `EMUX` field, which means software. Clear it the same way, then set `EMUX_SS3_TIMER` in it: `ADC0->EMUX = (ADC0->EMUX & ~EMUX_SS3) | EMUX_SS3_TIMER;`.
-- The interrupt needs **both** places, as for the timers in Experiment 7: `SS3` in `ADC0->IM`, and `NVIC_EnableIRQ(ADC0SS3_IRQn)`. `SSCTL_IE0`, already provided, is what sets the flag; `IM` is what lets that flag interrupt the CPU.
-- It goes before `ACTSS` turns the sequencer on: change a sequencer's setup only while it's off.
+- Clear sequencer 3's `EMUX` field as in the Activity, then set `EMUX_SS3_TIMER`: `ADC0->EMUX = (ADC0->EMUX & ~EMUX_SS3) | EMUX_SS3_TIMER;`.
+- Enable the interrupt in **both** places: `SS3` in `ADC0->IM`, and `NVIC_EnableIRQ(ADC0SS3_IRQn)`.
 
 :::
 
 ::: details TODO 3: the handler (the body of `ADC0SS3_Handler`)
-- It's the second half of the Activity's `adc_read()`: read `SSFIFO3` (keep 12 bits with `& 0xFFF`) into `raw`, and clear the flag with `ADC0->ISC = SS3`.
-- There's no `PSSI` (the timer started it) and no wait on `RIS` (the interrupt means it's done).
-- Then add one to `samples` and set `new_sample = 1` for `main`.
+- The second half of the Activity's `adc_read()`: `SSFIFO3 & 0xFFF` into `raw`, then `ADC0->ISC = SS3`.
+- No `PSSI` (the timer started it) and no `RIS` wait (the interrupt means it's done).
+- Then add one to `samples` and set `new_sample = 1`.
 
 :::
 
-**Test now:** add `raw`, `samples`, and `millivolts` to the Watch window and run. `samples` grows by about 100 a second, and `raw` and `millivolts` follow the knob, as in the Activity. The LED doesn't change yet.
+**Test now:** add `raw`, `samples`, and `millivolts` to the Watch window and run. `samples` grows by about 100 a second, and `raw` follows the knob. The LED doesn't change yet.
 
 ::: details TODO 4: the brightness (in `main`, inside `if (new_sample)`)
-- Scale the reading to a percentage the same way the Activity scaled it to millivolts: `raw * 100 / ADC_MAX`, multiplication first. 0 gives 0 and 4095 gives 100.
-- Store it in `duty`, then call `pwm_set(duty)`. You don't need to clamp it yourself: `pwm_set()` keeps it between 1 and 99.
+- Scale like the Activity's millivolts: `raw * 100 / ADC_MAX`, multiplication first. 0 gives 0, 4095 gives 100.
+- Store it in `duty` and call `pwm_set(duty)`: it clamps to 1 to 99 for you.
 :::
 ::::
 
-**Check:** build and flash, and add `raw`, `samples`, `millivolts`, and `duty` to the Watch window.
+Build and flash, and add `raw`, `samples`, `millivolts`, and `duty` to the Watch window.
 
-- **The rate:** stop the program, note `samples`, run for 10 seconds by a phone's stopwatch, and stop again: it grew by about 1000.
-- **The dimmer:** turn the knob from one end to the other. `duty` goes from 0 to 100, and the blue LED from nearly off to full, smoothly, with no steps you can see.
-- **The CPU is free:** `main` does nothing until a reading arrives. Put a breakpoint inside `if (new_sample)`: it stops at once, each time you run, because 100 readings a second keep coming.
+<Checklist id="task" title="Task checklist">
 
-### Then try
+- Did you write the Timer0A trigger and the `ADC0SS3_Handler` yourself?
+- Over 10 seconds by a phone's stopwatch, does `samples` grow by about 1000?
+- Turning the knob end to end, does `duty` go from 0 to 100?
+- Does the blue LED dim smoothly from nearly off to full, with no visible steps?
+- Can you say why the handler only stores the reading, and `main` calls `pwm_set()`?
 
-- **Change the rate.** Set `SAMPLE_HZ` to 1000, then to 2: check the new rate with `samples`. At 2 a second, turn the knob quickly and watch the brightness follow in jumps. Put it back to 100.
-- **Average in hardware.** In the Activity's flicker test, `raw` jumps by a few counts with your hand off the knob. Add `ADC0->SAC = 0x6;` while the sequencer is off: each trigger now makes 64 conversions, and the ADC returns their average as one result. Watch `raw` with your hand off the knob: it barely moves. (`SAC` takes 0 to 6, for 1, 2, 4, ... 64 samples.)
-- **Average in software.** Remove `SAC` again and average the last 64 readings yourself, in `ADC0SS3_Handler`. Keep `raw` as the newest reading, add an `average`, and use the average for `duty`.
+</Checklist>
 
-  ::: details Hint: a running average without a big sum
-  Keep the last 64 readings in an array used as a ring, and a running total. Each new reading replaces the oldest: subtract the old one from the total, add the new one, and move the ring index on with `(i + 1) % 64`. The average is `total / 64`. 64 readings of up to 4095 sum to at most 262,080, so the total fits in a `uint32_t` with room to spare. This is short enough for a handler: a few additions, no waiting.
-  :::
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Set `SAMPLE_HZ` to 1000, then to 2 | `samples` grows 10 times faster, then 50 times slower. At 2, the brightness follows a fast turn in jumps. Put it back to 100. |
+| Add `ADC0->SAC = 0x6;` while the sequencer is off (hardware averaging) | Each trigger makes 64 conversions and returns their average: `raw` barely moves with your hand off the knob. `SAC` takes 0 to 6, for 1, 2, 4, ... 64 samples. |
+| Remove `SAC` and average the last 64 readings in the handler, into an `average` used for `duty` | The same steadiness, done in software. Hint below. |
+| Light the **red LED** (PF1, a plain output) below 1.1 V, from `main` | It flickers at the border. With **hysteresis**, on below 1000 mV and off only above 1200 mV, it doesn't. Hint below. |
+| Add `TS0`, `(1U << 3)`, to the `SSCTL3` write and compute `temp_x10` as in the Activity | A thermometer read 100 times a second by the timer, with no code at sample time. |
+| A second pot on **PE2** (AIN1), read by **ADC1**, sets the **green LED** (PF3) by PWM on **Timer1B** | Two knobs, two colours: the two modules convert at the same moment. Hints below. |
 
-- **Hysteresis: a low-level warning.** Light the **red LED** (PF1, a plain output: set it in `DIR` and `DEN`) when the knob is below 1.1 V, from `main`. Turn slowly at the border: it flickers. Fix it with **100 mV of hysteresis**: the red LED turns on below 1000 mV and off only above 1200 mV, and between the two it stays as it was.
+**Running average:** keep the last 64 readings in an array used as a ring, and a running total. Each new reading replaces the oldest: subtract the old one, add the new one, move the index on with `(i + 1) % 64`. The average is `total / 64`; the total is at most 262,080, so a `uint32_t` holds it. That's short enough for a handler.
 
-  ::: details Hint: hysteresis
-  Remember whether the warning is on. If it's off, only check for falling below 1000; if it's on, only check for rising above 1200. Nothing else changes it. The same idea fixes the Activity's three colour zones: each zone checks only its own two exits, each 100 mV past a border.
-  :::
+**Hysteresis:** remember whether the warning is on. If it's off, only check for falling below 1000; if it's on, only check for rising above 1200. The same idea fixes the Activity's colour zones: each zone checks only its own two exits, 100 mV past each border.
 
-- **A timed thermometer.** Add the `TS0` bit, `(1U << 3)`, to the `SSCTL3` write, as in the Activity's Then try, and compute `temp_x10 = 1475 - (2475 * raw) / 4096` in `main`. The chip's temperature is now measured 100 times a second by the timer, with no code at sample time. (The LED brightness now follows the temperature, which barely changes.)
-- **Two inputs on two modules.** Add a second potentiometer on **PE2** (AIN1), read by **ADC1**, that sets the **green LED** (PF3) by PWM on **Timer1B**: two knobs, two colours. ADC1 is a copy of ADC0, so both modules convert at the same moment.
-
-  ::: details Hints: ADC1 and Timer1B
-  - **ADC1:** its clock is bit 1 of `RCGCADC`, and its ready bit is bit 1 of `PRADC`. Make PE2 analog like PE3. Set up `ADC1`'s sequencer 3 exactly like `ADC0`'s, except `ADC1->SSMUX3 = 1` (AIN1). With `EMUX` 0x5 in both modules, Timer0A's one trigger starts both.
-  - **Its interrupt:** `ADC1SS3_Handler`, with `ADC1SS3_IRQn` in the NVIC. It reads `ADC1->SSFIFO3` into a second variable and clears `ADC1->ISC`.
-  - **Timer1B on PF3:** PF3's `PCTL` field is bits 15:12, and 7 selects T1CCP1. Timer B has its own `TBMR`, `TBPR`, `TBILR`, and `TBMATCHR`, set the same way as Timer A's, and its enable is `TBEN`, bit 8 of `CTL`. `CFG` is shared and already 16-bit: don't write it again, and set `TBEN` with `|=` so Timer A keeps running. Write a `pwm_set_green()` like `pwm_set()`, but on `TBMATCHR`.
-  :::
+**ADC1 and Timer1B:**
+- ADC1's clock is bit 1 of `RCGCADC` (ready: bit 1 of `PRADC`). Make PE2 analog like PE3, and set up `ADC1`'s sequencer 3 like `ADC0`'s, with `ADC1->SSMUX3 = 1`. With `EMUX` 0x5 in both, Timer0A's one trigger starts both modules.
+- `ADC1SS3_Handler`, with `ADC1SS3_IRQn` in the NVIC, reads `ADC1->SSFIFO3` and clears `ADC1->ISC`.
+- PF3's `PCTL` field is bits 15:12, and 7 selects T1CCP1. Timer B has its own `TBMR`, `TBPR`, `TBILR` and `TBMATCHR`, set like Timer A's; its enable is `TBEN`, bit 8 of `CTL`. `CFG` is shared and already 16-bit, and set `TBEN` with `|=` so Timer A keeps running. Write `pwm_set_green()` like `pwm_set()`, on `TBMATCHR`.
+:::
