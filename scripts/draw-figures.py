@@ -2,7 +2,6 @@
 
   exp6/vending-machine.svg  the Experiment 6 Task's state machine: four states, the two buttons
   exp7/reaction-game.svg    the Experiment 7 Task's state machine: three states, buttons and a timer
-  exp8/stopwatch.svg        the Experiment 8 Task's state machine: two states
 
   exp8/lcd-wiring.svg     the 16x2 LCD: 5 V and GND rails, the contrast potentiometer, and every
                           signal straight up to its LaunchPad pin (header locations: setup/pinout)
@@ -178,7 +177,8 @@ def pot_wiring(path):
 # ------------------------------------------------------------------ state diagrams (Experiments 6 and 7)
 SW1C, SW2C, TIMC = '#c2410c', '#7c3aed', '#0f766e'   # an arrow colour per kind of event
 
-def state_diagram(path, w, h, label, nodes, edges, loops=(), start=None, key=()):
+def state_diagram(path, w, h, label, nodes, edges, loops=(), start=None, key=(),
+                  note='Each circle is a state, filled with its LED colour.'):
     """nodes: key -> (x, y, name, led text, fill, text colour, stroke)
     edges: (from, to, colour, label, bend, label dx, label dy, anchor, box)
     loops: (node, side, colour, label, anchor);  start: (node, side);  key: (colour, text) pairs"""
@@ -241,7 +241,7 @@ def state_diagram(path, w, h, label, nodes, edges, loops=(), start=None, key=())
         head(kx + 42, h - 28, 1, 0, color)
         s.text(kx + 52, h - 28, text, 13, INK, anchor='start')
         kx += 72 + len(text) * 7.6
-    s.text(kx + 10, h - 28, 'Each circle is a state, filled with its LED colour.', 13, DIM, anchor='start')
+    s.text(kx + 10, h - 28, note, 13, DIM, anchor='start')
     s.save(path)
 
 
@@ -278,19 +278,7 @@ def reaction_game(path):
                   key=((SW1C, 'SW1: start'), (SW2C, 'SW2: react'), (TIMC, 'Timer1A time-out')))
 
 
-def stopwatch(path):
-    nodes = {'stop': (340, 150, 'Stopped', 'LED off', *OFF),
-             'run': (700, 150, 'Running', 'green', '#16a34a', '#ffffff', '#166534')}
-    edges = [('stop', 'run', SW1C, 'SW1: start, note millis()', -60, 0, -4, 'middle', True),
-             ('run', 'stop', SW1C, 'SW1: stop, add the run to the total', -60, 0, 4, 'middle', True)]
-    loops = [('stop', 'left', SW2C, 'SW2: reset to 00:00.0', 'end')]
-    state_diagram(path, 1000, 330, 'State diagram of the stopwatch. Stopped, LED off: SW1 starts it, noting the time with millis(), and goes to Running; SW2 resets the time to 00:00.0 and stays in Stopped. Running, green: SW1 stops it, adds the run to the total, and goes back to Stopped; SW2 is ignored.',
-                  nodes, edges, loops, start=None,
-                  key=((SW1C, 'SW1: start and stop'), (SW2C, 'SW2: reset')))
-
-
 vending_machine('public/images/exp6/vending-machine.svg')
 reaction_game('public/images/exp7/reaction-game.svg')
-stopwatch('public/images/exp8/stopwatch.svg')
 lcd_wiring('public/images/exp8/lcd-wiring.svg')
 pot_wiring('public/images/exp9/pot-wiring.svg')

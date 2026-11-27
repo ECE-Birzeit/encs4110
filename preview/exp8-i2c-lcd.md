@@ -1,12 +1,12 @@
 ---
-title: "Character LCD over I2C"
+title: "Inter-Integrated Circuit (I2C) and Character LCD"
 description: "Drive an HD44780 16x2 character LCD over two wires: configure the TM4C123's I2C module as a master, talk to the LCD's PCF8574 backpack, and build an LCD driver on top."
 outline: deep
 lastUpdated: true
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.8"
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=997"
 current: "/experiments/exp8-lcd"
-short: "I2C LCD"
+short: "I2C and LCD"
 search: false
 prev: false
 next: false
@@ -16,7 +16,7 @@ head:
       content: noindex
 ---
 
-# Character LCD over I2C
+# Inter-Integrated Circuit (I2C) and Character LCD
 
 This experiment drives a 16x2 character LCD, the HD44780 kind found on countless devices, over just two signal wires. A small **PCF8574 backpack** soldered to the LCD turns bytes sent over **I2C** into the levels on the LCD's pins, so the LaunchPad needs only SCL, SDA, power, and ground: four jumper wires instead of eleven. You'll learn how the HD44780 is driven in 4-bit mode, set up the TM4C123's I2C module as a master, and build an LCD driver on top of it. I2C is also how most sensors, real-time clocks, and small displays connect, so the same bus comes back in later labs.
 
@@ -472,7 +472,7 @@ Add the LCD functions after the I2C ones:
 <<< @/snippets/preview/exp8/main.c#lcd{c}
 
 - **A 1 ms clock comes first.** Once `main` starts SysTick with an interrupt every millisecond, `SysTick_Handler` counts in `ms`, and **`millis()`** returns it, like Arduino's. **`delay_ms(n)`** notes `ms` and waits until it has moved on by `n`. The subtraction `ms - start` is unsigned, so it's still right when `ms` wraps around after 49 days. SysTick keeps running for the whole program, free for anything else that needs the time.
-- Never call `delay_ms()`, or any LCD function, from an interrupt handler. SysTick has the lowest priority, so inside another handler `ms` stops counting, and `delay_ms()` waits forever.
+- Don't call `delay_ms()`, or any LCD function, from an interrupt handler as things stand. `SysTick_Config` gives SysTick the lowest priority, so inside another handler `ms` stops counting, and `delay_ms()` waits forever. The [Task](#task) shows how to raise SysTick's priority so a handler can use the LCD.
 - **`LCD_SendNibble()`** is the only LCD function that knows about I2C. It builds one byte (the nibble in bits 7:4, then `LCD_BL`, `LCD_EN`, and `RS`) and sends it three times: E low, E high, E low. The LCD latches the nibble when E falls. `LCD_BL` is in every byte because the PCF8574 shows the whole last byte on its outputs: a byte without it would switch the backlight off.
 - **`LCD_Command()`**, **`LCD_Data()`**, and **`LCD_Init()`** follow the Background: two nibbles per byte, RS = 0 for commands and 1 for characters, and the [initialization sequence](#lcd-initialization-sequence). There are almost no delays, because one nibble already takes three I2C bytes, about 0.6 ms. Only the power-up and Clear (1.6 ms) still wait.
 - **`LCD_Print()`** takes a `const char *`: it only reads the string, and a string literal such as `"ENCS4110 Lab"` can't be changed.
@@ -511,59 +511,46 @@ One character is two nibbles, six I2C bytes: about **1.2 ms**. A full 16-charact
 | Program hangs in `I2C0_Write` | The module isn't running the bus: `RCGCI2C` or `MCR_MFE` is missing, or `AFSEL` isn't set for PB2 and PB3. |
 | Backlight on, but boxes stay on line 1 | The initialization didn't reach the LCD. Check `LCD_SendNibble()` puts the nibble in bits 7:4 and pulses `LCD_EN`. |
 | Display blank, no boxes, no text | Contrast: turn the blue trimmer on the back of the backpack while the program runs. |
-| Program hangs in `delay_ms()` | `ms` isn't counting: `SysTick_Config` is missing from `main`, or `delay_ms()` was called from inside an interrupt handler. |
+| Program hangs in `delay_ms()` | `ms` isn't counting: `SysTick_Config` is missing from `main`, or `delay_ms()` was called from inside an interrupt handler whose priority isn't below SysTick's. |
 | Random characters | A nibble went missing: the delays after the first `0x03` (5 ms) and after Clear (2 ms) are too short or missing. |
 | Backlight goes off when text is printed | `LCD_BL` is missing from the byte in `LCD_SendNibble()`. |
 
 ## Task
 
-Build a **stopwatch** on the LCD. Line 1 shows a title, and line 2 the time as `mm:ss.t` (minutes, seconds, tenths). **SW1** starts and stops it, and the green LED is on while it runs. **SW2** resets it to `00:00.0`, but only while it's stopped.
+Build an **up/down counter** on the LCD. Line 1 shows `Counter`, and line 2 the count, starting at 0. **SW1** adds 1. **SW2** takes 1 away, but the count never goes below 0.
 
-![State diagram of the stopwatch. Stopped, LED off: SW1 starts it, noting the time with millis(), and goes to Running; SW2 resets the time to 00:00.0 and stays in Stopped. Running, green: SW1 stops it, adds the run to the total, and goes back to Stopped; SW2 is ignored.](/images/exp8/stopwatch.svg)
+There's no starter this time: you've already written every piece. Start from your Activity program, which has the I2C bus, the LCD functions, and the 1 ms clock, and add the buttons and the counter to it.
 
-SW2 has no arrow out of Running: while the stopwatch runs, it does nothing.
-
-### The starter program
-
-The LCD is wired as in [Step 1](#step-1-wire-the-lcd). The starter is three files. `lcd.c` and `lcd.h` are the I2C and LCD driver you wrote in the Activity, moved into a file of their own. Add both to your project: in Keil's **Project** window, right-click **Source Group 1**, choose **Add Existing Files to Group**, and pick `lcd.c` (keep `lcd.h` in the same folder). `main.c` is the stopwatch, with three TODOs left for you. This time the TODOs are bigger, and the hints say what to do rather than how.
-
-::: code-group
-<<< @/snippets/preview/exp8/task.c{c} [main.c]
-<<< @/snippets/preview/exp8/lcd.h{c} [lcd.h]
-<<< @/snippets/preview/exp8/lcd.c{c} [lcd.c]
+:::: details What you need, and where you've seen it
+::: details The buttons
+- SW1 is PF4 and SW2 is PF0, both inputs with pull-ups: pressed reads 0.
+- PF0 is locked at reset: unlock it first, as in [Experiment 6](/preview/exp6-gpio-interrupts#unlocking-protected-gpio-pins).
+- Interrupt on the falling edge only, a press, and enable `GPIOF_IRQn` in the NVIC.
 :::
 
-**The provided part.** The debouncing is the simplest kind: act on the press, then wait for the release. A falling edge on SW1 or SW2 calls `GPIOF_Handler`, which calls `on_press()` once and turns the buttons' interrupts off, so the bounces after it are ignored. `SysTick_Handler`, besides counting `ms` for `millis()`, checks the buttons every millisecond. Once both have been up for `DEBOUNCE_MS` (20 ms) in a row, it clears the release bounces and turns the interrupts back on. That's why `lcd.c` has no `SysTick_Handler` of its own, and why Port F is set up before `SysTick_Config`. `main` then starts the 1 ms clock and calls `I2C0_Init()` and `LCD_Init()`, as in the Activity. The main loop redraws the time only when the tenth on the screen changes, so the LCD isn't rewritten a thousand times a second. Don't change these.
-
-:::: details What to write: the three TODOs
-Each TODO is highlighted in `main.c`. Write them in order: **1, 2, 3**. The stopwatch needs no timer of its own: it measures each run against `millis()`, the Activity's 1 ms clock.
-
-::: details TODO 1: the buttons (on_press)
-- Follow the arrows in the diagram.
-- SW1 while stopped starts a run: note the time in `start_ms` with `millis()`, set `running`, and turn the green LED on.
-- SW1 while running ends it: add `millis() - start_ms` to `total_ms`, clear `running`, and turn the LED off.
-- SW2 sets `total_ms` back to 0, but only while the stopwatch is stopped. The screen follows by itself: the main loop sees the time change and redraws `00:00.0`.
-- `on_press()` runs **inside the button interrupt**, so it only changes variables and the LED. Never call an LCD function from it: the main loop may be halfway through writing the screen, and the interrupt's I2C bytes would land in the middle, so the LCD shows garbage.
-- Change only the green LED's bit (`|=` and `&= ~`), not the whole `GPIOF->DATA`.
+::: details The debounce
+- Use the one from the [Experiment 7 Task](/preview/exp7-timers#the-starter-program): act on the press, then wait for the release, each button on its own with a `ready` flag.
+- `GPIOF_Handler` clears the flag in `ICR`, and acts only if the button is ready: it clears `ready`, then changes the count.
+- `SysTick_Handler` already counts `ms`. Add `check_release()` for each button: once a pressed button has been up for 20 ms in a row, it's ready again.
+- Set up Port F before `SysTick_Config`: `SysTick_Handler` reads the buttons, and reading Port F before its clock is on crashes.
 :::
 
-::: details TODO 2: the time (elapsed)
-- Return `total_ms`, plus the current run, `millis() - start_ms`, while it's running.
-- `on_press()` runs inside the button interrupt, so it can change the three variables at any moment, even halfway through `elapsed()` reading them. If SW1 stopped the stopwatch between your read of `running` and your read of `total_ms`, you'd count the last run twice, and the wrong time would stay frozen on the screen.
-- So read them with interrupts off: `__disable_irq()` before the first read, `__enable_irq()` after the last. Keep that stretch short: a few lines, no LCD calls.
+::: details Everything in the button handler
+- As in Experiment 6, `GPIOF_Handler` does all the work: read `MIS` to see which button caused the interrupt, and for a ready button, change the count and redraw line 2. `main` sets everything up, then loops doing nothing.
+- The catch: the LCD functions call `delay_ms()`, which waits for SysTick to count `ms`. `SysTick_Config` gives SysTick the **lowest** priority, 7, so it can't interrupt `GPIOF_Handler`, and `delay_ms()` would wait there forever.
+- So after `SysTick_Config`, raise SysTick above the button: `NVIC_SetPriority(SysTick_IRQn, 0)` and `NVIC_SetPriority(GPIOF_IRQn, 1)`. A lower number is a higher priority. Now SysTick keeps counting while `GPIOF_Handler` runs.
+- Call `NVIC_EnableIRQ(GPIOF_IRQn)` last, after `LCD_Init()` and the first drawing, so a press can't cut into `main` halfway through writing the LCD.
 :::
 
-**Test now:** add `running`, `total_ms`, and `elapsed()`'s result to the Watch window (or watch `total_ms` after each stop). SW1 turns the green LED on and off, `total_ms` grows by the length of each run, and SW2 zeroes it only while the LED is off. The LCD still shows only the title.
-
-::: details TODO 3: the display (show_time)
-- Split `t` (milliseconds) into minutes, seconds, and tenths of a second. Minutes go past 59, so keep two digits with `% 100`.
-- Print them on line 2 from column 0 as `mm:ss.t`, with every field padded to its width: `01:05.3`, never `1:5.3`. Print one character at a time with `LCD_Data()`. The character for a digit `d` is `'0' + d`.
+::: details The count
+- `count` is unsigned: 0 - 1 would wrap around to 4294967295. Only take 1 away while it's above 0.
+- The LCD keeps every character until something overwrites it: going from 10 down to 9 would print `9` over the `1` and leave the `0`, showing `90`. Clear line 2 with spaces before printing the number.
 :::
 ::::
 
 **Check:** build and flash.
 
-- At start, line 1 shows **Stopwatch** and line 2 **00:00.0**.
-- SW1: the time runs and the green LED is on. SW1 again: it stops and holds.
-- SW2 while stopped: back to **00:00.0**. SW2 while running: nothing happens.
-- Let it run past a minute: **00:59.9** becomes **01:00.0**. Against a phone stopwatch, it keeps time to within a tenth over a minute.
+- At start, line 1 shows **Counter** and line 2 **0**.
+- SW1 twelve times: **12**. One step per press, however long you hold the button.
+- SW2 three times: **9**, not **90**.
+- SW2 until 0, then once more: it stays at **0**.
