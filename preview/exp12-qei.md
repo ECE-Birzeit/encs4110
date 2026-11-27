@@ -1,6 +1,6 @@
 ---
 title: "Quadrature Encoder Interface (QEI)"
-description: "Read a rotary encoder in hardware with the TM4C123's Quadrature Encoder Interface: track position and direction, measure speed with the velocity timer, and use an HW-040 knob to control PWM brightness."
+description: "Read a rotary encoder in hardware with the TM4C123's Quadrature Encoder Interface: track position and direction, measure speed with the velocity timer, and use an HW-040 knob as a PWM dimmer."
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=1305"
@@ -17,7 +17,7 @@ head:
 
 # Quadrature Encoder Interface (QEI)
 
-This experiment reads a **rotary encoder**, the knob used for volume controls and menus, and the sensor on the shaft of most robot and industrial motors. The TM4C123 has a dedicated peripheral for it, the **Quadrature Encoder Interface (QEI)**, which decodes the encoder's two signals in hardware: it keeps the position, knows which way the shaft last turned, and measures how fast it's turning, all without CPU time. You will wire an HW-040 encoder module to QEI1, read its position and speed, and use it as a knob for the PWM output from [Experiment 11](/preview/exp8-pwm).
+This experiment reads a **rotary encoder**, the knob used for volume controls and menus, and the sensor on the shaft of most robot and industrial motors. The TM4C123 has a dedicated peripheral for it, the **Quadrature Encoder Interface (QEI)**, which decodes the encoder's two signals in hardware: it keeps the position, knows which way the shaft last turned, and measures how fast it's turning, all without CPU time. You will wire an HW-040 encoder module to QEI1, read its position and speed, and use it as a dimmer for the PWM output from [Experiment 8](/preview/exp8-pwm).
 
 ::: warning Reworked version: in testing
 This is the reworked version of [Experiment 12](/experiments/exp12-qei), shared for TAs to test. In the new order it becomes Experiment 12. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp12-qei)** until this one replaces it.
@@ -30,10 +30,10 @@ This experiment is new and isn't in the lab manual yet. If something on this pag
 ## Objectives
 
 - Explain how two quadrature signals encode both position and direction.
-- Route the encoder's signals to QEI1 with `AFSEL` and `PCTL`, without touching the JTAG pins.
-- Configure `QEICTL` and `QEIMAXPOS` and read the position from `QEIPOS` and the direction from `QEISTAT`.
+- Route the encoder's signals to QEI1 with `AFSEL` and `PCTL`, changing only the Port C pins you use, never the JTAG pins.
+- Configure `QEICTL` and `QEIMAXPOS`, and read the position from `QEIPOS` and the direction from `QEISTAT`.
 - Measure speed with the velocity timer (`QEILOAD`, `QEISPEED`) and its interrupt, and convert it to rpm.
-- Use the encoder as an input device that controls another peripheral.
+- Use the knob as a dimmer: count whole clicks, change a PWM duty cycle by a step that depends on the speed, and switch the light with the knob's debounced button.
 
 ## Background
 
@@ -234,7 +234,7 @@ In the NVIC, QEI1 is **interrupt 38** (`QEI1_IRQn`), and its handler is `QEI1_Ha
 Read the HW-040 knob three ways at once: its **position** within one turn (in counts, clicks, and degrees), the **direction** it last moved (green LED forward, red reverse), and its **speed** in rpm, measured ten times a second. QEI1 does all the counting; the program only reads registers.
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works. All the code goes in that project's `main.c`.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, choosing **C**, and make sure its blinking-LED test works. All the code goes in that project's `main.c`.
 :::
 
 ### Step 1: Wire the encoder
@@ -317,32 +317,67 @@ By hand you can turn the HW-040 at a few hundred rpm at most, so `SPEED` is a sm
 
 ## Task
 
-Make the knob a proper **dimmer** for the blue LED: slow turns make fine changes, fast turns make big ones, and pressing the knob switches the light on and off.
+Make the knob a proper **dimmer** for the blue LED: slow turns make fine changes, fast turns make big ones, and pressing the knob switches the light off and on.
 
-**Requirements:**
-- Generate a 1 kHz PWM signal on PF2 with Timer1A and `pwm_set()`, as in the [Experiment 11 Activity](/preview/exp8-pwm#activity). Remove the direction LEDs: PF2 is the blue part of the same RGB LED.
-- Configure QEI1 as in this Activity, but with `MAXPOS = 0xFFFFFFFF`, so the position never wraps within reach of a hand.
-- Each click changes the brightness by **1%** when the knob turns slower than 120 rpm, and by **5%** when faster. Keep the brightness within 1–99%. Turning past an end leaves it there, and turning back changes it again straight away.
-- Wire `SW` to **PC4** as a digital input with its pull-up. Each press switches the light **off**, and the next press back **on** at the brightness it had. While it's off, turning the knob does nothing.
-- Add the brightness, `rpm`, and the on/off state to the Watch window and check all three behave as described.
+- Each click changes the brightness by **1%** when the knob turns slower than 120 rpm, and by **5%** when faster. Forward is brighter.
+- The brightness stays within **1 to 99%**. Turning past an end leaves it there, and turning back changes it again straight away.
+- Pressing the knob switches the light **off**, and the next press back **on** at the brightness it had. While it's off, turning the knob does nothing.
 
-::: details Hint: counting clicks instead of positions
-Keep the last position in a variable and work with the difference. Signed subtraction handles the wrap from 0 to 0xFFFFFFFF for you:
+**Wiring:** the HW-040 as in the Activity, plus **`SW` to PC4**. PF2 is the blue part of the RGB LED, so the direction LEDs are gone.
 
-```c
-int32_t now   = (int32_t)QEI1->POS;
-int32_t moved = now - last;     // Counts since last time, negative in reverse
-int32_t steps = moved / 4;      // Whole clicks
-last += steps * 4;              // Keep the rest for next time
-```
+### The starter program
 
-Clamp the **brightness**, not the position: that's what lets the knob turn back from an end straight away.
+Start from this program. It compiles and runs as it is: the LED glows at 25%, but the knob doesn't change it yet.
+
+<<< @/snippets/preview/exp12/task.c{c}
+
+**The provided part.** The PWM is the [Experiment 8 Activity](/preview/exp8-pwm#activity)'s: Timer1A makes a 1 kHz signal on PF2, and `pwm_set()` sets its duty cycle, without the breathing. QEI1 is set up as in this Activity, with one change: `MAXPOS = 0xFFFFFFFF`, so the position never wraps within reach of a hand, and `QEI1_Handler` keeps `rpm` up to date every 100 ms. `light()` switches the LED: on, PF2 is driven by the PWM; off, `AFSEL` is cleared and PF2 is a plain output, low. The PWM keeps running, so the brightness is kept. `SysTick_Handler` runs every 1 ms and does the knob button's release half of the debounce, as for SW1 in the [Experiment 7 Activity](/preview/exp7-timers#activity). Don't change these.
+
+:::: details What to write: the five TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **3, 5, 4**, then **2, 1**. That way the knob works before you add the button.
+
+::: details TODO 3: count whole clicks (the main loop)
+- Read the position as a signed number, `(int32_t)QEI1->POS`, and subtract `last`: that's how many counts the knob has moved since the last whole click, negative in reverse. Signed subtraction handles the wrap from 0 to 0xFFFFFFFF for you.
+- One click is 4 counts: divide by 4 into `steps`. Integer division drops the rest, so a knob halfway between two clicks gives 0.
+- Move `last` on by the counts you used, `steps * 4`, not to the position now. The rest stays for next time, and no part of a click is lost.
+
 :::
 
-::: details Hint: the button
-PC4 is on Port C too: configure it with `|=` and `&= ~` only, and don't set its `AFSEL` bit (it would become the QEI1 index input). Act on the **press**, not on the button being held: remember the last reading and switch only when it goes from 1 to 0. The contacts bounce, so ignore changes for about 20 ms after a press, for example by counting `QEI1_Handler`'s 100 ms windows or with a short delay.
+::: details TODO 5: change the brightness (the main loop)
+- Only while `on` is 1, and only if `steps` isn't 0.
+- Add `steps * size` to `level`. `steps` is negative in reverse, so the same line makes the LED dimmer.
+- Clamp **`level`** itself to 1 to 99, then call `pwm_set(level)`. `pwm_set()` clamps too, but only what it sends to the timer: if `level` itself were left at, say, 140, turning back would need 41 clicks before anything changed.
+- `level` is `volatile`: compute the new value in a local variable, clamp it, then store it.
+
 :::
 
-::: tip Keep this code
-The click counting comes back in the [Experiment 13 Task](/preview/exp11-i2c-lcd#task), where the knob sets three colours through an LCD menu.
+**Test now:** with `size` still always 1, each click forward makes the LED 1% brighter, and backward 1% dimmer. Add `level` to the Watch window: it stops at 99 and at 1, and turning back changes it at once.
+
+::: details TODO 4: the speed-dependent step (the main loop)
+- If `rpm` is above `FAST_RPM` **or** below `-FAST_RPM`, set `size` to `FAST_STEP`. `rpm` is negative in reverse, and turning fast backward should take big steps too.
+- `rpm` comes from the Activity's handler: it's the speed over the last 100 ms window.
+
 :::
+
+::: details TODO 2: the knob's button (in `main`)
+- PC4 is set up like SW1 in Experiment 7, on Port C: input (`DIR` cleared), pull-up (`PUR`), digital (`DEN`), and a falling-edge interrupt: `IS`, `IBE`, and `IEV` cleared, `ICR` cleared, `IM` set, and `NVIC_EnableIRQ(GPIOC_IRQn)`.
+- Port C holds the debugger's JTAG pins: use only `|=` and `&= ~` with `KNOB_SW`, never a plain `=` (see the warning in [The QEI module](#the-qei-module)).
+- Don't set PC4's `AFSEL` bit: that would make it the QEI1 index input.
+- It comes before `SysTick_Config`, because `SysTick_Handler` reads PC4.
+
+:::
+
+::: details TODO 1: switch the light (`GPIOC_Handler`)
+- First the debounce, as in the Experiment 7 Activity's `GPIOF_Handler`: clear the flag in `ICR`, mask `KNOB_SW` in `IM` so the bounces can't interrupt, and set `up_ms` to 0. `SysTick_Handler` unmasks it 20 ms after the release.
+- Then flip `on` (`on = !on`) and call `light(on)`.
+- While it's off, TODO 3 still moves `last` on, but TODO 5 doesn't change `level`: turning the knob while off does nothing, even after it's switched back on.
+
+:::
+::::
+
+**Check:** build and flash, and add `level`, `rpm`, and `on` to the Watch window.
+
+- **Slow:** turn one click at a time: `level` changes by 1, and the LED by a little.
+- **Fast:** spin the knob: `rpm` goes above 120 and `level` jumps by 5 per click. A quarter turn fast covers about 25%.
+- **The ends:** turn far forward: `level` stops at 99. One click back: 98 straight away. The same at 1.
+- **The button:** press the knob: the LED goes off and `on` is 0. Turn the knob: `level` doesn't change. Press again: the LED comes back at the same brightness. One press is always exactly one switch.
