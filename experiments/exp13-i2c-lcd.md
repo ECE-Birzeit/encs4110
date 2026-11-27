@@ -5,6 +5,7 @@ description: "Talk to devices over two wires with the TM4C123's I2C module: chec
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=997"
+preview: "/preview/exp11-i2c-lcd"
 part: "Part 3: Advanced Peripherals"
 ---
 

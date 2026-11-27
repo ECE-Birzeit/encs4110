@@ -3,9 +3,8 @@ title: "Inter-Integrated Circuit (I2C) and Character LCD"
 description: "Drive an HD44780 16x2 character LCD over two wires: configure the TM4C123's I2C module as a master, talk to the LCD's PCF8574 backpack, and build an LCD driver on top."
 outline: deep
 lastUpdated: true
-manual: "/manual/encs4110_manual.pdf#nameddest=chapter.8"
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=997"
-current: "/experiments/exp8-lcd"
+current: "/experiments/exp13-i2c-lcd"
 short: "I2C and LCD"
 search: false
 prev: false
@@ -21,7 +20,7 @@ head:
 This experiment drives a 16x2 character LCD, the HD44780 kind found on countless devices, over just two signal wires. A small **PCF8574 backpack** soldered to the LCD turns bytes sent over **I2C** into the levels on the LCD's pins, so the LaunchPad needs only SCL, SDA, power, and ground: four jumper wires instead of eleven. You'll learn how the HD44780 is driven in 4-bit mode, set up the TM4C123's I2C module as a master, and build an LCD driver on top of it. I2C is also how most sensors, real-time clocks, and small displays connect, so the same bus comes back in later labs.
 
 ::: warning Reworked version: in testing
-This is the reworked version of [Experiment 8](/experiments/exp8-lcd), shared for TAs to test. It moves the LCD to its I2C backpack, then has one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp8-lcd)** until this one replaces it.
+This is the reworked version of [Experiment 13](/experiments/exp13-i2c-lcd), shared for TAs to test. In the new order it becomes Experiment 11, one of the two extra experiments. It has the background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp13-i2c-lcd)** until this one replaces it.
 :::
 
 ## Objectives
@@ -449,7 +448,7 @@ The backlight should light up as soon as the LaunchPad has power, and line 1 sho
 
 Replace the contents of `main.c` with the include and the definitions:
 
-<<< @/snippets/preview/exp8/main.c#defines{c}
+<<< @/snippets/preview/exp11/main.c#defines{c}
 
 - **`I2C0SCL`** and **`I2C0SDA`** are the pin bits on Port B, named after their I2C function. **`PCTL_PB23_I2C0`** puts 3 in both pins' `PCTL` fields.
 - The **`MCS_`** names come in two groups because [I2CMCS](#i2cmcs-—-i2c-master-control-status) is two registers at one address: `RUN`, `START`, and `STOP` are written; `BUSY` and `ERROR` are read. `MCS_RUN` and `MCS_BUSY` are both bit 0, with different meanings.
@@ -459,7 +458,7 @@ Replace the contents of `main.c` with the include and the definitions:
 
 Add `I2C0_Init()` and `I2C0_Write()` after the definitions:
 
-<<< @/snippets/preview/exp8/main.c#i2c{c}
+<<< @/snippets/preview/exp11/main.c#i2c{c}
 
 - **`I2C0_Init()`** is the configuration from [The TM4C123 I2C Module](#the-tm4c123-i2c-module). Only **SDA** gets `ODR`: the datasheet says SCL must not be open drain, because the module drives it with its own pull-up. `MTPR = 24` gives 100 kHz at 50 MHz, from the [I2CMTPR formula](#i2cmtpr-—-i2c-master-timer-period).
 - **`I2C0_Write()`** puts the address in bits 7:1 of `MSA` (shifted left by one; bit 0 = 0 means write) and the byte in `MDR`. Writing `STOP | START | RUN` to `MCS` makes the module do the whole [transfer](#one-transfer) by itself.
@@ -469,7 +468,7 @@ Add `I2C0_Init()` and `I2C0_Write()` after the definitions:
 
 Add the LCD functions after the I2C ones:
 
-<<< @/snippets/preview/exp8/main.c#lcd{c}
+<<< @/snippets/preview/exp11/main.c#lcd{c}
 
 - **A 1 ms clock comes first.** Once `main` starts SysTick with an interrupt every millisecond, `SysTick_Handler` counts in `ms`, and **`millis()`** returns it, like Arduino's. **`delay_ms(n)`** notes `ms` and waits until it has moved on by `n`. The subtraction `ms - start` is unsigned, so it's still right when `ms` wraps around after 49 days. SysTick keeps running for the whole program, free for anything else that needs the time.
 - Never call `delay_ms()`, or any LCD function, from an interrupt handler. `SysTick_Config` gives SysTick the lowest priority, so inside another handler `ms` stops counting, and `delay_ms()` waits forever (see [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7).
@@ -482,7 +481,7 @@ Add the LCD functions after the I2C ones:
 
 Add `main` at the end of the file:
 
-<<< @/snippets/preview/exp8/main.c#main{c}
+<<< @/snippets/preview/exp11/main.c#main{c}
 
 - `SysTick_Config(SystemCoreClock / 1000)` starts the 1 ms clock: a reload of $f_\text{clock}/1000$, with its interrupt enabled. It has to come before the first `delay_ms()`, which is in `LCD_Init()`.
 - Before touching the LCD, `main` sends one byte, `LCD_BL`, to switch the backlight on. If the backpack doesn't ACK, the red LED comes on and the program stops there: that separates an I2C problem from an LCD problem.
@@ -496,7 +495,7 @@ Add `main` at the end of the file:
 **Then try** what the ACK means: change `LCD_ADDR` to `0x26` and re-flash. Now nothing answers, the address gets a NACK, and the red LED comes on. Put it back to `0x27`.
 
 ::: details The complete program
-<<< @/snippets/preview/exp8/main.c#full{c}
+<<< @/snippets/preview/exp11/main.c#full{c}
 :::
 
 ::: info How slow is it?

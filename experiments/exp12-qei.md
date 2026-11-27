@@ -5,6 +5,7 @@ description: "Read a rotary encoder in hardware with the TM4C123's Quadrature En
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=1305"
+preview: "/preview/exp12-qei"
 part: "Part 3: Advanced Peripherals"
 ---
 

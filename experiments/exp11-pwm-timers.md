@@ -5,6 +5,7 @@ description: "Generate pulse-width modulated signals in hardware with the TM4C12
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=704"
+preview: "/preview/exp8-pwm"
 part: "Part 3: Advanced Peripherals"
 ---
 
