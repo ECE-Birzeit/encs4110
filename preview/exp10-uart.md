@@ -421,20 +421,32 @@ Add `main` at the end of the file:
 
 Lines sent to the terminal end in `"\r\n"`: `\r` returns the cursor to the start of the line, and `\n` moves it down one.
 
-**Check:** build and flash, then press the LaunchPad's **RESET** button with PuTTY open. You should see **ENCS4110 UART ready** and a `> ` prompt. Type `hello`: each letter appears as you type it. Press Enter: the board answers **You typed: hello**. Try Backspace in the middle of a word.
+Build, flash, and press the LaunchPad's **RESET** button with PuTTY open.
 
-**Then try:**
+<Checklist id="activity" title="Activity checklist">
 
-- Remove the `UART0_WriteChar(c);` echo from `UART0_ReadLine()`: you now type blind, though the board still receives everything.
-- Change `BAUD_IBRD` to 54 (half the baud rate) without changing PuTTY: the output turns to garbage. Both ends must agree on the baud rate, because there's no clock wire.
-- Type more than 31 characters: the extra ones are ignored, because `line` has room for 31 and the terminating 0.
+- Does PuTTY show **ENCS4110 UART ready** and a `> ` prompt after RESET?
+- Does each letter appear as you type it?
+- After Enter, does the board answer **You typed:** with your line?
+- Does Backspace in the middle of a word remove the last character, on screen and in the answer?
+- Can you say why the board, not PuTTY, has to send back what you type?
+
+</Checklist>
+
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Remove `UART0_WriteChar(c);` (the echo) from `UART0_ReadLine()` | You type blind, but the board still receives everything: **You typed:** is right. |
+| Change `BAUD_IBRD` to 54 (half the baud rate), leaving PuTTY at 115200 | Garbage characters. Both ends must agree on the baud rate, because there's no clock wire. |
+| Type more than 31 characters | The extra ones are ignored: `line` has room for 31 and the terminating 0. |
+| Send `"\n"` instead of `"\r\n"` after **You typed:** | Each answer starts further right: `\n` only moves down, `\r` is what returns to the start of the line. |
+:::
 
 ::: details The complete program
 <<< @/snippets/preview/exp10/main.c#full{c}
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | Nothing appears in PuTTY | Wrong COM port, or PuTTY isn't set to 115200. Press RESET after opening PuTTY: the greeting was sent before you connected. |
@@ -443,6 +455,7 @@ Lines sent to the terminal end in `"\r\n"`: `\r` returns the cursor to the start
 | Output appears, typing does nothing | The receiver is off: `CTL_RXE` is missing from `CTL`. |
 | Lines start further and further right | `"\n"` without `"\r"`: send `"\r\n"` at the end of every line. |
 | Program stops in `HardFault_Handler` | A UART0 register was written before its clock was ready: keep the `PRUART` wait. |
+:::
 
 ## Task
 
@@ -458,30 +471,29 @@ Build an **LED command line**: you type a command in PuTTY, and the board does i
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is: the greeting appears, and `red` already works, as a worked example. Every other command does nothing yet.
+Start from this program. It compiles and runs: the greeting appears and `red` already works, as a worked example. The other commands are yours to write, all in `run_command()`.
 
 <<< @/snippets/preview/exp10/task.c{c}
 
-**The provided part.** `UART0_Init()`, `UART0_WriteChar()`, `UART0_WriteString()`, `UART0_ReadChar()` and `UART0_ReadLine()` are the Activity's, unchanged. Three helpers are new:
+::: details How the provided part works
+The UART functions are the Activity's, unchanged. `main` reads each line with `UART0_ReadLine()` and hands it to `run_command()`, which counts it in `commands` and picks the answer with an `if` / `else if` chain. Three helpers are new:
 
 - **`UART0_WriteNumber(n)`** prints a number in decimal. `n % 10` is the last digit and `n / 10` drops it, so the digits come out last first; the function stores them and sends them in reverse. `'0' + 7` is the character `'7'`.
-- **`equals(a, b)`** is 1 when two strings are the same, 0 when not. Comparing with `==` doesn't work for strings: `line == "red"` compares where the two are in memory, not their characters.
+- **`equals(a, b)`** is 1 when two strings are the same, 0 when not. `line == "red"` doesn't work: it compares where the two strings are in memory, not their characters.
 - **`LEDs_Init()`** and **`show(led)`** set up the three LEDs and light exactly the ones in `led`, or none for 0, as in Experiment 5.
-
-`main` reads each line with `UART0_ReadLine()` and hands it to **`run_command()`**, which counts it in `commands` and picks the answer with an `if` / `else if` chain. Your code goes in `run_command()`.
+:::
 
 :::: details What to write: the four TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 4**, then **2, 3**.
 
 ::: details TODO 1: `green`, `blue` and `off`
 - Copy the `red` block three times, each starting with `else if`, and change the command and the LED: `GREEN_LED`, `BLUE_LED`, and `show(0)` for `off`.
-- Keep the `"OK\r\n"` answer in each one: without an answer, you can't tell from the terminal that the board heard you.
 
 :::
 
 ::: details TODO 4: an unknown command
 - A last `else` at the end of the chain, after the `status` block: it runs when no command matched.
-- Print `"Unknown command: "`, then the line itself with `UART0_WriteString(line)`, then `"\r\n"`. Printing back what was received shows you exactly what the board got, like the Activity's **You typed:**.
+- Print `"Unknown command: "`, then the line itself with `UART0_WriteString(line)`, then `"\r\n"`.
 
 :::
 
@@ -496,20 +508,34 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 
 ::: details TODO 3: the number of commands (in the `status` block)
 - `UART0_WriteNumber(commands)`, then `UART0_WriteString("\r\n")` to end the line.
-- Don't write `UART0_WriteString(commands)`: `commands` is a number, not a string. That's what `UART0_WriteNumber()` is for.
+- Not `UART0_WriteString(commands)`: `commands` is a number, not a string.
 :::
 ::::
 
-**Check:** build and flash, and press RESET with PuTTY open.
+Build, flash, and press RESET with PuTTY open.
 
-- **The greeting:** **LED command line: red, green, blue, off, status** and a `> ` prompt.
-- **The colours:** `green` answers `OK` and only the green LED is on. `blue`, then `red`: one LED at a time. `off`: all off.
-- **Status:** after `green`, `status` answers `LED: green, commands: 2` (the count includes the `status` line itself, and resets with the board). After `off`, it says `LED: off`.
-- **Errors:** `blink`, `Red` and `red ` (with a space) all answer `Unknown command:`. The comparison is exact: case and spaces count.
-- **Typing:** a mistyped command fixed with Backspace works; just Enter prints only a new prompt and doesn't change the count.
+<Checklist id="task" title="Task checklist">
 
-**Then try:**
+- Did you write the `status` answer yourself, choosing the colour from `lit`?
+- Do `red`, `green`, `blue` and `off` each answer `OK` and light only that LED, or none?
+- After `green`, does `status` answer `LED: green, commands: 2`, and `LED: off` after `off`?
+- Do `blink`, `Red` and `red ` (with a space) all answer `Unknown command:`?
+- Does just Enter print only a new prompt, without changing the count?
 
-- Add a `help` command that lists the commands.
-- Make `Red` and `RED` work too: before comparing, turn the line to lower case. A character `c` between `'A'` and `'Z'` becomes `c + ('a' - 'A')`. The line is `const` in `run_command()`, so do it in `main`, before the call.
-- If you've done [Experiment 9](/preview/exp9-adc): add an `adc` command that answers with the potentiometer reading, printed with `UART0_WriteNumber()`.
+</Checklist>
+
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Add a `help` command that lists the commands | The list, from a command you added in one more `else if`. |
+| Turn the line to lower case in `main`, before `run_command()` (code below) | `Red` and `RED` work like `red`. |
+| If you've done [Experiment 9](/preview/exp9-adc): an `adc` command that prints the potentiometer reading with `UART0_WriteNumber()` | A number from 0 to 4095 that follows the knob. |
+
+Lower case: a character between `'A'` and `'Z'` becomes lower case by adding `'a' - 'A'`. `line` is `const` in `run_command()`, so do it in `main`:
+
+```c
+for (uint32_t i = 0; line[i] != '\0'; i++)
+	if (line[i] >= 'A' && line[i] <= 'Z')
+		line[i] += 'a' - 'A';
+```
+:::
