@@ -1,6 +1,6 @@
 ---
 title: "Inter-Integrated Circuit (I2C) and Character LCD"
-description: "Drive an HD44780 16x2 character LCD over two wires: configure the TM4C123's I2C module as a master, talk to the LCD's PCF8574 backpack, and build an LCD driver on top."
+description: "Drive an HD44780 16x2 character LCD over two wires: configure the TM4C123's I2C module as a master, talk to the LCD's PCF8574 backpack, and show a button counter on the LCD."
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=997"
@@ -17,7 +17,7 @@ head:
 
 # Inter-Integrated Circuit (I2C) and Character LCD
 
-This experiment drives a 16x2 character LCD, the HD44780 kind found on countless devices, over just two signal wires. A small **PCF8574 backpack** soldered to the LCD turns bytes sent over **I2C** into the levels on the LCD's pins, so the LaunchPad needs only SCL, SDA, power, and ground: four jumper wires instead of eleven. You'll learn how the HD44780 is driven in 4-bit mode, set up the TM4C123's I2C module as a master, and build an LCD driver on top of it. I2C is also how most sensors, real-time clocks, and small displays connect, so the same bus comes back in later labs.
+This experiment drives a 16x2 character LCD, the HD44780 kind found on countless devices, over just two signal wires. A small **PCF8574 backpack** soldered to the LCD turns bytes sent over **I2C** into the levels on the LCD's pins, so the LaunchPad needs only SCL, SDA, power, and ground: four jumper wires instead of eleven. You'll learn how I2C works, set up the TM4C123's I2C module as a master, and use an LCD driver built on top of it to show text and a counter. I2C is also how most sensors, real-time clocks, and small displays connect.
 
 ::: warning Reworked version: in testing
 This is the reworked version of [Experiment 13](/experiments/exp13-i2c-lcd), shared for TAs to test. In the new order it becomes Experiment 11, one of the two extra experiments. It has the background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp13-i2c-lcd)** until this one replaces it.
@@ -25,185 +25,66 @@ This is the reworked version of [Experiment 13](/experiments/exp13-i2c-lcd), sha
 
 ## Objectives
 
-- Explain how the HD44780 LCD works: its two registers, its commands, and its DDRAM addresses.
-- Start the LCD in 4-bit mode and send it commands and characters.
 - Describe how I2C works: two shared wires, open-drain outputs with pull-ups, addresses, START, STOP, and ACK.
-- Set up the TM4C123's I2C module as a master and send bytes, checking that the device answered.
-- Drive the LCD through a PCF8574 I/O expander, and explain why it's slower than wiring the LCD's pins directly.
+- Set up the TM4C123's I2C0 module as a master and send a byte, checking that the device answered.
+- Explain how the PCF8574 backpack drives an HD44780 LCD in 4-bit mode, and why each character takes six I2C bytes.
+- Start the LCD and print text and numbers at a chosen row and column.
+- Show a value changed by the buttons on the LCD: the interrupt handler changes it and sets a flag, `main` redraws it.
 
 ## Background
 
-### HD44780 LCD Controller Architecture
+### The HD44780 LCD
 
-The HD44780 is an LCD controller/driver developed by Hitachi and widely adopted as an industry standard for character-based LCD modules. It provides a simple microprocessor interface for controlling alphanumeric displays with minimal external components.
+The 16x2 LCD is driven by an **HD44780** controller, or a copy of it: the same commands work on almost every character LCD. The controller refreshes the screen and draws the characters by itself. The program only sends it bytes, and each byte is one of two kinds, chosen by the **RS** (register select) pin:
 
-#### LCD Module Overview
+- **RS = 0, a command:** clear the screen, move the cursor, switch the display on, and so on.
+- **RS = 1, a character:** its ASCII code is drawn at the cursor, and the cursor moves one place right.
 
-The 16x2 LCD module consists of:
+The byte goes on the data pins, and the LCD reads it when its **E** (enable) pin falls from high to low. A third pin, **RW**, chooses read or write; it stays 0 (write) here. A **V0** pin sets the contrast.
 
-- **HD44780 Controller**: Manages display operations, character generation, and timing
-- **LCD Panel**: 2 rows x 16 columns of character positions
-- **Character Generator ROM (CGROM)**: Contains 208 predefined character patterns (alphanumeric, symbols, Japanese kana)
-- **Character Generator RAM (CGRAM)**: 64 bytes for up to 8 user-defined custom characters (5x8 pixels each)
-- **Display Data RAM (DDRAM)**: 80 bytes storing characters currently displayed (40 bytes per line)
-- **Backlight**: Optional LED backlight for improved visibility
+#### 4-bit mode
 
-The controller handles all low-level display refresh, character rendering, and cursor management automatically. The microcontroller simply writes characters to DDRAM and issues commands for cursor positioning, display control, and special effects.
+The LCD has eight data pins, D0 to D7, but it can also run in **4-bit mode**, using only **D4 to D7**. Each byte then goes in two halves, called **nibbles**, upper first:
 
-#### LCD Registers
+1. Put RS, and the upper nibble (bits 7 to 4) on D7 to D4. Pulse E: high, then low.
+2. Put the lower nibble (bits 3 to 0) on D7 to D4. Pulse E again.
 
-The HD44780 has two main registers accessible by the microcontroller:
+The backpack described below has only eight outputs, so it uses 4-bit mode.
 
-##### Instruction Register (IR)
+#### Starting the LCD
 
-The Instruction Register receives commands that control display operations:
+The LCD powers up in 8-bit mode, so it has to be told to switch, with a fixed sequence:
 
-- Clear display and return cursor to home
-- Set cursor position in DDRAM
-- Control display on/off, cursor visibility, and blinking
-- Set entry mode (cursor direction, display shift)
-- Shift cursor or entire display left/right
-- Configure interface width (4-bit or 8-bit), number of lines, and font size
+1. Wait at least **40 ms** after power-up.
+2. Send the nibble `0x3` three times: wait **over 4.1 ms** after the first, and **over 100 µs** after the other two. This puts the LCD in a known state, whatever it was doing.
+3. Send the nibble `0x2`: 4-bit mode. From now on, every byte goes as two nibbles.
+4. Send the commands `0x28` (4-bit, 2 lines, 5x8 dots), `0x0C` (display on, cursor off), `0x06` (cursor moves right), and `0x01` (clear).
 
-##### Data Register (DR)
+Steps 2 and 3 send a **single** nibble each, because the LCD is still in 8-bit mode and reads only D7 to D4.
 
-The Data Register receives character codes (ASCII) to be displayed:
+#### The commands used here
 
-- Writing to DR displays a character at the current cursor position
-- The cursor automatically advances after each write (direction set by entry mode)
-- Reading from DR retrieves the character at the current cursor position (rarely used)
-
-### LCD Pin Configuration
-
-The HD44780 interface consists of 16 pins (some modules have 18 pins with additional backlight control):
-
-| **Pin** | **Name** | **Description** |
-|:--:|:---|:---|
-| 1 | VSS | Ground (0V) |
-| 2 | VDD | Power supply (+5V or +3.3V) |
-| 3 | V0 | Contrast adjustment (connect to potentiometer) |
-| 4 | RS | Register Select: 0 = Instruction (command), 1 = Data (character) |
-| 5 | RW | Read/Write: 0 = Write to LCD, 1 = Read from LCD (usually grounded for write-only) |
-| 6 | E | Enable: Falling edge latches data/command into LCD |
-| 7­14 | D0-D7 | 8-bit data bus (D0-D3 unused in 4-bit mode) |
-| 15 | A | Backlight anode (+5V, typically with series resistor) |
-| 16 | K | Backlight cathode (Ground) |
-
-*HD44780 LCD Pin Definitions*
-
-### 4-Bit vs. 8-Bit Communication Mode
-
-The HD44780 supports two communication modes:
-
-#### 8-Bit Mode
-
-- Uses all 8 data pins (D0-D7)
-- Each command or character requires one write cycle
-- Faster communication (single byte transfer)
-- Requires 11 GPIO pins total (3 control + 8 data)
-
-#### 4-Bit Mode
-
-- Uses only upper 4 data pins (D4-D7), D0-D3 are left unconnected
-- Each command or character requires two write cycles (upper nibble, then lower nibble)
-- Slightly slower due to two transfers per byte
-- Requires only 7 GPIO pins total (3 control + 4 data)
-- **Preferred mode** for GPIO-constrained systems
-
-**4-Bit Communication Protocol:**
-
-1.  Set RS and RW to appropriate values
-2.  Place upper 4 bits (bits 7-4) on D7-D4
-3.  Generate enable pulse: E high → delay → E low
-4.  Place lower 4 bits (bits 3-0) on D7-D4
-5.  Generate another enable pulse: E high → delay → E low
-
-In this experiment the LCD runs in 4-bit mode, but its pins aren't wired to the LaunchPad: the I2C backpack described below sets them, one byte at a time.
-
-### LCD Initialization Sequence
-
-Proper initialization is critical for reliable LCD operation. The HD44780 requires a specific sequence of commands with precise timing delays, especially during the transition to 4-bit mode.
-
-#### Initialization Steps (4-Bit Mode)
-
-The initialization sequence must account for the fact that the LCD powers up in 8-bit mode and must be switched to 4-bit mode:
-
-1.  **Wait for power-on stabilization**: Delay at least 40 ms after VDD rises to 4.5V
-2.  **Initial function set (8-bit interface)**: Send `0x30` (upper nibble only) three times:
-
-    - First time: Wait > 4.1 ms
-
-    - Second time: Wait > 100 μs
-
-    - Third time: Wait > 100 μs
-
-3.  **Switch to 4-bit mode**: Send `0x20` (upper nibble only), wait > 100 μs
-4.  **Configure display parameters**: Now send full 8-bit commands in two nibbles:
-
-    - `0x28`: Function set — 4-bit mode, 2 lines, 5x8 font
-
-    - `0x0C`: Display control — Display ON, cursor OFF, blink OFF
-
-    - `0x06`: Entry mode set — Increment cursor, no display shift
-
-    - `0x01`: Clear display
-
-    - `0x02`: Return home
-
-**Critical Note**: Steps 2-3 send only the *upper nibble* because the LCD is still in 8-bit mode. After step 3 completes, the LCD switches to 4-bit mode, and all subsequent commands must be sent as two nibbles (upper first, then lower).
-
-### LCD Command Set
-
-The HD44780 supports a comprehensive set of commands for display control, cursor manipulation, and special effects.
-
-| **Command** | **Hex Code** | **Description** |
+| Command | Code | What it does |
 |:---|:--:|:---|
-| Clear Display | `0x01` | Clears entire display, sets DDRAM address 0, cursor to home |
-| Return Home | `0x02` | Sets DDRAM address 0, cursor to home (display content unchanged) |
-| Entry Mode Set | `0x04-0x07` | Controls cursor direction and display shift |
-|  | `0x04` | Cursor moves left, no shift |
-|  | `0x06` | Cursor moves right, no shift (default) |
-|  | `0x05` | Cursor moves left, display shifts right |
-|  | `0x07` | Cursor moves right, display shifts left |
-| Display Control | `0x08-0x0F` | Controls display, cursor, and blink on/off |
-|  | `0x08` | Display OFF |
-|  | `0x0C` | Display ON, cursor OFF, blink OFF |
-|  | `0x0E` | Display ON, cursor ON, blink OFF |
-|  | `0x0F` | Display ON, cursor ON, blink ON |
-| Cursor/Display Shift | `0x10-0x1F` | Shifts cursor or display left/right |
-|  | `0x10` | Shift cursor left |
-|  | `0x14` | Shift cursor right |
-|  | `0x18` | Shift display left |
-|  | `0x1C` | Shift display right |
-| Function Set | `0x20-0x3F` | Sets interface length, line number, font |
-|  | `0x28` | 4-bit mode, 2 lines, 5x8 font |
-|  | `0x38` | 8-bit mode, 2 lines, 5x8 font |
-| Set DDRAM Address | `0x80 + addr` | Positions cursor at DDRAM address (see [DDRAM Address Mapping](#ddram-address-mapping) for the full address layout) |
+| Clear | `0x01` | Blanks the screen and moves the cursor to row 0, column 0. Takes **1.6 ms**. |
+| Home | `0x02` | Moves the cursor to row 0, column 0 without clearing. Takes **1.6 ms**. |
+| Entry mode | `0x06` | The cursor moves right after each character |
+| Display on | `0x0C` | Display on, cursor hidden (`0x0E` shows it, `0x0F` also blinks it) |
+| Function set | `0x28` | 4-bit mode, 2 lines, 5x8 dots |
+| Set cursor | `0x80 + address` | Moves the cursor to a DDRAM address (below) |
 
-*Common HD44780 LCD Commands*
+Every other command takes about 40 µs.
 
-### DDRAM Address Mapping
+#### Cursor positions: DDRAM addresses
 
-The Display Data RAM (DDRAM) is 80 bytes, but only 32 bytes (16 per line) are visible at any time. Understanding the address mapping is essential for cursor positioning:
+The characters on the screen are kept in the LCD's **DDRAM** (display data RAM), and each position on the screen has an address. The two rows don't follow each other:
 
-| **Display Position** | **DDRAM Address** | **Command** |
-|:---------------------|:------------------|:------------|
-| Line 1, Column 0     | `0x00`            | `0x80`      |
-| Line 1, Column 1     | `0x01`            | `0x81`      |
-| Line 1, Column 15    | `0x0F`            | `0x8F`      |
-| Line 2, Column 0     | `0x40`            | `0xC0`      |
-| Line 2, Column 1     | `0x41`            | `0xC1`      |
-| Line 2, Column 15    | `0x4F`            | `0xCF`      |
+| Row | Column 0 | Column 15 | Set cursor command |
+|:---|:---|:---|:---|
+| 0 (top) | `0x00` | `0x0F` | `0x80 + column` |
+| 1 (bottom) | `0x40` | `0x4F` | `0xC0 + column` |
 
-*DDRAM Address Mapping for 16x2 LCD*
-
-**Formula for cursor positioning:**
-$$
-\text{Command} = \begin{cases}
-0x80 + \text{column} & \text{for line 1 (row 0)} \\
-0xC0 + \text{column} & \text{for line 2 (row 1)}
-\end{cases}
-$$
+So row 1, column 7 is the command `0xC0 + 7` = `0xC7`. A character stays on the screen until another one is written at its address: printing `9` where `10` was leaves the `0`, and the screen shows `90`.
 
 ### What is I2C?
 
@@ -257,11 +138,11 @@ The backpack is a small board soldered onto the LCD's 16 pins. Its main chip, th
 | P1 | 1 | RW (always 0 here) |
 | P0 | 0 | RS (0 = command, 1 = character) |
 
-So the LCD runs in **4-bit mode**, as described in [4-Bit Mode](#_4-bit-mode) above. The difference is how the pins change: instead of the TM4C123 driving the LCD's pins directly, the driver writes a byte to the PCF8574, and the PCF8574 drives them. Sending one nibble takes three bytes (data with E low, then E high, then E low again), and one character takes two nibbles: six I2C bytes, about **1.2 ms** per character instead of a few microseconds.
+So the LCD runs in [4-bit mode](#_4-bit-mode). The difference is how the pins change: instead of the TM4C123 driving the LCD's pins directly, the driver writes a byte to the PCF8574, and the PCF8574 drives them. Sending one nibble takes three bytes (data with E low, then E high, then E low again), and one character takes two nibbles: six I2C bytes, about **1.2 ms** per character instead of a few microseconds.
 
 The board also has:
 
-- A **blue trimmer potentiometer** for the contrast (the V0 pin in the [pin table](#lcd-pin-configuration) above).
+- A **blue trimmer potentiometer** for the contrast (the LCD's V0 pin).
 - A **jumper** for the backlight.
 - Three solder pads, **A0 to A2**, that change the address. Unsoldered, the address is **0x27** for a PCF8574T chip, which is what the lab's boards use. (Boards with a PCF8574AT chip are at **0x3F**.)
 
@@ -398,7 +279,7 @@ This register is two registers at one address: **writing** it gives the module a
 | `0x01` (RUN) | Send the next byte in `MDR`, keep the bus |
 | `0x05` (STOP, RUN) | Send the last byte, then STOP |
 
-This experiment only uses `0x07`: every byte is its own transfer. The others send several bytes after one address, which is faster (see the [Task](#task)'s last hint).
+This experiment only uses `0x07`: every byte is its own transfer. The others send several bytes after one address, which is faster, but one byte at a time is simpler and fast enough for the LCD.
 
 **I2CMCS Register — read (status)**
 
@@ -425,10 +306,10 @@ This experiment only uses `0x07`: every byte is its own transfer. The others sen
 
 ## Activity
 
-Drive the LCD over I2C: line 1 shows **ENCS4110 Lab** and line 2 counts up twice a second. The program has two layers: I2C functions that send one byte to a device, and LCD functions on top that send their nibbles as bytes to the backpack. Only the lowest LCD function, the one that sends a nibble, knows about I2C: the rest follow the HD44780 steps from the Background.
+Drive the LCD over I2C: line 1 shows **ENCS4110 Lab** and line 2 counts up twice a second. The program has two layers: I2C functions that send one byte to a device, and LCD functions on top that send their nibbles as bytes to the backpack. Only the lowest LCD function, the one that sends a nibble, knows about I2C: the rest follow the [HD44780 steps](#the-hd44780-lcd) from the Background.
 
 ::: info Setting up the project
-This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, and make sure its blinking-LED test works. All the code goes in that project's `main.c`. The code assumes the 50 MHz system clock set by `SystemInit`.
+This experiment runs on the TM4C123 LaunchPad. If you haven't made a project yet, follow the [Tiva LaunchPad Project](/setup/tiva-project) guide first, choosing **C**, and make sure its blinking-LED test works. All the code goes in that project's `main.c`. The code assumes the 50 MHz system clock set by `SystemInit`.
 :::
 
 ### Step 1: Wire the LCD
@@ -473,7 +354,7 @@ Add the LCD functions after the I2C ones:
 - **A 1 ms clock comes first.** Once `main` starts SysTick with an interrupt every millisecond, `SysTick_Handler` counts in `ms`, and **`millis()`** returns it, like Arduino's. **`delay_ms(n)`** notes `ms` and waits until it has moved on by `n`. The subtraction `ms - start` is unsigned, so it's still right when `ms` wraps around after 49 days. SysTick keeps running for the whole program, free for anything else that needs the time.
 - Never call `delay_ms()`, or any LCD function, from an interrupt handler. `SysTick_Config` gives SysTick the lowest priority, so inside another handler `ms` stops counting, and `delay_ms()` waits forever (see [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7).
 - **`LCD_SendNibble()`** is the only LCD function that knows about I2C. It builds one byte (the nibble in bits 7:4, then `LCD_BL`, `LCD_EN`, and `RS`) and sends it three times: E low, E high, E low. The LCD latches the nibble when E falls. `LCD_BL` is in every byte because the PCF8574 shows the whole last byte on its outputs: a byte without it would switch the backlight off.
-- **`LCD_Command()`**, **`LCD_Data()`**, and **`LCD_Init()`** follow the Background: two nibbles per byte, RS = 0 for commands and 1 for characters, and the [initialization sequence](#lcd-initialization-sequence). There are almost no delays, because one nibble already takes three I2C bytes, about 0.6 ms. Only the power-up and Clear (1.6 ms) still wait.
+- **`LCD_Command()`**, **`LCD_Data()`**, and **`LCD_Init()`** follow the Background: two nibbles per byte, RS = 0 for commands and 1 for characters, and the [start-up sequence](#starting-the-lcd). There are almost no delays, because one nibble already takes three I2C bytes, about 0.6 ms. Only the power-up and Clear (1.6 ms) still wait.
 - **`LCD_Print()`** takes a `const char *`: it only reads the string, and a string literal such as `"ENCS4110 Lab"` can't be changed.
 - **`LCD_PrintNumber()`** collects the digits from the last one (`n % 10`, then `n /= 10`) and sends them in reverse, so the first digit comes out first.
 
@@ -518,38 +399,55 @@ One character is two nibbles, six I2C bytes: about **1.2 ms**. A full 16-charact
 
 Build an **up/down counter** on the LCD. Line 1 shows `Counter`, and line 2 the count, starting at 0. **SW1** adds 1. **SW2** takes 1 away, but the count never goes below 0.
 
-There's no starter this time: you've already written every piece. Start from your Activity program, which has the I2C bus, the LCD functions, and the 1 ms clock, and add the buttons and the counter to it.
+The buttons change the count inside an interrupt, but the LCD is too slow for that: one character takes about 1.2 ms, and some LCD functions call `delay_ms()`, which needs SysTick to count `ms`. SysTick has the lowest priority, so inside `GPIOF_Handler` it can't run, and `delay_ms()` would wait forever (see [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7). So the work is split:
 
-:::: details What you need, and where you've seen it
-::: details The buttons
-- SW1 is PF4 and SW2 is PF0, both inputs with pull-ups: pressed reads 0.
-- PF0 is locked at reset: unlock it first, as in [Experiment 6](/preview/exp6-gpio-interrupts#unlocking-protected-gpio-pins).
-- Interrupt on the falling edge only, a press, and enable `GPIOF_IRQn` in the NVIC.
+- **The handler** changes the count, sets a flag, `changed`, and returns at once.
+- **`main`** watches the flag, and when it's set, redraws the count.
+
+### The starter program
+
+Start from this program. It compiles and runs as it is: it shows `Counter` and `0`, but the buttons don't change anything yet. Nothing new needs wiring: the LCD stays as in the Activity, and the buttons are on the board.
+
+<<< @/snippets/preview/exp11/task.c{c}
+
+**The provided part.** The I2C and LCD functions are the Activity's, unchanged. The buttons are set up as in the [Experiment 7 Task](/preview/exp7-timers#the-starter-program): SW1 on PF4 and SW2 on PF0 (unlocked first), each interrupting on its falling edge. Port F is set up **before** `SysTick_Config`, because `SysTick_Handler` now reads the buttons. The debounce is also the Experiment 7 Task's: each button has a `ready` flag, `GPIOF_Handler` calls `on_press()` once per press, and `SysTick_Handler` makes the button ready again 20 ms after its release. `SysTick_Handler` still counts `ms` too, for `delay_ms()`. Don't change these.
+
+:::: details What to write: the four TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **3, 1, 2, 4**.
+
+::: details TODO 3: show the count (`show_count()`)
+- Move the cursor to the start of line 2: `LCD_SetCursor(1, 0)`, as in the Activity's Step 5.
+- Clear the old digits: print enough spaces to cover the longest number, with `LCD_Print()`. Without them, going from 10 down to 9 prints `9` over the `1` and leaves the `0`: the screen shows `90`. A `uint32_t` has at most 10 digits.
+- Move the cursor back to the start of line 2, and print `count` with `LCD_PrintNumber()`.
+
 :::
 
-::: details The debounce
-- Use the one from the [Experiment 7 Task](/preview/exp7-timers#the-starter-program): act on the press, then wait for the release, each button on its own with a `ready` flag.
-- `GPIOF_Handler` clears the flag in `ICR`, and acts only if the button is ready: it clears `ready`, then changes the count.
-- `SysTick_Handler` already counts `ms`. Add `check_release()` for each button: once a pressed button has been up for 20 ms in a row, it's ready again.
-- Set up Port F before `SysTick_Config`: `SysTick_Handler` reads the buttons, and reading Port F before its clock is on crashes.
+**Test now:** start `count` at 1234 (`volatile uint32_t count = 1234;`) and re-flash: line 2 shows `1234`. Put it back to 0.
+
+::: details TODO 1: change the count (`on_press()`)
+- `button` is `SW1` or `SW2`. If it's `SW1`, add 1 to `count`.
+- If it's `SW2`, take 1 away, but **only if `count` is above 0**. `count` is unsigned: 0 - 1 would wrap around to 4294967295.
+- No LCD functions here: `on_press()` runs inside `GPIOF_Handler`.
+
 :::
 
-::: details The handler changes the count, main redraws it
-- As in Experiment 6, `GPIOF_Handler` reads `MIS` to see which button caused the interrupt, and for a ready button, changes the count. Then it sets a flag, say `changed = 1`, and returns.
-- The main loop does the slow part: when `changed` is 1, it clears it and redraws line 2.
-- Why not redraw in the handler? The LCD functions take milliseconds, and some of them call `delay_ms()`, which waits for SysTick to count `ms`. SysTick has the lowest priority, so inside `GPIOF_Handler` it can't run and `delay_ms()` would wait forever. See [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7. Handlers change state and return quickly; `main` does the output.
-- `count` and `changed` are shared between the handler and `main`: make them `volatile`.
+::: details TODO 2: tell `main` (`on_press()`)
+- One line: set `changed` to 1. Put it after TODO 1, so `main` sees the new count.
+- `count` and `changed` are `volatile`, because the handler changes them while `main` reads them.
+
 :::
 
-::: details The count
-- `count` is unsigned: 0 - 1 would wrap around to 4294967295. Only take 1 away while it's above 0.
-- The LCD keeps every character until something overwrites it: going from 10 down to 9 would print `9` over the `1` and leave the `0`, showing `90`. Clear line 2 with spaces before printing the number.
+::: details TODO 4: redraw (the main loop)
+- If `changed` is 1: set it back to 0, then call `show_count()`.
+- Clear the flag **before** redrawing. If a press comes during the redraw, it sets the flag again, and the next time round the loop draws the newer count. Cleared after, that press would be lost from the screen.
+
 :::
 ::::
 
-**Check:** build and flash.
+**Check:** build and flash, and add `count` to the Watch window.
 
 - At start, line 1 shows **Counter** and line 2 **0**.
-- SW1 twelve times: **12**. One step per press, however long you hold the button.
+- SW1 twelve times: **12**. One step per press, however long you hold the button, and nothing on release.
 - SW2 three times: **9**, not **90**.
 - SW2 until 0, then once more: it stays at **0**.
+- Press SW1 quickly several times: every press counts, and the screen catches up with `count`.
