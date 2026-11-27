@@ -22,15 +22,14 @@
 // Times
 #define HEARTBEAT_MS   500              // The LED turns on or off every 500 ms: a 1 Hz blink
 #define HEARTBEAT_LOAD ((SystemCoreClock / 1000) * HEARTBEAT_MS - 1)   // 25,000,000 - 1 at 50 MHz
-#define DEBOUNCE_MS    50               // Quiet time before an edge counts as a new press
+#define DEBOUNCE_MS    20               // How long SW1 must stay up after a release
 
 // The colours SW1 steps through. uint8_t: each is a pattern for Port F's 8 pins.
 const uint8_t colors[3] = { RED_LED, GREEN_LED, BLUE_LED };
 
 volatile uint32_t ms;                   // Milliseconds since reset, from SysTick
-volatile uint32_t last_edge;            // ms at SW1's last edge, rising or falling
-volatile uint32_t edges;                // Every SW1 edge, bounces included
-volatile uint32_t presses;              // Real presses, after debouncing
+volatile uint32_t up_ms;                // How long SW1 has been up, in ms
+volatile uint32_t presses;              // Presses, after debouncing
 volatile uint32_t color_index;          // The colour now: 0 red, 1 green, 2 blue
 volatile uint32_t led_on;               // 1 while the heartbeat has the LED on
 // #endregion defines
@@ -46,29 +45,33 @@ void show(void)
 	GPIOF->DATA = (GPIOF->DATA & ~LEDS) | led;
 }
 
-// Every 1 ms
+// Every 1 ms: count the time, and wait for SW1's release. Once SW1 has been up for
+// DEBOUNCE_MS in a row, listen for the next press.
 void SysTick_Handler(void)
 {
 	ms++;
+
+	if ((GPIOF->DATA & SW1) == 0)			// SW1 is down (or bouncing)
+		up_ms = 0;
+	else if (++up_ms == DEBOUNCE_MS)		// Up, and quiet for DEBOUNCE_MS
+	{
+		GPIOF->ICR = SW1;					// Forget the release bounces
+		GPIOF->IM |= SW1;					// Listen for the next press
+	}
 }
 
-// Every edge of SW1, both directions. A falling edge counts as a press only if the
-// line was quiet for DEBOUNCE_MS before it; every edge restarts the quiet time.
+// SW1's falling edge: a press. Act on it, then ignore SW1 until it's released.
 void GPIOF_Handler(void)
 {
-	GPIOF->ICR = SW1;						// Clear the flag first
+	GPIOF->ICR = SW1;						// Clear the flag
+	GPIOF->IM &= ~SW1;						// Ignore the bounces: SysTick turns this back on
+	up_ms = 0;
 
-	if (ms - last_edge >= DEBOUNCE_MS		// The line was quiet...
-	    && (GPIOF->DATA & SW1) == 0)		// ...and it's now pressed: a falling edge
-	{
-		color_index = (color_index + 1) % 3;	// Next colour
-		presses++;
-		led_on = 1;							// Show it now, whatever the heartbeat was doing...
-		show();
-		TIMER1->TAILR = HEARTBEAT_LOAD;		// ...and restart the heartbeat: a full 500 ms on
-	}
-	last_edge = ms;							// Press, release, or bounce: start the quiet time again
-	edges++;
+	color_index = (color_index + 1) % 3;	// Next colour
+	presses++;
+	led_on = 1;								// Show it now, whatever the heartbeat was doing...
+	show();
+	TIMER1->TAILR = HEARTBEAT_LOAD;			// ...and restart the heartbeat: a full 500 ms on
 }
 
 // Every HEARTBEAT_MS: on, off, on, off...
@@ -89,17 +92,18 @@ int main(void)
 	while ((SYSCTL->PRGPIO  & RCGC_GPIOF)  == 0);
 	while ((SYSCTL->PRTIMER & RCGC_TIMER1) == 0);
 
-	// LEDs out; SW1 in, with pull-up and an interrupt on both edges
+	// LEDs out; SW1 in, with pull-up and an interrupt on its falling edge (a press)
 	GPIOF->DIR  = (GPIOF->DIR | LEDS) & ~SW1;
 	GPIOF->PUR |= SW1;
 	GPIOF->DEN |= LEDS | SW1;
-	GPIOF->IS  &= ~SW1;
-	GPIOF->IBE |= SW1;							// Both edges: releases restart the quiet time too
+	GPIOF->IS  &= ~SW1;							// Edge...
+	GPIOF->IBE &= ~SW1;							// ...one direction...
+	GPIOF->IEV &= ~SW1;							// ...falling
 	GPIOF->ICR  = SW1;
 	GPIOF->IM  |= SW1;
 	NVIC_EnableIRQ(GPIOF_IRQn);
 
-	// SysTick: interrupt every 1 ms
+	// SysTick: interrupt every 1 ms. After Port F: its handler reads SW1
 	SysTick_Config(SystemCoreClock / 1000);
 
 	// Timer1A: 32-bit periodic, interrupt every HEARTBEAT_MS

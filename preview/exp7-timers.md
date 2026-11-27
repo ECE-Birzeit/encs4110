@@ -646,8 +646,8 @@ Replace the contents of `main.c` with the include, the definitions, and the vari
 - **`CFG_32BIT`** and **`TAMR_PERIODIC`** are the [GPTMCFG](#gptmcfg-—-timer-configuration-register) and [GPTMTAMR](#gptmtamr-—-timer-a-mode-register) values for a 32-bit timer that reloads itself. A 32-bit timer needs no prescaler for 500 ms.
 - **`TATO`** is the time-out bit. It's at the same position in `IMR` (enable), `MIS` (status), and `ICR` (clear), so one name serves all three.
 - **`HEARTBEAT_LOAD`** is the timer's load value for 500 ms. It's a macro because two places use it: `main` starts the timer with it, and a press restarts the timer with it.
-- **`DEBOUNCE_MS`** is 50. Textbooks often say 20 ms, but the LaunchPad's switches still bounced at 20 ms in testing, and 50 ms is still far shorter than any human press.
-- **`last_edge`** holds the time of SW1's last edge. With `ms`, it's all the debouncing needs.
+- **`DEBOUNCE_MS`** is 20: how long SW1 must stay up after a release before the next press can count. Bounces last 5 to 20 ms.
+- **`up_ms`** counts how long SW1 has been up. With it, SysTick knows when the release has settled.
 - The variables are `volatile`: the handlers change them.
 
 ### Step 2: Add the interrupt handlers
@@ -658,15 +658,14 @@ Add `show()` and the handlers after the definitions:
 
 - **`show()`** lights the current colour if the heartbeat has the LED on, and nothing otherwise. It writes the whole colour each time instead of toggling bits, so changing the colour can never leave the old one lit.
 - **`TIMER1A_Handler`** clears the time-out flag, flips `led_on`, and calls `show()`. It runs every 500 ms, so the LED blinks at 1 Hz.
-- **`SysTick_Handler`** adds one to `ms` every millisecond, and that's all: a running clock, like Arduino's `millis()`. SysTick needs no flag cleared: the core clears its pending interrupt when the handler starts.
-- **`GPIOF_Handler`** debounces SW1 with a **quiet-time** rule. The interrupt fires on **every** edge, both directions, bounces included. A falling edge counts as a press only if the line was quiet for `DEBOUNCE_MS` before it. Every edge, counted or not, restarts the quiet time by updating `last_edge`.
-- Follow one press: the first falling edge comes after a long quiet spell, so it counts **at once**. The bounces that follow arrive within 50 ms of each other, so they're ignored. On release, the first edge is **rising** (the pin reads 1, so it isn't a press), and the release bounces fall inside the quiet time it just started.
+- The debounce is the one from [Experiment 6](/preview/exp6-gpio-interrupts): act on the press, then wait for the release. The difference is who waits. In Experiment 6 the main loop waited in delay loops and could do nothing else. Here SysTick does the waiting, a millisecond at a time, so nothing ever stops.
+- **`GPIOF_Handler`** runs on SW1's falling edge: a press. It acts on it **at once**, then masks SW1 in `IM`, so the bounces that follow can't interrupt.
+- **`SysTick_Handler`** adds one to `ms` every millisecond, a running clock like Arduino's `millis()`. It also waits for the release: while SW1 is down or bouncing, it keeps `up_ms` at 0. Once SW1 has been up for `DEBOUNCE_MS` in a row, it clears the flags the release bounces left in `ICR` and unmasks SW1, ready for the next press. SysTick needs no flag cleared: the core clears its pending interrupt when the handler starts.
+- Follow one press: the first falling edge interrupts, and the colour changes. The press bounces and the hold are ignored, because SW1 is masked. The release bounces keep setting `up_ms` back to 0. 20 ms after the last one, SW1 listens again.
 - **A press restarts the heartbeat.** If you pressed while the LED was off, you'd wait up to half a second to see the new colour. So the handler turns the LED on at once and writes `HEARTBEAT_LOAD` back into `TAILR`. With `TAILD` 0 in [GPTMTAMR](#gptmtamr-—-timer-a-mode-register), the default, the timer loads a new `TAILR` value on the next clock cycle: the countdown starts over, and the new colour stays on for a full 500 ms.
 - Both `GPIOF_Handler` and `TIMER1A_Handler` call `show()`. Interrupts at the same priority never interrupt each other, and these two have the same (default) priority, so one can't cut into the other's write to `GPIOF->DATA`.
-- **`ms - last_edge`** is unsigned subtraction, so it stays correct when `ms` wraps from 0xFFFFFFFF to 0 after 49 days: the difference is still the number of milliseconds between the two.
-
 ::: info Why not "time since the last press"?
-The common version, `if (ms - last_press >= 150) { toggle; last_press = ms; }`, times from the last **press**. Hold the button for more than 150 ms and let go: the release bounces include falling edges, the last press was long ago, and the LED toggles on release. Timing from the last **edge** of either kind closes that hole, with no extra code.
+The common version, `if (ms - last_press >= 150) { toggle; last_press = ms; }`, times from the last **press**. Hold the button for more than 150 ms and let go: the release bounces include falling edges, the last press was long ago, and the LED toggles on release. Waiting for the release closes that hole: SW1 isn't listened to again until it has been up and quiet.
 :::
 
 ### Step 3: Write `main`
@@ -675,19 +674,19 @@ Add `main` at the end of the file:
 
 <<< @/snippets/preview/exp7/main.c#main{c}
 
-1. **Port F** is set up as in Experiment 6: LEDs out, SW1 in with its pull-up. The difference is `IBE`: SW1 interrupts on **both** edges, so releases restart the quiet time too (with `IBE` set, `IEV` is ignored). Only SW1 is used, so there's no unlocking.
-2. **SysTick** is started with `SysTick_Config` from [SysTick Configuration with CMSIS](#systick-configuration-with-cmsis): a reload of $f_\text{clock}/1000$ gives 1 ms, and the function also enables its interrupt.
+1. **Port F** is set up as in Experiment 6: LEDs out, SW1 in with its pull-up. SW1 interrupts on its falling edge, a press. Only SW1 is used, so there's no unlocking.
+2. **SysTick** is started after Port F, because its handler reads SW1. It's started with `SysTick_Config` from [SysTick Configuration with CMSIS](#systick-configuration-with-cmsis): a reload of $f_\text{clock}/1000$ gives 1 ms, and the function also enables its interrupt.
 3. **Timer1A** follows the [GPTM steps](#gptm-configuration-steps-periodic-mode): stop, 32-bit, periodic, load, clear, enable the interrupt (in the timer and in the NVIC), start. The load is $50{,}000 \times 500 - 1$: 500 ms of 50 MHz clocks, minus one because the count includes 0.
 
 **Check:** build, flash, and run.
 
 - The LED blinks red once a second, by itself.
 - Add `ms` to the Watch window: it goes up by about 1000 every second.
-- Press SW1: the colour changes **immediately**, even if the LED was off, and stays on for half a second before blinking on. Press ten times, slowly and quickly, short and long: red, green, blue, red..., exactly one step per press, never on release. Add `presses` and `edges`: `presses` is 10, and `edges` is well above 20. Each press and each release is at least one edge, and every bounce is one more.
+- Press SW1: the colour changes **immediately**, even if the LED was off, and stays on for half a second before blinking on. Press ten times, slowly and quickly, short and long: red, green, blue, red..., exactly one step per press, never on release. Add `presses` to the Watch window: it's 10.
 
 **Then try:**
 
-- Set `DEBOUNCE_MS` to 0 and press SW1 a few times: some presses skip a colour, as in Experiment 6. Then try 200 and press quickly: fast double presses now count as one, because the second comes inside the quiet time. Put it back to 50.
+- Set `DEBOUNCE_MS` to 1 and press SW1 a few times: some releases now count as presses and skip a colour, because SW1 listens again in the middle of the release bounce. Then try 300 and press quickly: fast double presses count as one, because the second comes before SW1 listens again. Put it back to 20.
 - Remove the `TIMER1->TAILR = HEARTBEAT_LOAD;` line and press SW1 several times: now the new colour sometimes flashes for an instant and goes off, because the old countdown was about to end. Put it back.
 - Change `HEARTBEAT_MS` to 100: the LED blinks five times faster, while the button still works the same.
 
@@ -702,8 +701,10 @@ Add `main` at the end of the file:
 | LED doesn't blink | `TAEN`, `IMR`, or `NVIC_EnableIRQ(TIMER1A_IRQn)` is missing, or the handler isn't named exactly `TIMER1A_Handler`. |
 | LED stays on and the board freezes | `TIMER1->ICR = TATO` is missing from the handler, so it runs again and again. |
 | `ms` doesn't change | `SysTick_Config` is missing, or the handler isn't named exactly `SysTick_Handler`. |
-| The colour also changes on release | `IBE` isn't set, so releases don't restart the quiet time; or `last_edge = ms` is inside the `if` instead of after it. |
-| A press sometimes skips a colour | `DEBOUNCE_MS` is too short for your switch: keep it at 50 or more. Or the `(GPIOF->DATA & SW1) == 0` check is missing, so a rising edge counts as a press. |
+| The colour also changes on release | `IBE` or `IEV` is set, so the rising edge interrupts too: SW1 must interrupt on its falling edge only. |
+| A press sometimes skips a colour | `GPIOF_Handler` doesn't mask SW1 (`IM &= ~SW1`), so the bounces interrupt too. Or `DEBOUNCE_MS` is too short for your switch: try 30. |
+| SW1 works once, then never again | SysTick doesn't unmask SW1: `SysTick_Config` is missing, or the `IM \|= SW1` line is. |
+| Program stops in `HardFault_Handler` at start | SysTick was started before Port F's clock: its handler reads SW1, so set up Port F first. |
 | Two colours lit at once (purple, yellow, ...) | The LED is being toggled with `^=` somewhere. Write the whole colour through `show()`. |
 | A press changes the colour, but it only appears later | The press doesn't set `led_on` and call `show()`. |
 | Program stops in `HardFault_Handler` | A Timer1 register was written before its clock was ready: keep the `PRTIMER` wait. |
@@ -724,7 +725,7 @@ Start from this program. It compiles and runs as it is, but does nothing yet: th
 
 <<< @/snippets/preview/exp7/task.c{c}
 
-**The provided part.** `GPIOF_Handler` is the Activity's quiet-time debounce, applied to both buttons: each has its own `last_edge`, and a real press of either calls `on_press()` exactly once, with the button that was pressed. `SysTick_Handler` keeps the `ms` clock. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
+**The provided part.** The debounce is the Activity's, for both buttons. `GPIOF_Handler` calls `on_press()` once per press, with the button that was pressed, then masks both buttons. `SysTick_Handler` keeps the `ms` clock and unmasks them once both have been up for `DEBOUNCE_MS`. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
 
 :::: details What to write: the five TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 5, 4, 2**, then **3**. That way you can test halfway: after TODO 2, SW1 already makes the LED turn green after a random wait.

@@ -26,7 +26,7 @@
 #define CTL_TAEN       (1U << 0)        // CTL: Timer A enable
 #define TATO           (1U << 0)        // IMR, MIS, ICR: Timer A time-out
 
-#define DEBOUNCE_MS    50               // Quiet time before an edge counts as a new press
+#define DEBOUNCE_MS    20               // How long the buttons must stay up after a release
 
 typedef enum {
 	IDLE,           // waiting for SW1 to start a round
@@ -50,31 +50,37 @@ void show(uint32_t led)
 	GPIOF->DATA = (GPIOF->DATA & ~LEDS) | led;
 }
 
-// Every 1 ms
+// The Activity's debounce, for both buttons: act on the press, then wait for the release.
+volatile uint32_t up_ms;                // How long both buttons have been up
+
+// Every 1 ms: count the time, and once both buttons have been up for DEBOUNCE_MS in a row,
+// listen for the next press
 void SysTick_Handler(void)
 {
 	ms++;
+
+	if ((GPIOF->DATA & SWITCHES) != SWITCHES)   // A button is down (or bouncing)
+		up_ms = 0;
+	else if (++up_ms == DEBOUNCE_MS)    // Both up, and quiet for DEBOUNCE_MS
+	{
+		GPIOF->ICR = SWITCHES;          // Forget the release bounces
+		GPIOF->IM |= SWITCHES;          // Listen for the next press
+	}
 }
 
-// Every edge of SW1 or SW2, both directions. The quiet-time rule from the Activity, for each
-// button: a falling edge after DEBOUNCE_MS of quiet is a press, and calls on_press() once.
-volatile uint32_t last_edge[2];         // [0] for SW1, [1] for SW2
-
+// A falling edge of SW1 or SW2: a press. Calls on_press() once, then ignores the buttons
+// until they're released.
 void GPIOF_Handler(void)
 {
-	uint32_t mis = GPIOF->MIS;
-	GPIOF->ICR = mis;                   // Clear the flags of the buttons that interrupted
+	uint32_t button = GPIOF->MIS;       // Which button was pressed
+	GPIOF->ICR = button;
+	GPIOF->IM &= ~SWITCHES;             // Ignore the bounces: SysTick turns this back on
+	up_ms = 0;
 
-	for (uint32_t i = 0; i < 2; i++)
-	{
-		uint32_t button = (i == 0) ? SW1 : SW2;
-		if (mis & button)
-		{
-			if (ms - last_edge[i] >= DEBOUNCE_MS && (GPIOF->DATA & button) == 0)
-				on_press(button);       // A real press of this button
-			last_edge[i] = ms;          // Every edge restarts its quiet time
-		}
-	}
+	if (button & SW1)
+		on_press(SW1);
+	else if (button & SW2)
+		on_press(SW2);
 }
 // ---------------------------------------------------------------- end of provided part
 
@@ -117,12 +123,13 @@ int main(void)
 	GPIOF->PUR |= SWITCHES;                         // Pull-ups: pressed reads 0
 	GPIOF->DEN |= LEDS | SWITCHES;
 	GPIOF->IS  &= ~SWITCHES;                        // Both buttons: edge interrupts...
-	GPIOF->IBE |= SWITCHES;                         // ...on both edges, for the quiet-time rule
+	GPIOF->IBE &= ~SWITCHES;                        // ...one direction...
+	GPIOF->IEV &= ~SWITCHES;                        // ...falling: a press
 	GPIOF->ICR  = SWITCHES;
 	GPIOF->IM  |= SWITCHES;
 	NVIC_EnableIRQ(GPIOF_IRQn);
 
-	SysTick_Config(SystemCoreClock / 1000);         // 1 ms clock
+	SysTick_Config(SystemCoreClock / 1000);         // 1 ms clock, after Port F: it reads the buttons
 
 	// TODO 5: set up Timer1A: stopped, 32-bit, one-shot, time-out interrupt enabled in the // [!code highlight]
 	//         timer (IMR) and the NVIC. Don't start it: SW1 does that, once per round. // [!code highlight]
