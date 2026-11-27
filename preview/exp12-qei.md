@@ -284,36 +284,48 @@ It does four things, in order:
 3. **Starts the speed measurement.** `LOAD` sets the window to $f_\text{clock}/10$ clocks, minus one: 100 ms. The interrupt fires at the end of each window and runs the Step 3 handler.
 4. **Reads the results** in the loop: the position from `POS`, and the direction from `DIRECTION` in [QEISTAT](#qeistat-—-qei-status), which holds the direction of the **last** edge, so the LED keeps its colour when the knob stops. The QEI counts every edge in hardware, so nothing is missed however long the loop takes.
 
-**Check:** build, flash, run, and add `position`, `clicks`, `angle`, and `rpm` to the Watch window.
+Build, flash, and run, and add `position`, `clicks`, `angle`, and `rpm` to the Watch window.
 
-- Turn the knob one click at a time: `position` changes by **4** per click and `angle` by 18°. One full turn (20 clicks) brings `position` back to where it started.
-- Turn it forward: the LED is green. One click back: red.
-- Spin it at about one turn per second: `rpm` reads about 60, negative in reverse, and goes back to 0 within 100 ms of stopping.
+<Checklist id="activity" title="Activity checklist">
 
-::: tip If it counts the wrong way or by 2
-- Counting **down** when you turn clockwise: A and B are the other way round on your module. Swap the CLK and DT wires, or add the `SWAP` bit (bit 1) to the `CTL` write.
-- Changing by **2** per click: your encoder has two clicks per pulse. Count the clicks in one full turn and how far `position` moves, and set `PPR` to the counts per turn divided by 4.
+- One click at a time: does `position` change by **4** per click, and `angle` by 18°?
+- Does one full turn (20 clicks) bring `position` back to where it started?
+- Is the LED green while turning forward, and red after one click back?
+- At about one turn per second, does `rpm` read about 60, negative in reverse, and 0 soon after you stop?
+- Can you say why the QEI never misses a click, however slow the main loop is?
+
+</Checklist>
+
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Set `WINDOW_HZ` to 4 | `rpm` moves in steps of 3 rpm instead of 7.5, but updates only four times a second ([Speed resolution](#measuring-speed)). |
+| Set `MAXPOS` to `0xFFFFFFFF`, and add `volatile int32_t turns;` with `turns = (int32_t)QEI1->POS;` in the loop | `position` never wraps at 79, and `turns` goes negative when you turn back past 0: -1, -2, ... |
+| Remove `CTL_CAPMODE` from the `CTL` write | Only PhA's edges count: 2 per click, 40 per turn, and the `rpm` reading halves. |
+| Add `CTL_SWAP` (`1U << 1`) to the `CTL` write | Forward and reverse swap: the count goes down and the LED turns red when you turn clockwise. |
 :::
 
 ::: details The complete program
 <<< @/snippets/preview/exp12/main.c#full{c}
 :::
 
-::: info Why does the rpm jump around?
-By hand you can turn the HW-040 at a few hundred rpm at most, so `SPEED` is a small number and each edge is worth 7.5 rpm (see [Speed resolution](#measuring-speed)). The reading also includes the bounce of the contacts. Try `WINDOW_HZ` 4: the steps shrink to 3 rpm, but the value updates more slowly.
+::: details Why does the rpm jump around?
+By hand you can turn the HW-040 at a few hundred rpm at most, so `SPEED` is a small number and each edge is worth 7.5 rpm (see [Speed resolution](#measuring-speed)). The reading also includes the bounce of the contacts.
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | `position` never changes | `RCGCQEI`, `AFSEL`, or `PCTL` is missing or wrong (6 for QEI), or the wires are on PB5/PB6 instead of **PC5/PC6**. Check `+` is on 3.3V. |
 | `position` goes back and forth by one, never further | Only one channel is connected: check the DT wire to **PC6**. |
+| Counts **down** when you turn clockwise | A and B are the other way round on your module. Swap the CLK and DT wires, or add the `SWAP` bit (bit 1) to the `CTL` write. |
+| Changes by **2** per click | Your encoder has two clicks per pulse. Count the clicks in one full turn and how far `position` moves, and set `PPR` to the counts per turn divided by 4. |
 | The debugger can't connect any more | A Port C register was written with `=` and took the JTAG pins. Use **LM Flash Programmer → Other Utilities → Debug Port Unlock** to recover the board, then fix the write. |
 | `position` only goes up to 79 | That's `MAXPOS`: one turn, by design. For an unlimited count, use `MAXPOS = 0xFFFFFFFF`. |
 | Writing `POS = 0` has no effect | It was written before `ENABLE`. Write it after. |
 | `rpm` stays 0 | `NVIC_EnableIRQ(QEI1_IRQn)` is missing, `VELEN` isn't in the `CTL` write, or the handler's name is misspelled: it must be exactly `QEI1_Handler`. |
 | Program stops in the handler and never leaves | The interrupt isn't cleared: write `INT_TIMER` to `ISC`. |
+:::
 
 ## Task
 
@@ -327,11 +339,13 @@ Make the knob a proper **dimmer** for the blue LED: slow turns make fine changes
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is: the LED glows at 25%, but the knob doesn't change it yet.
+Start from this program. It compiles and runs: the LED glows at 25%, but the knob doesn't change it yet.
 
 <<< @/snippets/preview/exp12/task.c{c}
 
-**The provided part.** The PWM is the [Experiment 8 Activity](/preview/exp8-pwm#activity)'s: Timer1A makes a 1 kHz signal on PF2, and `pwm_set()` sets its duty cycle, without the breathing. QEI1 is set up as in this Activity, with one change: `MAXPOS = 0xFFFFFFFF`, so the position never wraps within reach of a hand, and `QEI1_Handler` keeps `rpm` up to date every 100 ms. `light()` switches the LED: on, PF2 is driven by the PWM; off, `AFSEL` is cleared and PF2 is a plain output, low. The PWM keeps running, so the brightness is kept. `SysTick_Handler` runs every 1 ms and does the knob button's release half of the debounce, as for SW1 in the [Experiment 7 Activity](/preview/exp7-timers#activity). Don't change these.
+::: details How the provided part works
+The PWM is the [Experiment 8 Activity](/preview/exp8-pwm#activity)'s: Timer1A makes a 1 kHz signal on PF2, and `pwm_set()` sets its duty cycle, without the breathing. QEI1 is set up as in this Activity, with one change: `MAXPOS = 0xFFFFFFFF`, so the position never wraps within reach of a hand, and `QEI1_Handler` keeps `rpm` up to date every 100 ms. `light()` switches the LED: on, PF2 is driven by the PWM; off, `AFSEL` is cleared and PF2 is a plain output, low. The PWM keeps running, so the brightness is kept. `SysTick_Handler` runs every 1 ms and does the knob button's release half of the debounce, as for SW1 in the [Experiment 7 Activity](/preview/exp7-timers#activity). Don't change these.
+:::
 
 :::: details What to write: the five TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **3, 5, 4**, then **2, 1**. That way the knob works before you add the button.
@@ -347,7 +361,6 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 - Only while `on` is 1, and only if `steps` isn't 0.
 - Add `steps * size` to `level`. `steps` is negative in reverse, so the same line makes the LED dimmer.
 - Clamp **`level`** itself to 1 to 99, then call `pwm_set(level)`. `pwm_set()` clamps too, but only what it sends to the timer: if `level` itself were left at, say, 140, turning back would need 41 clicks before anything changed.
-- `level` is `volatile`: compute the new value in a local variable, clamp it, then store it.
 
 :::
 
@@ -355,7 +368,6 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 
 ::: details TODO 4: the speed-dependent step (the main loop)
 - If `rpm` is above `FAST_RPM` **or** below `-FAST_RPM`, set `size` to `FAST_STEP`. `rpm` is negative in reverse, and turning fast backward should take big steps too.
-- `rpm` comes from the Activity's handler: it's the speed over the last 100 ms window.
 
 :::
 
@@ -363,7 +375,7 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 - PC4 is set up like SW1 in Experiment 7, on Port C: input (`DIR` cleared), pull-up (`PUR`), digital (`DEN`), and a falling-edge interrupt: `IS`, `IBE`, and `IEV` cleared, `ICR` cleared, `IM` set, and `NVIC_EnableIRQ(GPIOC_IRQn)`.
 - Port C holds the debugger's JTAG pins: use only `|=` and `&= ~` with `KNOB_SW`, never a plain `=` (see the warning in [The QEI module](#the-qei-module)).
 - Don't set PC4's `AFSEL` bit: that would make it the QEI1 index input.
-- It comes before `SysTick_Config`, because `SysTick_Handler` reads PC4.
+- It goes before `SysTick_Config`: `SysTick_Handler` reads PC4.
 
 :::
 
@@ -375,9 +387,14 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 :::
 ::::
 
-**Check:** build and flash, and add `level`, `rpm`, and `on` to the Watch window.
+Build and flash, and add `level`, `rpm`, and `on` to the Watch window.
 
-- **Slow:** turn one click at a time: `level` changes by 1, and the LED by a little.
-- **Fast:** spin the knob: `rpm` goes above 120 and `level` jumps by 5 per click. A quarter turn fast covers about 25%.
-- **The ends:** turn far forward: `level` stops at 99. One click back: 98 straight away. The same at 1.
-- **The button:** press the knob: the LED goes off and `on` is 0. Turn the knob: `level` doesn't change. Press again: the LED comes back at the same brightness. One press is always exactly one switch.
+<Checklist id="task" title="Task checklist">
+
+- Did you write the click counting and the clamp yourself?
+- One click at a time: does `level` change by 1? Spinning fast: by 5 per click?
+- Turned far forward, does `level` stop at 99, and one click back give 98 at once? The same at 1?
+- Does a press switch the LED off, with turning doing nothing, and the next press bring it back at the same brightness?
+- Is one press always exactly one switch?
+
+</Checklist>
