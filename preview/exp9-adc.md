@@ -18,7 +18,7 @@ head:
 
 # Analog-to-Digital Converter (ADC)
 
-This experiment introduces analog-to-digital conversion using the TM4C123’s dual 12-bit ADC modules. You will configure sample sequencers for automatic multi-channel data acquisition, implement both polling and interrupt-driven sampling modes, and interface with analog sensors such as potentiometers and the internal temperature sensor. By the end of this lab, you will understand how to convert continuous analog signals to discrete digital values, configure trigger sources for periodic sampling, and implement sensor interfacing applications that bridge the analog and digital domains.
+This experiment introduces analog-to-digital conversion using the TM4C123’s dual 12-bit ADC modules. You will read a potentiometer with a sample sequencer, first by polling with a software trigger, then with a timer trigger and an interrupt, and turn the readings into millivolts, a temperature, and an LED brightness. By the end of this lab, you will understand how continuous analog signals become discrete digital values, and how to sample them periodically without the CPU's help.
 
 ::: warning Reworked version: in testing
 This is the reworked version of [Experiment 9](/experiments/exp9-adc), shared for TAs to test. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp9-adc)** until this one replaces it.
@@ -29,12 +29,13 @@ This is the reworked version of [Experiment 9](/experiments/exp9-adc), shared fo
 
 - Understand analog-to-digital conversion principles including sampling, quantization, and resolution.
 - Recognize the architecture of the TM4C123 ADC modules including dual 12-bit converters and shared input channels.
-- Configure ADC sample sequencers (SS0-SS3) with different depths and trigger sources.
+- Configure an ADC sample sequencer (SS3 here; SS0 to SS2 work the same way with more samples) and choose its trigger source.
 - Configure GPIO pins for analog input using AFSEL, AMSEL, and DEN registers.
-- Implement software-triggered and hardware-triggered ADC conversions.
-- Read and interpret ADC conversion results from FIFO registers.
-- Convert digital ADC values to physical quantities such as voltage and temperature.
-- Implement both polling and interrupt-driven ADC operation modes.
+- Start conversions by software (`PSSI`) and by hardware, with a timer's output trigger (`TAOTE`, `EMUX` 0x5).
+- Read conversion results from the sequencer's FIFO (`SSFIFO3`).
+- Convert ADC readings to physical quantities: millivolts and the chip's temperature.
+- Use the ADC both by polling (`RIS`) and with interrupts (`IM`, the NVIC, `ISC`).
+- Use a reading to control an output: an LED's PWM brightness from Experiment 8.
 
 ## Background
 
@@ -52,7 +53,7 @@ where $V_{\text{REFP}}$ is the positive reference voltage, $V_{\text{REFN}}$ is 
 
 ### TM4C123 ADC Architecture
 
-The TM4C123GH6PM microcontroller features **two identical 12-bit ADC modules** (ADC0 and ADC1) that share 12 analog input channels. These modules provide high-precision conversion of continuous analog voltages to discrete digital numbers.
+The TM4C123GH6PM microcontroller features **two identical 12-bit ADC modules** (ADC0 and ADC1) that share 12 analog input channels. These modules provide high-precision conversion of continuous analog voltages to discrete digital numbers. Each module has its own registers (`ADC0->...` and `ADC1->...`), its own clock bit in `RCGCADC`, its own sequencers and its own interrupts, so the two can convert two inputs at the same moment. This lab uses ADC0; a [Then try](#then-try) in the Task adds ADC1.
 
 #### Key Features
 
@@ -246,7 +247,7 @@ Selects trigger source for each sample sequencer. Each 4-bit field (EM0-EM3) spe
 *ADC Event Multiplexer Trigger Sources*
 
 **Timer-triggered sampling (EM = 0x5):**
-this hooks a GPTM directly to the ADC without any CPU involvement at sample time. Configure the timer (as in Experiment 7) in periodic mode, then set its `TnOTE` bit (bit 5 of `TIMERx->CTL` for Timer A, bit 13 for Timer B — the same `CTL` register from Experiment 7’s GPTM section) so that each timeout pulses the ADC trigger instead of (or in addition to) generating a CPU interrupt. Set the corresponding sequencer’s `ADCEMUX` field to `0x5`, and the ADC samples automatically every time the timer expires — this is what the [Task](#task) asks you to wire up.
+this hooks a GPTM directly to the ADC without any CPU involvement at sample time. Configure the timer (as in Experiment 7) in periodic mode, then set its `TnOTE` bit (bit 5 of `TIMERx->CTL` for Timer A, bit 13 for Timer B — the same `CTL` register from Experiment 7’s GPTM section) so that each timeout pulses the ADC trigger instead of (or in addition to) generating a CPU interrupt. Set the corresponding sequencer’s `ADCEMUX` field to `0x5`, and the ADC samples automatically every time the timer expires — this is what the [Task](#task) wires up.
 
 #### ADCPSSI — ADC Processor Sample Sequence Initiate
 
@@ -506,7 +507,7 @@ Add `main` at the end of the file:
 
 **Then try:**
 
-- Turn the knob slowly until the LED sits right at the red-green border, at 1.1 V. The LED flickers between the two colours, and `raw` jumps by a few counts even with your hand off the knob. That's **noise**: every reading is a little different. The [Task](#task) fixes both.
+- Turn the knob slowly until the LED sits right at the red-green border, at 1.1 V. The LED flickers between the two colours, and `raw` jumps by a few counts even with your hand off the knob. That's **noise**: every reading is a little different. The Task's [Then try](#then-try) fixes both, with averaging and hysteresis.
 - Read the chip's **internal temperature sensor** instead: add `(1U << 3)` (the `TS0` bit) to the `SSCTL3` write, and compute the temperature in tenths of a degree from the [formula above](#internal-temperature-sensor): `temp_x10 = 1475 - (2475 * raw) / 4096`. Put a finger on the chip and watch it rise slowly.
 
 ::: details The complete program
@@ -522,22 +523,87 @@ Add `main` at the end of the file:
 | Program hangs in `adc_read()` | The sequencer isn't enabled (`ACTSS`), or `SSCTL3` lacks `IE0`, so `RIS` never sets. |
 | Program stops in `HardFault_Handler` | An ADC0 register was written before its clock was ready: keep the `PRADC` wait. |
 | `millivolts` wraps to small values near the top | The formula overflowed: keep `raw * VREF_MV` in a `uint32_t` (4095 × 3300 fits easily). |
+| Task: `samples` stays at 0 | No trigger reaches the ADC, or the interrupt is off. Check `TAOTE` and `TAEN` on Timer0A, `EMUX` field 0x5, `SS3` in `IM`, and `NVIC_EnableIRQ(ADC0SS3_IRQn)`. |
+| Task: the program never leaves `ADC0SS3_Handler` | `ISC` isn't cleared, so the interrupt fires again the moment the handler returns. |
+| Task: `samples` grows far faster than 100 a second | `TAILR` is wrong: it's `SystemCoreClock / SAMPLE_HZ - 1`, in clock cycles. |
 
 ## Task
 
-Turn the reading into a steady **level meter**. The ADC samples **1000 times a second by itself**, started by a timer, with no code running at sample time. The program **averages** the samples to cut the noise, and uses **hysteresis** so the LED never flickers at a zone border.
+Build a **knob dimmer**: the potentiometer sets the **blue LED's brightness**, from nearly off at one end to full at the other. Two things change from the Activity:
 
-**Requirements:**
-- Trigger sequencer 3 from **Timer0A**, periodic at **1 kHz**, as described under [ADCEMUX](#adcemux-—-adc-event-multiplexer-select): `EMUX` field 0x5, and the timer's `TAOTE` bit set. Don't enable Timer0A's own interrupt: the timer only starts conversions.
-- Enable sequencer 3's interrupt (`ADC0->IM`, and `ADC0SS3_IRQn` in the NVIC). Its handler, `ADC0SS3_Handler`, reads the result and adds it to a **running average of the last 64 samples**.
-- In the main loop, convert the average to millivolts and show the zone on the LED, as in the Activity, but with **100 mV of hysteresis**: once in a zone, the voltage must go 100 mV past a border before the colour changes.
-- Add `raw`, the average, and `millivolts` to the Watch window. With your hand off the knob, `raw` should still jump by a few counts while the average barely moves.
-- At a border, the LED must not flicker, however slowly you turn the knob.
+- **Nobody asks for the samples.** Timer0A runs out 100 times a second, and each time-out starts a conversion by itself (its `TAOTE` bit, and `EMUX` field 0x5, as described under [ADCEMUX](#adcemux-—-adc-event-multiplexer-select)). No code runs at sample time, and there's no `adc_read()` loop.
+- **The result interrupts the CPU.** When the conversion is done, sequencer 3's interrupt runs `ADC0SS3_Handler`, which stores the reading and sets a flag. `main` sees the flag and sets the brightness with Experiment 8's `pwm_set()`. The handler only stores; `main` does the output.
 
-::: details Hint: a running average without a big sum
-Keep the last 64 samples in an array used as a ring, and a running total. Each new sample replaces the oldest: subtract the old one from the total, add the new one, and move the ring index on with `(i + 1) % 64`. The average is `total / 64`. 64 samples of up to 4095 sum to at most 262,080, so the total fits in a `uint32_t` with room to spare.
+The wiring is the Activity's: the potentiometer's wiper on PE3. The blue LED is driven by Timer1A's PWM on PF2, as in [Experiment 8](/preview/exp8-pwm), so it no longer shows colour zones.
+
+### The starter program
+
+Start from this program. It compiles and runs as it is, but the LED stays nearly off: the pot pin, the sequencer, and the PWM are done, and the timer trigger and the interrupt are yours to write.
+
+<<< @/snippets/preview/exp9/task.c{c}
+
+**The provided part.** `pwm_init()` and `pwm_set()` are Experiment 8's Activity, unchanged: Timer1A makes a 1 kHz PWM signal on PF2, and `pwm_set(percent)` sets its duty cycle, clamped to 1 to 99. In `main`, PE3 and sequencer 3 are set up as in the Activity, except for the trigger. Timer0 is a different timer from Timer1, with its own clock bit, so the trigger and the PWM don't disturb each other. Don't change these.
+
+:::: details What to write: the four TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in order, **1, 2, 3**, then **4**: after TODO 3 the readings already arrive, before any brightness changes.
+
+::: details TODO 1: Timer0A as the trigger (in `main`)
+- It's [Experiment 7](/preview/exp7-timers)'s periodic timer on `TIMER0`: stop it (clear `TAEN`), make it 32-bit (`CFG_32BIT`) and periodic (`TAMR_PERIODIC`).
+- `TAILR` is the number of clock cycles per sample, minus one: `SystemCoreClock / SAMPLE_HZ - 1`.
+- Start it with **two** bits in one write: `TIMER0->CTL |= CTL_TAOTE | CTL_TAEN;`. Without `TAOTE`, the timer still runs, but the ADC never hears it.
+- No `IMR` and no `NVIC_EnableIRQ(TIMER0A_IRQn)`: the timer's job is only to start conversions. The interrupt you want is the ADC's, in TODO 2.
+
 :::
 
-::: details Hint: hysteresis
-Remember the current zone. To leave zone 0 (red), the voltage must rise above 1100 + 100 mV; to come back from zone 1 (green), it must fall below 1100 − 100 mV. Between those, nothing changes. Write it as a `switch` on the current zone: each zone only checks its own two exits.
+::: details TODO 2: the trigger and the interrupt (in `main`, while the sequencer is off)
+- The Activity cleared sequencer 3's `EMUX` field, which means software. Clear it the same way, then set `EMUX_SS3_TIMER` in it: `ADC0->EMUX = (ADC0->EMUX & ~EMUX_SS3) | EMUX_SS3_TIMER;`.
+- The interrupt needs **both** places, as for the timers in Experiment 7: `SS3` in `ADC0->IM`, and `NVIC_EnableIRQ(ADC0SS3_IRQn)`. `SSCTL_IE0`, already provided, is what sets the flag; `IM` is what lets that flag interrupt the CPU.
+- It goes before `ACTSS` turns the sequencer on: change a sequencer's setup only while it's off.
+
 :::
+
+::: details TODO 3: the handler (the body of `ADC0SS3_Handler`)
+- It's the second half of the Activity's `adc_read()`: read `SSFIFO3` (keep 12 bits with `& 0xFFF`) into `raw`, and clear the flag with `ADC0->ISC = SS3`.
+- There's no `PSSI` (the timer started it) and no wait on `RIS` (the interrupt means it's done).
+- Then add one to `samples` and set `new_sample = 1` for `main`.
+
+:::
+
+**Test now:** add `raw`, `samples`, and `millivolts` to the Watch window and run. `samples` grows by about 100 a second, and `raw` and `millivolts` follow the knob, as in the Activity. The LED doesn't change yet.
+
+::: details TODO 4: the brightness (in `main`, inside `if (new_sample)`)
+- Scale the reading to a percentage the same way the Activity scaled it to millivolts: `raw * 100 / ADC_MAX`, multiplication first. 0 gives 0 and 4095 gives 100.
+- Store it in `duty`, then call `pwm_set(duty)`. You don't need to clamp it yourself: `pwm_set()` keeps it between 1 and 99.
+:::
+::::
+
+**Check:** build and flash, and add `raw`, `samples`, `millivolts`, and `duty` to the Watch window.
+
+- **The rate:** stop the program, note `samples`, run for 10 seconds by a phone's stopwatch, and stop again: it grew by about 1000.
+- **The dimmer:** turn the knob from one end to the other. `duty` goes from 0 to 100, and the blue LED from nearly off to full, smoothly, with no steps you can see.
+- **The CPU is free:** `main` does nothing until a reading arrives. Put a breakpoint inside `if (new_sample)`: it stops at once, each time you run, because 100 readings a second keep coming.
+
+### Then try
+
+- **Change the rate.** Set `SAMPLE_HZ` to 1000, then to 2: check the new rate with `samples`. At 2 a second, turn the knob quickly and watch the brightness follow in jumps. Put it back to 100.
+- **Average in hardware.** In the Activity's flicker test, `raw` jumps by a few counts with your hand off the knob. Add `ADC0->SAC = 0x6;` while the sequencer is off: each trigger now makes 64 conversions, and the ADC returns their average as one result. Watch `raw` with your hand off the knob: it barely moves. (`SAC` takes 0 to 6, for 1, 2, 4, ... 64 samples.)
+- **Average in software.** Remove `SAC` again and average the last 64 readings yourself, in `ADC0SS3_Handler`. Keep `raw` as the newest reading, add an `average`, and use the average for `duty`.
+
+  ::: details Hint: a running average without a big sum
+  Keep the last 64 readings in an array used as a ring, and a running total. Each new reading replaces the oldest: subtract the old one from the total, add the new one, and move the ring index on with `(i + 1) % 64`. The average is `total / 64`. 64 readings of up to 4095 sum to at most 262,080, so the total fits in a `uint32_t` with room to spare. This is short enough for a handler: a few additions, no waiting.
+  :::
+
+- **Hysteresis: a low-level warning.** Light the **red LED** (PF1, a plain output: set it in `DIR` and `DEN`) when the knob is below 1.1 V, from `main`. Turn slowly at the border: it flickers. Fix it with **100 mV of hysteresis**: the red LED turns on below 1000 mV and off only above 1200 mV, and between the two it stays as it was.
+
+  ::: details Hint: hysteresis
+  Remember whether the warning is on. If it's off, only check for falling below 1000; if it's on, only check for rising above 1200. Nothing else changes it. The same idea fixes the Activity's three colour zones: each zone checks only its own two exits, each 100 mV past a border.
+  :::
+
+- **A timed thermometer.** Add the `TS0` bit, `(1U << 3)`, to the `SSCTL3` write, as in the Activity's Then try, and compute `temp_x10 = 1475 - (2475 * raw) / 4096` in `main`. The chip's temperature is now measured 100 times a second by the timer, with no code at sample time. (The LED brightness now follows the temperature, which barely changes.)
+- **Two inputs on two modules.** Add a second potentiometer on **PE2** (AIN1), read by **ADC1**, that sets the **green LED** (PF3) by PWM on **Timer1B**: two knobs, two colours. ADC1 is a copy of ADC0, so both modules convert at the same moment.
+
+  ::: details Hints: ADC1 and Timer1B
+  - **ADC1:** its clock is bit 1 of `RCGCADC`, and its ready bit is bit 1 of `PRADC`. Make PE2 analog like PE3. Set up `ADC1`'s sequencer 3 exactly like `ADC0`'s, except `ADC1->SSMUX3 = 1` (AIN1). With `EMUX` 0x5 in both modules, Timer0A's one trigger starts both.
+  - **Its interrupt:** `ADC1SS3_Handler`, with `ADC1SS3_IRQn` in the NVIC. It reads `ADC1->SSFIFO3` into a second variable and clears `ADC1->ISC`.
+  - **Timer1B on PF3:** PF3's `PCTL` field is bits 15:12, and 7 selects T1CCP1. Timer B has its own `TBMR`, `TBPR`, `TBILR`, and `TBMATCHR`, set the same way as Timer A's, and its enable is `TBEN`, bit 8 of `CTL`. `CFG` is shared and already 16-bit: don't write it again, and set `TBEN` with `|=` so Timer A keeps running. Write a `pwm_set_green()` like `pwm_set()`, but on `TBMATCHR`.
+  :::
