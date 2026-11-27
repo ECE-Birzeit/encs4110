@@ -692,41 +692,44 @@ Add `main` at the end of the file:
 2. **SysTick** is started after Port F, because its handler reads SW1. It's started with `SysTick_Config` from [SysTick Configuration with CMSIS](#systick-configuration-with-cmsis): a reload of $f_\text{clock}/1000$ gives 1 ms, and the function also enables its interrupt.
 3. **Timer1A** follows the [GPTM steps](#gptm-configuration-steps-periodic-mode): stop, 32-bit, periodic, load, clear, enable the interrupt (in the timer and in the NVIC), start. The load is $50{,}000 \times 500 - 1$: 500 ms of 50 MHz clocks, minus one because the count includes 0.
 
-**Check:** build, flash, and run.
+Build, flash, and run.
 
-- The LED blinks red once a second, by itself.
-- Add `ms` to the Watch window: it goes up by about 1000 every second.
-- Press SW1: the colour changes **immediately**, even if the LED was off, and stays on for half a second before blinking on. Press ten times, slowly and quickly, short and long: red, green, blue, red..., exactly one step per press, never on release. Add `presses` to the Watch window: it's 10.
+<Checklist id="activity" title="Activity checklist">
 
-**Then try:**
+- Does the LED blink red once a second, by itself?
+- In the Watch window, does `ms` go up by about 1000 every second?
+- Does SW1 change the colour **at once**, even while the LED is off?
+- Ten presses, slow and fast, short and long: exactly one colour step each, never on release, and `presses` reads 10?
+- Can you say which handler runs every 1 ms, which every 500 ms, and which on a press?
 
-- Set `DEBOUNCE_MS` to 1 and press SW1 a few times: some releases now count as presses and skip a colour, because SW1 listens again in the middle of the release bounce. Then try 300 and press quickly: fast double presses count as one, because the second comes before SW1 listens again. Put it back to 20.
-- Remove the `TIMER1->TAILR = HEARTBEAT_LOAD;` line and press SW1 several times: now the new colour sometimes flashes for an instant and goes off, because the old countdown was about to end. Put it back.
-- **Start SysTick with its own registers.** Replace the `SysTick_Config(SystemCoreClock / 1000);` line with the three writes it does for you ([STCTRL](#systick-control-and-status-register-stctrl), [STLOAD](#systick-reload-value-register-stload)):
+</Checklist>
 
-  ```c
-  SysTick->LOAD = SystemCoreClock / 1000 - 1;    // 50,000 clocks: 1 ms
-  SysTick->VAL  = 0;                             // Start the count from LOAD
-  SysTick->CTRL = 0x07;                          // CLKSOURCE, TICKINT, ENABLE: system clock, interrupt, on
-  ```
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Set `DEBOUNCE_MS` to 1, then to 300 | At 1, some releases count as presses and skip a colour. At 300, two fast presses count as one. Put it back to 20. |
+| Delete `TIMER1->TAILR = HEARTBEAT_LOAD;` from `GPIOF_Handler` | The new colour sometimes flashes and goes straight off: the old countdown was about to end. |
+| Set `HEARTBEAT_MS` to 100, working out `HEARTBEAT_LOAD` by hand first ([32-bit formula](#_32-bit-mode-no-prescaler)) | Five blinks a second. Compare your number with `TIMER1->TAILR` in the Watch window. |
+| Start SysTick with its registers instead of `SysTick_Config` (code below) | The same 1 ms clock. Only the priority differs: SysTick stays at 0 ([Interrupt priorities](#interrupt-priorities)). |
+| Add a third timer: Timer2A, 1 s, its handler adding one to `volatile uint32_t seconds` | `seconds` keeps up with `ms / 1000`: three timers, each keeping its own time. |
+| Make Timer1A 16-bit (`CFG` = `0x4`) with a 250 ms heartbeat, choosing `TAPR` and `TAILR` ([prescaler](#_16-bit-mode-with-prescaler)) | Ten blinks take about 5 s. Answer below. |
 
-  Everything works the same: `ms` still goes up by 1000 a second. The one difference is the priority: `SysTick_Config` also gives SysTick the lowest priority, and without it SysTick stays at 0 (see [Interrupt priorities](#interrupt-priorities)). Put `SysTick_Config` back.
-- **A third timer.** Count seconds with Timer2A: copy the Timer1A setup in `main` with `TIMER2`, `RCGC` bit 2, `PRTIMER` bit 2 and `TIMER2A_IRQn`, and load it for 1 s, working out `TAILR` yourself. Its handler, `TIMER2A_Handler`, clears its flag and adds one to a new `volatile uint32_t seconds`. Add `seconds` and `ms` to the Watch window: `seconds` keeps up with `ms / 1000`, three timers each keeping their own time.
-- Change `HEARTBEAT_MS` to 100: the LED blinks five times faster, while the button still works the same. Before you build, work out `HEARTBEAT_LOAD` by hand with the [32-bit formula](#_32-bit-mode-no-prescaler), then add `TIMER1->TAILR` to the Watch window and compare. Put it back to 500.
-- **Use a 16-bit timer with the prescaler.** Make Timer1A 16-bit (`CFG` = `0x4`) with a 250 ms heartbeat. 250 ms is 12,500,000 clock cycles, far more than `TAILR` holds in 16-bit mode (65,535), so the [prescaler](#_16-bit-mode-with-prescaler) `TAPR` divides the clock first. Choose `TAPR` so that `TAILR` fits, work out `TAILR`, then: set `CFG` to `0x4`, write `TIMER1->TAPR` right after it, and define `HEARTBEAT_LOAD` as your `TAILR`. Time ten blinks against a phone: about 5 s.
+SysTick from its registers ([STCTRL](#systick-control-and-status-register-stctrl), [STLOAD](#systick-reload-value-register-stload)):
 
-  ::: details One answer
-  `TAPR` = 199 divides 50 MHz by 200, down to 250 kHz: a tick every 4 µs. 250 ms is 62,500 ticks, so `TAILR` = 62,499, which fits. Other pairs work too, as long as (`TAILR` + 1) × (`TAPR` + 1) = 12,500,000 and `TAILR` ≤ 65,535.
+```c
+SysTick->LOAD = SystemCoreClock / 1000 - 1;    // 50,000 clocks: 1 ms
+SysTick->VAL  = 0;                             // Start the count from LOAD
+SysTick->CTRL = 0x07;                          // CLKSOURCE, TICKINT, ENABLE
+```
 
-  Now try a 500 ms heartbeat in 16-bit mode: no pair fits. The most a 16-bit timer can count at 50 MHz is 65,536 × 256 clock cycles, about 0.335 s. That's why the Activity uses the 32-bit timer.
-  :::
+The 16-bit answer: `TAPR` = 199 divides 50 MHz down to 250 kHz, so 250 ms is 62,500 ticks and `TAILR` = 62,499. A 500 ms heartbeat can't be done in 16-bit mode: the most it counts is 65,536 × 256 clocks, about 0.335 s.
+:::
 
 ::: details The complete program
 <<< @/snippets/preview/exp7/main.c#full{c}
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | LED doesn't blink | `TAEN`, `IMR`, or `NVIC_EnableIRQ(TIMER1A_IRQn)` is missing, or the handler isn't named exactly `TIMER1A_Handler`. |
@@ -739,6 +742,7 @@ Add `main` at the end of the file:
 | Two colours lit at once (purple, yellow, ...) | The LED is being toggled with `^=` somewhere. Write the whole colour through `show()`. |
 | A press changes the colour, but it only appears later | The press doesn't set `led_on` and call `show()`. |
 | Program stops in `HardFault_Handler` | A Timer1 register was written before its clock was ready: keep the `PRTIMER` wait. |
+:::
 
 ## Task
 
@@ -752,11 +756,13 @@ A press with no arrow from the current state is ignored: SW2 in Idle, and SW1 on
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is, but does nothing yet: the pins, the 1 ms clock, and the debouncing are done, and the game is yours to write. This time there's more to write than in Experiment 6, and fewer worked examples: a whole interrupt handler, and the timer's setup.
+Start from this program. It compiles and runs, but does nothing yet: the pins, the 1 ms clock and the debouncing are done, and the game is yours to write.
 
 <<< @/snippets/preview/exp7/task.c{c}
 
-**The provided part.** The debounce is the Activity's, for each button on its own. With two buttons, `GPIOF_Handler` could interrupt `SysTick_Handler` halfway through changing `IM` (see [Interrupt priorities](#interrupt-priorities)). So instead of masking, each button has a **`ready`** flag. A falling edge counts only while its button is ready: `GPIOF_Handler` calls `on_press()` once, with the button, and clears its flag. The bounces still interrupt, but they're ignored. Every millisecond, `SysTick_Handler` keeps the `ms` clock and calls `check_release()` for each button: once a pressed button has been up for `DEBOUNCE_MS`, it's ready again. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
+::: details How the provided part works
+The debounce is the Activity's, for each button on its own. With two buttons, `GPIOF_Handler` could interrupt `SysTick_Handler` halfway through changing `IM` (see [Interrupt priorities](#interrupt-priorities)). So instead of masking, each button has a **`ready`** flag. A falling edge counts only while its button is ready: `GPIOF_Handler` calls `on_press()` once, with the button, and clears its flag. The bounces still interrupt, but they're ignored. Every millisecond, `SysTick_Handler` keeps the `ms` clock and calls `check_release()` for each button: once a pressed button has been up for `DEBOUNCE_MS`, it's ready again. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
+:::
 
 :::: details What to write: the five TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 5, 4, 2**, then **3**. That way you can test halfway: after TODO 2, SW1 already makes the LED turn green after a random wait.
@@ -797,9 +803,14 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 :::
 ::::
 
-**Check:** build and flash, and add `state`, `reaction`, `best`, and `false_starts` to the Watch window.
+Build and flash, and add `state`, `reaction`, `best`, and `false_starts` to the Watch window.
 
-- **A round:** press SW1. The LED goes off and `state` is `WAITING`. One to three seconds later it turns green (`GO`). Press SW2: the LED turns blue, `state` is `IDLE`, and `reaction` holds your time, typically 200 to 400 ms.
-- **The best time:** play five rounds. `best` is set by the first round and only changes when you beat it.
-- **A false start:** press SW1, then SW2 before green. The LED turns red, `false_starts` goes up by one, and green never comes. Press SW1 to try again.
-- **Ignored presses:** SW2 in Idle does nothing, and SW1 during a round doesn't restart it.
+<Checklist id="task" title="Task checklist">
+
+- Did you work out the `TAILR` expression for the random wait yourself?
+- A round: SW1 turns the LED off, it turns green 1 to 3 s later, and SW2 turns it blue with your time in `reaction` (typically 200 to 400 ms)?
+- Over five rounds, does `best` change only when you beat it?
+- A false start (SW2 before green): red, `false_starts` up by one, and green never comes?
+- Are SW2 in Idle and SW1 during a round ignored?
+
+</Checklist>

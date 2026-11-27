@@ -9,6 +9,7 @@ import JumpToProcedure from './components/JumpToProcedure.vue'
 import ContinueReading from './components/ContinueReading.vue'
 import Screenshot from './components/Screenshot.vue'
 import PinoutPanel from './components/PinoutPanel.vue'
+import Checklist from './components/Checklist.vue'
 
 export default {
   extends: DefaultTheme,
@@ -21,5 +22,6 @@ export default {
   },
   enhanceApp({ app }) {
     app.component('Screenshot', Screenshot)
+    app.component('Checklist', Checklist)
   },
 }
