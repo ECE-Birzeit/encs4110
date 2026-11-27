@@ -368,86 +368,103 @@ Add `main` at the end of the file:
 - Before touching the LCD, `main` sends one byte, `LCD_BL`, to switch the backlight on. If the backpack doesn't ACK, the red LED comes on and the program stops there: that separates an I2C problem from an LCD problem.
 - Then it initializes the LCD, prints both lines, and rewrites the number every 500 ms.
 
-**Check:** build, flash, and run. Line 1 shows **ENCS4110 Lab** and line 2 **Count:** followed by a number that goes up twice a second. If something's wrong, the board tells you which layer:
+Build, flash, and run.
 
-- **Red LED on:** the I2C layer. The backpack didn't answer at `LCD_ADDR`.
-- **No red LED, but the boxes stay on line 1:** the LCD layer. The bytes arrive, but the initialization didn't work.
+<Checklist id="activity" title="Activity checklist">
 
-**Then try** what the ACK means: change `LCD_ADDR` to `0x26` and re-flash. Now nothing answers, the address gets a NACK, and the red LED comes on. Put it back to `0x27`.
+- Does the backlight come on, with no red LED?
+- Does line 1 show **ENCS4110 Lab**, and line 2 **Count:** with a number going up twice a second?
+- With `LCD_ADDR` changed to `0x26`, does the red LED come on? (Put it back to `0x27`.)
+- Can you say how many I2C bytes one character takes, and why?
+- Can you say why the code never calls an LCD function from an interrupt handler?
+
+</Checklist>
+
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Set `LCD_ADDR` to `0x26` | Nothing answers: the address gets a NACK, and the red LED comes on. Put it back to `0x27`. |
+| Add `LCD_Command(0x0F);` after `LCD_Init();` | A blinking block cursor just after the last character printed. `0x0E` shows it without blinking. |
+| Print at row 0, column 16: `LCD_SetCursor(0, 16)` | Nothing appears: column 16 is in DDRAM, but off the edge of the 16-column screen. |
+| Remove `LCD_BL` from the byte in `LCD_SendNibble()` | The backlight goes off as soon as text is sent: the PCF8574 shows the whole last byte. Put it back. |
+| Change `delay_ms(500)` in `main` to `delay_ms(0)` | The count races up, but only as fast as the bus allows: each redraw is a few characters, about 1.2 ms each. |
+:::
 
 ::: details The complete program
 <<< @/snippets/preview/exp11/main.c#full{c}
 :::
 
-::: info How slow is it?
+::: details How slow is it?
 One character is two nibbles, six I2C bytes: about **1.2 ms**. A full 16-character line takes about 20 ms, against microseconds when the LCD's pins are wired straight to the microcontroller. That's the price of using two wires instead of seven, and the reason to update only what changes on the screen.
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
-| Red LED on | The backpack didn't ACK. Check SDA on **PB3** and SCL on **PB2** (not swapped), `VCC` on VBUS, and that `PCTL` is 3, not 7. |
+| Red LED on | The backpack didn't ACK: the I2C layer. Check SDA on **PB3** and SCL on **PB2** (not swapped), `VCC` on VBUS, and that `PCTL` is 3, not 7. |
 | Program hangs in `I2C0_Write` | The module isn't running the bus: `RCGCI2C` or `MCR_MFE` is missing, or `AFSEL` isn't set for PB2 and PB3. |
-| Backlight on, but boxes stay on line 1 | The initialization didn't reach the LCD. Check `LCD_SendNibble()` puts the nibble in bits 7:4 and pulses `LCD_EN`. |
+| Backlight on, no red LED, but boxes stay on line 1 | The LCD layer: the bytes arrive, but the initialization didn't reach the LCD. Check `LCD_SendNibble()` puts the nibble in bits 7:4 and pulses `LCD_EN`. |
 | Display blank, no boxes, no text | Contrast: turn the blue trimmer on the back of the backpack while the program runs. |
 | Program hangs in `delay_ms()` | `ms` isn't counting: `SysTick_Config` is missing from `main`, or `delay_ms()` (or an LCD function) was called from inside an interrupt handler. |
 | Random characters | A nibble went missing: the delays after the first `0x03` (5 ms) and after Clear (2 ms) are too short or missing. |
 | Backlight goes off when text is printed | `LCD_BL` is missing from the byte in `LCD_SendNibble()`. |
+:::
 
 ## Task
 
 Build an **up/down counter** on the LCD. Line 1 shows `Counter`, and line 2 the count, starting at 0. **SW1** adds 1. **SW2** takes 1 away, but the count never goes below 0.
 
-The buttons change the count inside an interrupt, but the LCD is too slow for that: one character takes about 1.2 ms, and some LCD functions call `delay_ms()`, which needs SysTick to count `ms`. SysTick has the lowest priority, so inside `GPIOF_Handler` it can't run, and `delay_ms()` would wait forever (see [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7). So the work is split:
-
-- **The handler** changes the count, sets a flag, `changed`, and returns at once.
-- **`main`** watches the flag, and when it's set, redraws the count.
+The LCD is too slow for an interrupt handler (see [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7), so the work is split: **the handler** changes the count and sets a flag, `changed`; **`main`** sees the flag and redraws the count.
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is: it shows `Counter` and `0`, but the buttons don't change anything yet. Nothing new needs wiring: the LCD stays as in the Activity, and the buttons are on the board.
+Start from this program. It compiles and runs: it shows `Counter` and `0`, but the buttons don't change anything yet. The LCD stays wired as in the Activity.
 
 <<< @/snippets/preview/exp11/task.c{c}
 
-**The provided part.** The I2C and LCD functions are the Activity's, unchanged. The buttons are set up as in the [Experiment 7 Task](/preview/exp7-timers#the-starter-program): SW1 on PF4 and SW2 on PF0 (unlocked first), each interrupting on its falling edge. Port F is set up **before** `SysTick_Config`, because `SysTick_Handler` now reads the buttons. The debounce is also the Experiment 7 Task's: each button has a `ready` flag, `GPIOF_Handler` calls `on_press()` once per press, and `SysTick_Handler` makes the button ready again 20 ms after its release. `SysTick_Handler` still counts `ms` too, for `delay_ms()`. Don't change these.
+::: details How the provided part works
+The I2C and LCD functions are the Activity's, unchanged. The buttons are set up as in the [Experiment 7 Task](/preview/exp7-timers#the-starter-program): SW1 on PF4 and SW2 on PF0 (unlocked first), each interrupting on its falling edge. Port F is set up **before** `SysTick_Config`, because `SysTick_Handler` now reads the buttons. The debounce is also the Experiment 7 Task's: each button has a `ready` flag, `GPIOF_Handler` calls `on_press()` once per press, and `SysTick_Handler` makes the button ready again 20 ms after its release. `SysTick_Handler` still counts `ms` too, for `delay_ms()`. Why not redraw in the handler? Some LCD functions call `delay_ms()`, which waits for SysTick to count `ms`; SysTick has the lowest priority, so inside `GPIOF_Handler` it can't run, and `delay_ms()` would wait forever. Don't change these.
+:::
 
 :::: details What to write: the four TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **3, 1, 2, 4**.
 
 ::: details TODO 3: show the count (`show_count()`)
-- Move the cursor to the start of line 2: `LCD_SetCursor(1, 0)`, as in the Activity's Step 5.
-- Clear the old digits: print enough spaces to cover the longest number, with `LCD_Print()`. Without them, going from 10 down to 9 prints `9` over the `1` and leaves the `0`: the screen shows `90`. A `uint32_t` has at most 10 digits.
-- Move the cursor back to the start of line 2, and print `count` with `LCD_PrintNumber()`.
+- Move the cursor to the start of line 2 with `LCD_SetCursor(1, 0)`, as in the Activity's Step 5.
+- Print enough spaces to cover the longest number (a `uint32_t` has at most 10 digits). Without them, 10 down to 9 shows `90`.
+- Move the cursor back, and print `count` with `LCD_PrintNumber()`.
 
 :::
 
 **Test now:** start `count` at 1234 (`volatile uint32_t count = 1234;`) and re-flash: line 2 shows `1234`. Put it back to 0.
 
 ::: details TODO 1: change the count (`on_press()`)
-- `button` is `SW1` or `SW2`. If it's `SW1`, add 1 to `count`.
-- If it's `SW2`, take 1 away, but **only if `count` is above 0**. `count` is unsigned: 0 - 1 would wrap around to 4294967295.
+- If `button` is `SW1`, add 1 to `count`.
+- If it's `SW2`, take 1 away **only if `count` is above 0**: it's unsigned, and 0 - 1 would wrap to 4294967295.
 - No LCD functions here: `on_press()` runs inside `GPIOF_Handler`.
 
 :::
 
 ::: details TODO 2: tell `main` (`on_press()`)
-- One line: set `changed` to 1. Put it after TODO 1, so `main` sees the new count.
-- `count` and `changed` are `volatile`, because the handler changes them while `main` reads them.
+- One line, after TODO 1: set `changed` to 1.
 
 :::
 
 ::: details TODO 4: redraw (the main loop)
 - If `changed` is 1: set it back to 0, then call `show_count()`.
-- Clear the flag **before** redrawing. If a press comes during the redraw, it sets the flag again, and the next time round the loop draws the newer count. Cleared after, that press would be lost from the screen.
+- Clear the flag **before** redrawing: a press during the redraw sets it again, and the next time round draws the newer count.
 
 :::
 ::::
 
-**Check:** build and flash, and add `count` to the Watch window.
+Build and flash, and add `count` to the Watch window.
 
-- At start, line 1 shows **Counter** and line 2 **0**.
-- SW1 twelve times: **12**. One step per press, however long you hold the button, and nothing on release.
-- SW2 three times: **9**, not **90**.
-- SW2 until 0, then once more: it stays at **0**.
-- Press SW1 quickly several times: every press counts, and the screen catches up with `count`.
+<Checklist id="task" title="Task checklist">
+
+- Did you write the count change and the flag in `on_press()` yourself, with no LCD call there?
+- At start, does line 1 show **Counter** and line 2 **0**?
+- SW1 twelve times: **12**, one step per press, however long you hold it?
+- SW2 three times: **9**, not **90**?
+- SW2 until 0, then once more: does it stay at **0**?
+
+</Checklist>
