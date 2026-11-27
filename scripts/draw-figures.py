@@ -2,6 +2,7 @@
 
   exp6/vending-machine.svg  the Experiment 6 Task's state machine: four states, the two buttons
   exp7/reaction-game.svg    the Experiment 7 Task's state machine: three states, buttons and a timer
+  exp8/stopwatch.svg        the Experiment 8 Task's state machine: two states
 
   exp8/lcd-wiring.svg     the 16x2 LCD: 5 V and GND rails, the contrast potentiometer, and every
                           signal straight up to its LaunchPad pin (header locations: setup/pinout)
@@ -218,7 +219,7 @@ def state_diagram(path, w, h, label, nodes, edges, loops=(), start=None, key=())
         c1x, c1y = pt(a - 34, R + 92); c2x, c2y = pt(a + 34, R + 92)
         s.add(f"<path d='M{sx:.1f},{sy:.1f} C{c1x:.1f},{c1y:.1f} {c2x:.1f},{c2y:.1f} {ex:.1f},{ey:.1f}' fill='none' stroke='{color}' stroke-width='3'/>")
         head(ex, ey, ex - c2x, ey - c2y, color)
-        lx, ly = pt(a, R + 82)
+        lx, ly = pt(a, R + 82 + (10 if side in ('left', 'right') else 0))
         tag(lx + (2 if anchor == 'start' else 0), ly - (2 if side == 'top' else 0), text, color, anchor, box=(anchor == 'middle'))
 
     if start:
@@ -277,7 +278,19 @@ def reaction_game(path):
                   key=((SW1C, 'SW1: start'), (SW2C, 'SW2: react'), (TIMC, 'Timer1A time-out')))
 
 
+def stopwatch(path):
+    nodes = {'stop': (340, 150, 'Stopped', 'LED off', *OFF),
+             'run': (700, 150, 'Running', 'green', '#16a34a', '#ffffff', '#166534')}
+    edges = [('stop', 'run', SW1C, 'SW1: start, note millis()', -60, 0, -4, 'middle', True),
+             ('run', 'stop', SW1C, 'SW1: stop, add the run to the total', -60, 0, 4, 'middle', True)]
+    loops = [('stop', 'left', SW2C, 'SW2: reset to 00:00.0', 'end')]
+    state_diagram(path, 1000, 330, 'State diagram of the stopwatch. Stopped, LED off: SW1 starts it, noting the time with millis(), and goes to Running; SW2 resets the time to 00:00.0 and stays in Stopped. Running, green: SW1 stops it, adds the run to the total, and goes back to Stopped; SW2 is ignored.',
+                  nodes, edges, loops, start=None,
+                  key=((SW1C, 'SW1: start and stop'), (SW2C, 'SW2: reset')))
+
+
 vending_machine('public/images/exp6/vending-machine.svg')
 reaction_game('public/images/exp7/reaction-game.svg')
+stopwatch('public/images/exp8/stopwatch.svg')
 lcd_wiring('public/images/exp8/lcd-wiring.svg')
 pot_wiring('public/images/exp9/pot-wiring.svg')
