@@ -744,7 +744,7 @@ Add `main` at the end of the file:
 
 Build a **reaction-time game**. Press **SW1** to start a round: the LED goes off, and after a random wait of 1 to 3 seconds it turns green. Press **SW2** as fast as you can: the LED turns **blue** for a success, and your reaction time in milliseconds is stored, along with the best one so far. Pressing SW2 before green is a **false start**: the LED turns red and the round is lost.
 
-Like the vending machine in [Experiment 6](/preview/exp6-gpio-interrupts), the game is a state machine, but this time a **timer** moves it too, not only buttons:
+The game is a **state machine**: it is always in one state, and each event moves it along an arrow. Buttons move it, and so does a **timer**:
 
 ![State diagram of the reaction game. Idle: SW1 starts a random wait and goes to Waiting. Waiting, LED off: when Timer1A runs out the LED turns green and the game goes to Go; SW2 before that is a false start: red, back to Idle. Go, green: SW2 stores the reaction time, turns the LED blue for a success, and goes back to Idle. Presses not shown are ignored.](/images/exp7/reaction-game.svg)
 
