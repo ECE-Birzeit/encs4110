@@ -702,6 +702,16 @@ Add `main` at the end of the file:
 
 - Set `DEBOUNCE_MS` to 1 and press SW1 a few times: some releases now count as presses and skip a colour, because SW1 listens again in the middle of the release bounce. Then try 300 and press quickly: fast double presses count as one, because the second comes before SW1 listens again. Put it back to 20.
 - Remove the `TIMER1->TAILR = HEARTBEAT_LOAD;` line and press SW1 several times: now the new colour sometimes flashes for an instant and goes off, because the old countdown was about to end. Put it back.
+- **Start SysTick with its own registers.** Replace the `SysTick_Config(SystemCoreClock / 1000);` line with the three writes it does for you ([STCTRL](#systick-control-and-status-register-stctrl), [STLOAD](#systick-reload-value-register-stload)):
+
+  ```c
+  SysTick->LOAD = SystemCoreClock / 1000 - 1;    // 50,000 clocks: 1 ms
+  SysTick->VAL  = 0;                             // Start the count from LOAD
+  SysTick->CTRL = 0x07;                          // CLKSOURCE, TICKINT, ENABLE: system clock, interrupt, on
+  ```
+
+  Everything works the same: `ms` still goes up by 1000 a second. The one difference is the priority: `SysTick_Config` also gives SysTick the lowest priority, and without it SysTick stays at 0 (see [Interrupt priorities](#interrupt-priorities)). Put `SysTick_Config` back.
+- **A third timer.** Count seconds with Timer2A: copy the Timer1A setup in `main` with `TIMER2`, `RCGC` bit 2, `PRTIMER` bit 2 and `TIMER2A_IRQn`, and load it for 1 s, working out `TAILR` yourself. Its handler, `TIMER2A_Handler`, clears its flag and adds one to a new `volatile uint32_t seconds`. Add `seconds` and `ms` to the Watch window: `seconds` keeps up with `ms / 1000`, three timers each keeping their own time.
 - Change `HEARTBEAT_MS` to 100: the LED blinks five times faster, while the button still works the same. Before you build, work out `HEARTBEAT_LOAD` by hand with the [32-bit formula](#_32-bit-mode-no-prescaler), then add `TIMER1->TAILR` to the Watch window and compare. Put it back to 500.
 - **Use a 16-bit timer with the prescaler.** Make Timer1A 16-bit (`CFG` = `0x4`) with a 250 ms heartbeat. 250 ms is 12,500,000 clock cycles, far more than `TAILR` holds in 16-bit mode (65,535), so the [prescaler](#_16-bit-mode-with-prescaler) `TAPR` divides the clock first. Choose `TAPR` so that `TAILR` fits, work out `TAILR`, then: set `CFG` to `0x4`, write `TIMER1->TAPR` right after it, and define `HEARTBEAT_LOAD` as your `TAILR`. Time ten blinks against a phone: about 5 s.
 

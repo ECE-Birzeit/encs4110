@@ -225,9 +225,9 @@ Before accessing any GPIO port, its clock must be enabled. The `RCGCGPIO` regist
 
 ```asm
 LDR     R1, =0x400FE608     ; RCGCGPIO register
-        LDR     R0, [R1]
-        ORR     R0, R0, #0x20       ; Set bit 5 (Port F)
-        STR     R0, [R1]
+LDR     R0, [R1]
+ORR     R0, R0, #0x20       ; Set bit 5 (Port F)
+STR     R0, [R1]
 ```
 
 Once the clock is enabled, a short delay or status polling ensures the peripheral is ready before further configuration. This delay exists because enabling a peripheral’s clock in `RCGCGPIO` doesn’t take effect instantaneously — the clock-gating logic needs a few cycles to settle before the port’s registers can be safely accessed. A couple of `NOP` instructions (as used in this experiment’s examples) are enough to bridge that gap; the exact count isn’t critical as long as some delay follows the clock-enable write. A more robust alternative — used from [Experiment 6](/preview/exp6-gpio-interrupts) on — is to poll a peripheral-ready register (`SYSCTL->PRGPIO`) instead of guessing a fixed number of `NOP`s.
@@ -250,11 +250,11 @@ Certain pins such as PF0 are protected because they share critical alternate fun
 
 ```asm
 LDR     R1, =0x40025520     ; GPIO_LOCK
-        LDR     R0, =0x4C4F434B     ; Unlock key
-        STR     R0, [R1]            
-        LDR     R1, =0x40025524     ; GPIO_CR
-        MOV     R0, #0xFF           ; Allow changes to all pins
-        STR     R0, [R1]
+LDR     R0, =0x4C4F434B     ; Unlock key
+STR     R0, [R1]            
+LDR     R1, =0x40025524     ; GPIO_CR
+MOV     R0, #0xFF           ; Allow changes to all pins
+STR     R0, [R1]
 ```
 
 In this experiment, PF0 is not used, so unlocking is optional. After unlocking, configuration registers such as direction and digital enable can be safely modified.
@@ -284,9 +284,9 @@ For the on-board RGB LED, PF1-PF3 must be configured as outputs. Bits 1-3 are th
 
 ```asm
 LDR     R1, =0x40025400     ; GPIODIR register (Port F)
-        LDR     R0, [R1]
-        ORR     R0, R0, #0x0E       ; Set PF1, PF2, PF3 as outputs
-        STR     R0, [R1]
+LDR     R0, [R1]
+ORR     R0, R0, #0x0E       ; Set PF1, PF2, PF3 as outputs
+STR     R0, [R1]
 ```
 
 Unmodified bits remain unchanged, allowing input pins (such as PF0 or PF4) to retain their default configuration.
@@ -316,9 +316,9 @@ Each GPIO pin can serve analog or digital functions. The `GPIODEN` register enab
 
 ```asm
 LDR     R1, =0x4002551C     ; GPIODEN register (Port F)
-        LDR     R0, [R1]
-        ORR     R0, R0, #0x0E       ; Enable PF1-PF3 as digital pins
-        STR     R0, [R1]
+LDR     R0, [R1]
+ORR     R0, R0, #0x0E       ; Enable PF1-PF3 as digital pins
+STR     R0, [R1]
 ```
 
 Failing to enable `GPIODEN` leaves the pins electrically inactive even if their direction is set.
@@ -348,8 +348,8 @@ The example below drives PF1 (Red) and PF3 (Green) simultaneously to produce a y
 
 ```asm
 LDR     R1, =0x400253FC     ; GPIODATA register (Port F)
-    MOV     R0, #0x0A           ; Set PF1 (Red) and PF3 (Green) = Yellow
-    STR     R0, [R1]
+MOV     R0, #0x0A           ; Set PF1 (Red) and PF3 (Green) = Yellow
+STR     R0, [R1]
 ```
 
 By writing different bit combinations, various LED colors can be generated:
