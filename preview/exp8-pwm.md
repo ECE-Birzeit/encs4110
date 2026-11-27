@@ -322,41 +322,45 @@ It does three things, in order:
 2. **Starts Timer1A in PWM mode,** with the settings from [How GPTM PWM mode works](#how-gptm-pwm-mode-works): stop, 16-bit, PWM mode, period, match, start. `TAPR` is cleared because a 1 kHz period fits in 16 bits.
 3. **Starts SysTick** with an interrupt every 10 ms, as in Experiment 7, which begins the fade.
 
-**Check:** build, flash, and run. The LED should fade in and out, one breath about every 2 seconds. Add `level` to the Watch window: it sweeps between 1 and 99.
+Build, flash, and run.
 
-**Then try:**
+<Checklist id="activity" title="Activity checklist">
 
-- **The PWM signal on its own.** Comment out the `SysTick_Config` line and re-flash. The LED now glows steadily at `DUTY`, 25%. Change `DUTY` to 5, 50, and 95: the brightness changes, with no flicker, because 1 kHz is far too fast for the eye. In the debugger, **Peripherals → System Viewer → GPIOF** shows `AFSEL = 0x04` and `PCTL = 0x00000700`.
-- **A 50 Hz signal, with the prescaler as an extension.** Keep SysTick off and `DUTY` at 25, and slow the signal down to 50 Hz, the 20 ms period of a servo. That's $50{,}000{,}000 / 50 = 1{,}000{,}000$ counts, so set `PERIOD` to `1000000`. First change only `PERIOD` and re-flash: there's no 50 Hz flicker, because the timer keeps only the low 16 bits of `TAILR` and `TAMATCHR`, and 999,999 doesn't fit in 16 bits. So use the 24-bit [timer extension](#the-prescaler-is-a-timer-extension-in-pwm-mode): the start value's top 8 bits go into `TAPR` and its low 16 bits into `TAILR`, and the match value is split the same way into `TAPMR` and `TAMATCHR`. Change the `TAPR` and `TAILR` lines in `main`, and the write in `pwm_set()`. Work out all four values for 25% by hand first, then compare them with **Peripherals → System Viewer → TIMER1**. Now the LED **flickers**: 50 times a second is slow enough to see, most clearly out of the corner of your eye or when you move the board. Turn SysTick back on: the breath still works, but flickers. Put `PERIOD` and the three changes back.
+- Does the blue LED fade in and out by itself, one breath about every 2 seconds?
+- In the Watch window, does `level` sweep between 1 and 99?
+- With `SysTick_Config` commented out, does the LED glow steadily, brighter for a bigger `DUTY`, with no flicker?
+- In the System Viewer, does GPIOF show `AFSEL = 0x04` and `PCTL = 0x00000700`?
+- Can you say why a **bigger** duty cycle needs a **smaller** `TAMATCHR`?
 
-  ::: details One answer
-  In `main`: `TIMER1->TAPR = (PERIOD - 1) >> 16;` and `TIMER1->TAILR = (PERIOD - 1) & 0xFFFF;`. In `pwm_set()`, keep the match in a variable, `uint32_t match = (PERIOD - 1) - (PERIOD / 100) * (uint32_t)percent;`, then write `TIMER1->TAPMR = match >> 16;` and `TIMER1->TAMATCHR = match & 0xFFFF;`.
+</Checklist>
 
-  For 50 Hz: the start value is 999,999 = `0x0F423F`, so `TAPR = 0x0F` and `TAILR = 0x423F`. For 25% the high time is 250,000 counts, so the match is 999,999 − 250,000 = 749,999 = `0x0B71AF`: `TAPMR = 0x0B` and `TAMATCHR = 0x71AF`. On an oscilloscope, PF2 is high for 5 ms of every 20 ms. A servo would want a 1 to 2 ms pulse in that period: a duty of 5 to 10%.
-  :::
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Comment out `SysTick_Config`, then set `DUTY` to 5, 50, and 95 | A steady glow whose brightness follows `DUTY`, with no flicker: 1 kHz is far too fast for the eye. |
+| Probe **PF2** with an oscilloscope (ground on any GND pin), SysTick off, `DUTY` 25 | A 1 kHz square wave, high for 250 µs of every 1 ms. `DUTY` changes the width, not the frequency. With SysTick on, the high part grows and shrinks. |
+| Set `PERIOD` to `1000000` (50 Hz, the 20 ms servo period), changing nothing else | No 50 Hz flicker: the timer keeps only the low 16 bits of `TAILR` and `TAMATCHR`, and 999,999 doesn't fit. |
+| Now split both values with the [timer extension](#the-prescaler-is-a-timer-extension-in-pwm-mode): `TAPR`/`TAILR` in `main`, `TAPMR`/`TAMATCHR` in `pwm_set()`. Work out the four values for 25% by hand first | The LED **flickers**, most clearly out of the corner of your eye or when you move the board. Compare your values with **Peripherals → System Viewer → TIMER1**. Answer below. |
+| Replace `pwm_set(level)` with a lookup in a table such as `1, 2, 4, 7, 11, 18, 28, 43, 66, 99` | A more even fade. The eye isn't linear: 1% to 10% looks a much bigger change than 60% to 70%, so real dimmers use a "gamma curve". |
 
-::: tip See it on the oscilloscope
-Probe **PF2** on the LaunchPad header (ground on any GND pin). With SysTick off and `DUTY` at 25, you should see a 1 kHz square wave, high for 250 µs of every 1 ms. Changing `DUTY` changes the width of the high part, not the frequency. With SysTick back on, the high part grows and shrinks as you watch.
+The 50 Hz answer. In `main`: `TIMER1->TAPR = (PERIOD - 1) >> 16;` and `TIMER1->TAILR = (PERIOD - 1) & 0xFFFF;`. In `pwm_set()`, keep the match in a variable, `uint32_t match = (PERIOD - 1) - (PERIOD / 100) * (uint32_t)percent;`, then write `TIMER1->TAPMR = match >> 16;` and `TIMER1->TAMATCHR = match & 0xFFFF;`. The start value is 999,999 = `0x0F423F`, so `TAPR = 0x0F` and `TAILR = 0x423F`. For 25% the match is 999,999 − 250,000 = 749,999 = `0x0B71AF`: `TAPMR = 0x0B` and `TAMATCHR = 0x71AF`. PF2 is then high for 5 ms of every 20 ms; a servo would want a 1 to 2 ms pulse, a duty of 5 to 10%. Put `PERIOD` and the three lines back afterwards.
 :::
 
 ::: details The complete program
 <<< @/snippets/preview/exp8/main.c#full{c}
 :::
 
-::: info Why does the fade look uneven?
-The eye's response to brightness isn't linear: the change from 1% to 10% looks much bigger than from 60% to 70%. Real dimmers correct for this with a lookup table, a "gamma curve". Try replacing `pwm_set(level)` with a lookup in a table such as `1, 2, 4, 7, 11, 18, 28, 43, 66, 99`.
-:::
-
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | LED stays off | `TAEN` was never set, `RCGCTIMER` bit 1 is missing, or `PCTL` holds the wrong value (7 for T1CCP0). Check `TIMER1->CTL` and `GPIOF->PCTL` in the System Viewer. |
 | LED fully on whatever `DUTY` is | `TAMR` is not `0x0A`, so the timer isn't in PWM mode, or `TAMATCHR` is outside 0 to `TAILR`. |
 | Brightness right, but it flickers | The period is too long: check `PERIOD` and that `TAPR` is 0. |
+| No 50 Hz flicker after changing `PERIOD` to 1,000,000 | The value doesn't fit in 16 bits: split it across `TAPR`/`TAILR` and `TAPMR`/`TAMATCHR`. |
 | Brighter when `DUTY` goes down | `TAPWML` (bit 6 of `CTL`) is set and the output is inverted. Leave it at 0. |
 | Program stops in `HardFault_Handler` | A Timer1 register was written before its clock was ready: keep the `PRTIMER` wait. |
 | No fade, LED stays at 25% | `SysTick_Config` is missing or commented out, or the handler's name is misspelled: it must be exactly `SysTick_Handler`. |
+:::
 
 ## Task
 
@@ -371,13 +375,13 @@ The three LEDs use three timer outputs, from the table in [Which timer drives ea
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is: red and blue glow, but green and the buttons do nothing yet.
+Start from this program. It compiles and runs: red and blue glow, but green and the buttons do nothing yet.
 
 <<< @/snippets/preview/exp8/task.c{c}
 
-**The provided part.** The pins, red, and blue are set up for you. **Red's Timer0B** is the Activity's Timer1A setup with the Timer B registers, and **blue's Timer1A** is the Activity's. **`pwm_match()`** is the Activity's `pwm_set()` without the write: it clamps the percentage to 1 to 99 and returns the match value, so it works for any timer half. The debounce is the one from the [Experiment 7 Task](/preview/exp7-timers#task): each button has a **`ready`** flag, `GPIOF_Handler` calls `on_press()` once per press, and `SysTick_Handler`, every millisecond, makes a released button ready again. Don't change these.
-
-`on_press()` runs inside `GPIOF_Handler`. That's fine here: setting a colour is only three register writes, with no waiting.
+::: details How the provided part works
+The pins, red, and blue are set up for you. **Red's Timer0B** is the Activity's Timer1A setup with the Timer B registers, and **blue's Timer1A** is the Activity's. **`pwm_match()`** is the Activity's `pwm_set()` without the write: it clamps the percentage to 1 to 99 and returns the match value, so it works for any timer half. The debounce is the one from the [Experiment 7 Task](/preview/exp7-timers#task): each button has a **`ready`** flag, `GPIOF_Handler` calls `on_press()` once per press, and `SysTick_Handler`, every millisecond, makes a released button ready again. `on_press()` runs inside `GPIOF_Handler`, which is fine here: setting a colour is only three register writes, with no waiting. Don't change these.
+:::
 
 :::: details What to write: the five TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3** make green work, then **4** and **5** make the buttons work.
@@ -415,10 +419,14 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 :::
 ::::
 
-**Check:** build and flash, and add `selected` and `level` to the Watch window.
+Build and flash, and add `selected` and `level` to the Watch window.
 
-- **At the start:** dim white, and `selected` is 0, red.
-- **SW2:** press it six times. `level[0]` goes 40, 60, 80, 100, 0, 20, one step per press, and the white turns pinker, then nearly loses its red (cyan), then comes back.
-- **SW1:** each press moves `selected` one step, 0, 1, 2, 0, and the LED doesn't change. SW2 then changes only the selected colour.
-- **Mix colours:** make yellow (red 100, green 100, blue 0), cyan, and magenta, then a bright white with all three at 100.
-- **On the oscilloscope**, if you have one: PF1, PF2, and PF3 each carry a 1 kHz signal, and each one's high time follows its own level.
+<Checklist id="task" title="Task checklist">
+
+- Did you write the Timer1B setup and `set_color()` yourself?
+- At the start, is the LED a dim white, with `selected` at 0 (red)?
+- Six SW2 presses: does `level[0]` go 40, 60, 80, 100, 0, 20, one step per press, with the colour following?
+- Does SW1 move `selected` one step per press (0, 1, 2, 0) without changing the LED, so SW2 then changes only that colour?
+- Can you mix yellow, cyan, magenta, and a bright white?
+
+</Checklist>
