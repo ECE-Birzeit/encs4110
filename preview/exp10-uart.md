@@ -35,6 +35,7 @@ This is the reworked version of [Experiment 10](/experiments/exp10-uart), shared
 - Interface with a PC terminal emulator for debugging and data visualization.
 - Calculate the baud rate divisors for the 50 MHz system clock.
 - Understand UART FIFO buffering and status flag operations.
+- Build a command line that controls the LaunchPad's LEDs from the PC terminal and answers with text and numbers.
 
 ## Background
 
@@ -445,23 +446,70 @@ Lines sent to the terminal end in `"\r\n"`: `\r` returns the cursor to the start
 
 ## Task
 
-Build a **command shell**: the board reads a command per line, does it, and answers. It ties together the GPIO of [Experiment 5](/preview/exp5-gpio-output), the ADC of [Experiment 9](/preview/exp9-adc), and this experiment's UART.
+Build an **LED command line**: you type a command in PuTTY, and the board does it and answers. It's the Activity's program with LEDs from [Experiment 5](/preview/exp5-gpio-output) added, and a reply for every line:
 
-| Command | What it does | Example answer |
+| You type | The board | It answers |
 |:---|:---|:---|
-| `help` | Lists the commands | `led <red\|green\|blue\|off>, adc, count, help` |
-| `led red` (or `green`, `blue`) | Lights that LED, turning the others off | `OK` |
-| `led off` | Turns all the LEDs off | `OK` |
-| `adc` | Reads the potentiometer on PE3 (AIN0), as in Experiment 9 | `1650 mV` |
-| `count` | How many commands have been run since reset | `7` |
-| anything else | | `Unknown command: blink. Type help.` |
+| `red`, `green` or `blue` | Lights that LED, turning the others off | `OK` |
+| `off` | Turns all the LEDs off | `OK` |
+| `status` | Nothing changes | `LED: green, commands: 4` |
+| anything else | Nothing changes | `Unknown command: blink` |
+| just Enter | Nothing | a new prompt |
 
-**Requirements:**
-- Read each command with `UART0_ReadLine()` and compare it with the known commands.
-- Write `UART0_WriteNumber(uint32_t n)` to print numbers, the same way `LCD_PrintNumber()` does in [Experiment 8](/preview/exp11-i2c-lcd).
-- Accept commands typed in any mix of upper and lower case: `LED Red` works like `led red`.
-- Keep the command handling in one function, `run_command(const char *line)`, so `main` stays a short loop.
+### The starter program
 
-::: details Hint: comparing strings
-`#include <string.h>` gives you `strcmp(a, b)`, which returns 0 when two strings are equal, and `strncmp(a, b, n)`, which compares only the first `n` characters: `strncmp(line, "led ", 4) == 0` finds every `led` command, and `line + 4` is the colour after it. For case, convert the line to lower case once, before comparing: a character `c` between `'A'` and `'Z'` becomes `c + ('a' - 'A')`.
+Start from this program. It compiles and runs as it is: the greeting appears, and `red` already works, as a worked example. Every other command does nothing yet.
+
+<<< @/snippets/preview/exp10/task.c{c}
+
+**The provided part.** `UART0_Init()`, `UART0_WriteChar()`, `UART0_WriteString()`, `UART0_ReadChar()` and `UART0_ReadLine()` are the Activity's, unchanged. Three helpers are new:
+
+- **`UART0_WriteNumber(n)`** prints a number in decimal. `n % 10` is the last digit and `n / 10` drops it, so the digits come out last first; the function stores them and sends them in reverse. `'0' + 7` is the character `'7'`.
+- **`equals(a, b)`** is 1 when two strings are the same, 0 when not. Comparing with `==` doesn't work for strings: `line == "red"` compares where the two are in memory, not their characters.
+- **`LEDs_Init()`** and **`show(led)`** set up the three LEDs and light exactly the ones in `led`, or none for 0, as in Experiment 5.
+
+`main` reads each line with `UART0_ReadLine()` and hands it to **`run_command()`**, which counts it in `commands` and picks the answer with an `if` / `else if` chain. Your code goes in `run_command()`.
+
+:::: details What to write: the four TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 4**, then **2, 3**.
+
+::: details TODO 1: `green`, `blue` and `off`
+- Copy the `red` block three times, each starting with `else if`, and change the command and the LED: `GREEN_LED`, `BLUE_LED`, and `show(0)` for `off`.
+- Keep the `"OK\r\n"` answer in each one: without an answer, you can't tell from the terminal that the board heard you.
+
 :::
+
+::: details TODO 4: an unknown command
+- A last `else` at the end of the chain, after the `status` block: it runs when no command matched.
+- Print `"Unknown command: "`, then the line itself with `UART0_WriteString(line)`, then `"\r\n"`. Printing back what was received shows you exactly what the board got, like the Activity's **You typed:**.
+
+:::
+
+**Test now:** `red`, `green`, `blue` and `off` should each answer `OK` and change the LED; `blink` should answer `Unknown command: blink`.
+
+::: details TODO 2: which LED is on (in the `status` block)
+- `lit` holds the LED bits that are on now, read back from `GPIOF->DATA`. Only one LED is ever on, so `lit` is `RED_LED`, `GREEN_LED`, `BLUE_LED`, or 0.
+- Compare it with an `if` / `else if` chain, and print `"red"`, `"green"`, `"blue"`, or, in the last `else`, `"off"`.
+- Delete the `(void)lit;` line: it only stops the compiler warning that `lit` is unused.
+
+:::
+
+::: details TODO 3: the number of commands (in the `status` block)
+- `UART0_WriteNumber(commands)`, then `UART0_WriteString("\r\n")` to end the line.
+- Don't write `UART0_WriteString(commands)`: `commands` is a number, not a string. That's what `UART0_WriteNumber()` is for.
+:::
+::::
+
+**Check:** build and flash, and press RESET with PuTTY open.
+
+- **The greeting:** **LED command line: red, green, blue, off, status** and a `> ` prompt.
+- **The colours:** `green` answers `OK` and only the green LED is on. `blue`, then `red`: one LED at a time. `off`: all off.
+- **Status:** after `green`, `status` answers `LED: green, commands: 2` (the count includes the `status` line itself, and resets with the board). After `off`, it says `LED: off`.
+- **Errors:** `blink`, `Red` and `red ` (with a space) all answer `Unknown command:`. The comparison is exact: case and spaces count.
+- **Typing:** a mistyped command fixed with Backspace works; just Enter prints only a new prompt and doesn't change the count.
+
+**Then try:**
+
+- Add a `help` command that lists the commands.
+- Make `Red` and `RED` work too: before comparing, turn the line to lower case. A character `c` between `'A'` and `'Z'` becomes `c + ('a' - 'A')`. The line is `const` in `run_command()`, so do it in `main`, before the call.
+- If you've done [Experiment 9](/preview/exp9-adc): add an `adc` command that answers with the potentiometer reading, printed with `UART0_WriteNumber()`.
