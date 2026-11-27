@@ -458,7 +458,7 @@ Build a **command shell**: the board reads a command per line, does it, and answ
 
 **Requirements:**
 - Read each command with `UART0_ReadLine()` and compare it with the known commands.
-- Write `UART0_WriteNumber(uint32_t n)` to print numbers, the same way `LCD_PrintNumber()` does in [Experiment 8](/preview/exp8-lcd).
+- Write `UART0_WriteNumber(uint32_t n)` to print numbers, the same way `LCD_PrintNumber()` does in [Experiment 8](/preview/exp8-i2c-lcd).
 - Accept commands typed in any mix of upper and lower case: `LED Red` works like `led red`.
 - Keep the command handling in one function, `run_command(const char *line)`, so `main` stays a short loop.
 
