@@ -50,37 +50,51 @@ void show(uint32_t led)
 	GPIOF->DATA = (GPIOF->DATA & ~LEDS) | led;
 }
 
-// The Activity's debounce, for both buttons: act on the press, then wait for the release.
-volatile uint32_t up_ms;                // How long both buttons have been up
+// The Activity's debounce, for each button on its own: act on the press, then wait for the
+// release. With two buttons, both handlers would change IM at once, so instead of masking,
+// each button has a ready flag: a falling edge only counts while its button is ready.
+volatile uint32_t ready[2] = { 1, 1 };  // [0] SW1, [1] SW2: 1 = its next falling edge is a press
+volatile uint32_t up_ms[2];             // How long each button has been up, while not ready
 
-// Every 1 ms: count the time, and once both buttons have been up for DEBOUNCE_MS in a row,
-// listen for the next press
+// Called every 1 ms for each button. Once a pressed button has been up for DEBOUNCE_MS
+// in a row, it's ready for its next press.
+void check_release(uint32_t sw, uint32_t i)
+{
+	if (ready[i])                       // Not waiting for this one
+		return;
+	if ((GPIOF->DATA & sw) == 0)        // Down (or bouncing)
+		up_ms[i] = 0;
+	else if (++up_ms[i] >= DEBOUNCE_MS) // Up, and quiet for DEBOUNCE_MS
+		ready[i] = 1;
+}
+
+// Every 1 ms
 void SysTick_Handler(void)
 {
 	ms++;
-
-	if ((GPIOF->DATA & SWITCHES) != SWITCHES)   // A button is down (or bouncing)
-		up_ms = 0;
-	else if (++up_ms == DEBOUNCE_MS)    // Both up, and quiet for DEBOUNCE_MS
-	{
-		GPIOF->ICR = SWITCHES;          // Forget the release bounces
-		GPIOF->IM |= SWITCHES;          // Listen for the next press
-	}
+	check_release(SW1, 0);
+	check_release(SW2, 1);
 }
 
-// A falling edge of SW1 or SW2: a press. Calls on_press() once, then ignores the buttons
-// until they're released.
+// Every falling edge of SW1 or SW2, bounces included. Only a ready button's edge is a press:
+// it calls on_press() once, and the button isn't ready again until it's released.
 void GPIOF_Handler(void)
 {
-	uint32_t button = GPIOF->MIS;       // Which button was pressed
-	GPIOF->ICR = button;
-	GPIOF->IM &= ~SWITCHES;             // Ignore the bounces: SysTick turns this back on
-	up_ms = 0;
+	uint32_t edge = GPIOF->MIS & SWITCHES;  // Which button caused the interrupt
+	GPIOF->ICR = edge;
 
-	if (button & SW1)
+	if ((edge & SW1) && ready[0])
+	{
+		up_ms[0] = 0;
+		ready[0] = 0;
 		on_press(SW1);
-	else if (button & SW2)
+	}
+	if ((edge & SW2) && ready[1])
+	{
+		up_ms[1] = 0;
+		ready[1] = 0;
 		on_press(SW2);
+	}
 }
 // ---------------------------------------------------------------- end of provided part
 

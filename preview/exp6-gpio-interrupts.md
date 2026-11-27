@@ -702,9 +702,11 @@ Start from this program. It compiles and runs as it is: the pins, the interrupts
 
 **The provided part: how the debouncing works.** Each press reaches the state machine exactly once:
 
-1. The first falling edge of a press interrupts. `GPIOF_Handler` notes which button it was in `button`, then **masks both buttons** in `IM`. The bounces that follow can't interrupt any more.
-2. `main` sees `button`, runs one step of the state machine with `next_state()`, and shows the new state.
-3. `debounce()` waits about 40 ms for the press bounce to die out, waits until the button is released, and waits another 40 ms for the release bounce. Then it clears the flags those bounces left in `ICR` and **unmasks** the buttons for the next press.
+1. Each button has a **`ready`** flag, 1 at the start. The first falling edge of a press interrupts while the button is ready: `GPIOF_Handler` notes the button in `button` and clears its `ready` flag. The bounces that follow still interrupt, but the flag is 0, so they're ignored.
+2. `main` sees `button`, clears it, runs one step of the state machine with `next_state()`, and shows the new state.
+3. `debounce()` waits about 40 ms for the press bounce to die out, waits until that button is released, and waits another 40 ms for the release bounce. Then it sets the button's `ready` flag again, for its next press.
+
+Each button is debounced on its own: a press of SW2 while SW1 is held isn't lost. It's handled as soon as SW1's debounce ends.
 
 Don't change the provided part. If a press ever seems to count twice, ask your instructor before touching it.
 

@@ -725,7 +725,7 @@ Start from this program. It compiles and runs as it is, but does nothing yet: th
 
 <<< @/snippets/preview/exp7/task.c{c}
 
-**The provided part.** The debounce is the Activity's, for both buttons. `GPIOF_Handler` calls `on_press()` once per press, with the button that was pressed, then masks both buttons. `SysTick_Handler` keeps the `ms` clock and unmasks them once both have been up for `DEBOUNCE_MS`. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
+**The provided part.** The debounce is the Activity's, for each button on its own. With two buttons, `GPIOF_Handler` and `SysTick_Handler` could both be halfway through changing `IM` at the same moment. So instead of masking, each button has a **`ready`** flag. A falling edge counts only while its button is ready: `GPIOF_Handler` calls `on_press()` once, with the button, and clears its flag. The bounces still interrupt, but they're ignored. Every millisecond, `SysTick_Handler` keeps the `ms` clock and calls `check_release()` for each button: once a pressed button has been up for `DEBOUNCE_MS`, it's ready again. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
 
 :::: details What to write: the five TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 5, 4, 2**, then **3**. That way you can test halfway: after TODO 2, SW1 already makes the LED turn green after a random wait.

@@ -32,28 +32,41 @@ typedef enum {
 
 volatile State    state = IDLE;         // Where the machine is now (Watch window)
 volatile uint32_t button;               // The button just pressed: SW1 or SW2 (0 = none)
+volatile uint32_t ready[2] = { 1, 1 };  // [0] SW1, [1] SW2: 1 = its next falling edge is a press
 
 
 // ---------------------------------------------------------------- provided: don't change
-// The first edge of a press: note which button, then ignore both buttons until main has
-// handled this press and the bounce is over. So one press is only ever seen once.
+// Every falling edge of either button, bounces included. Only the first edge of a press
+// counts: it notes the button for main and clears that button's ready flag, so its bounces
+// are ignored until debounce() sets the flag again. Each button is debounced on its own.
 void GPIOF_Handler(void)
 {
-	button = GPIOF->MIS & SWITCHES;     // Which button caused the interrupt
-	GPIOF->ICR = SWITCHES;              // Clear the flags
-	GPIOF->IM &= ~SWITCHES;             // Mask both buttons: no more interrupts for now
+	uint32_t edge = GPIOF->MIS & SWITCHES;  // Which button caused the interrupt
+	GPIOF->ICR = edge;                  // Clear its flag
+
+	if ((edge & SW1) && ready[0])       // A press of SW1, not a bounce
+	{
+		ready[0] = 0;
+		button = SW1;
+	}
+	else if ((edge & SW2) && ready[1])  // A press of SW2, not a bounce
+	{
+		ready[1] = 0;
+		button = SW2;
+	}
 }
 
-// Wait for the press to stop bouncing, for the button to be released, and for the release
-// to stop bouncing. Then forget the bounces and let the buttons interrupt again.
-void debounce(void)
+// Wait for the press to stop bouncing, for the button b to be released, and for the release
+// to stop bouncing. Then b is ready for its next press.
+void debounce(uint32_t b)
 {
 	for (volatile uint32_t i = 0; i < DEBOUNCE_LOOPS; i++);    // Press bounce dies out
-	while ((GPIOF->DATA & SWITCHES) != SWITCHES);               // Wait until both are released
+	while ((GPIOF->DATA & b) == 0);                             // Wait until it's released
 	for (volatile uint32_t i = 0; i < DEBOUNCE_LOOPS; i++);    // Release bounce dies out
-	button = 0;
-	GPIOF->ICR = SWITCHES;              // Forget the edges the bounces left
-	GPIOF->IM |= SWITCHES;              // Listen to both buttons again
+	if (b == SW1)
+		ready[0] = 1;
+	else
+		ready[1] = 1;
 }
 // ---------------------------------------------------------------- end of provided part
 
@@ -113,9 +126,11 @@ int main(void)
 	{
 		if (button)                     // A press arrived (the handler set it)
 		{
-			state = next_state(state, button);
+			uint32_t b = button;
+			button = 0;
+			state = next_state(state, b);
 			show(state);
-			debounce();                 // Provided: wait out the bounce, then listen again
+			debounce(b);                // Provided: wait out this button's bounce
 		}
 	}
 }
