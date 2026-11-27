@@ -1,5 +1,6 @@
 ---
 title: "Data Processing and Memory Operations"
+short: "Data Processing"
 description: "This experiment develops fluency with the ARM Cortex-M4 instruction set for data manipulation and memory access."
 outline: deep
 lastUpdated: true
@@ -275,6 +276,16 @@ This example demonstrates load and store instructions using various addressing m
 
 <<< @/snippets/assembly/exp2/example3.asm
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- Did you single-step Example 1 and check each arithmetic and bitwise result in hex?
+- In Example 2, did you watch how each addressing mode changes the base register, or leaves it alone?
+- Did you open a Memory window and see the stored values appear?
+- Can you say the difference between pre-indexed and post-indexed addressing?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Bitwise Register Manipulation
 Start with `R0 = 0x12345678`. Perform the following operations and observe the results in the debugger (verify in hex and binary):
@@ -309,3 +320,13 @@ OUT_F   SPACE   4               ; TEMP_C converted to Fahrenheit
 - Change `TEMP_F` to `-40` and run again (the result should also be −40). Explain why the program must use `SDIV` rather than `UDIV`.
 
 *Hint:* Integer division truncates, so multiply **before** you divide. For $F = 70$, computing $(F-32)/9$ first gives $38/9 = 4$ and then $5 \times 4 = 20$, instead of the better answer $190/9 = 21$.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: after clearing bits 4 to 7, setting bits 8 to 11 and toggling bits 28 to 31, does R0 read `0xE2345F08`?
+- Did you check the same result in binary?
+- Lab work 2: does `OUT_C` read 21 and `OUT_F` read 71 in the Memory window?
+- With `TEMP_F` set to -40, does `OUT_C` read -40 too?
+- Can you say why the program needs `SDIV` rather than `UDIV`, and why it multiplies before dividing?
+
+</Checklist>

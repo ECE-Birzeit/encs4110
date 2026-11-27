@@ -1,5 +1,6 @@
 ---
 title: "Branching and Loops"
+short: "Branching and Loops"
 description: "This experiment introduces program flow control on the ARM Cortex-M4 processor."
 outline: deep
 lastUpdated: true
@@ -257,6 +258,16 @@ This example demonstrates how to process a null-terminated string and count the 
 
 **Check:** Verify that the program correctly counts the uppercase letters and stores the result in `UPPERCOUNT`.
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- After Example 1, does `MAXRES` hold the largest element of the array?
+- Did you find the `IT` instruction the assembler added before `MOVGT`, in the Disassembly window?
+- After Example 2, does `UPPERCOUNT` hold the number of uppercase letters?
+- Can you say how Example 1's for loop and Example 2's while loop decide when to stop?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Count Vowels and Non-Vowels in a String
 Write a program that scans the following null-terminated string, stored with `DCB`:
@@ -286,3 +297,13 @@ Using a single loop over the array, compute:
 - the number of negative elements in R3.
 
 Then change the condition you used to update the minimum from the signed form (`LT`/`GE`) to the unsigned form (`LO`/`HS`) and run the program again. Report the new value of R2 and explain why it changed.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: did you record R1 (vowels) and R2 (everything else), and does R1 + R2 equal 44, the string's length?
+- Did you count uppercase and lowercase vowels alike?
+- Lab work 2: does R1 (the sum) read 12, R2 (the minimum) -8, and R3 (the negatives) 3?
+- After switching the minimum test to `LO`/`HS`, did R2 change, and can you say why?
+- Can you say why `ORR R3, R3, #0x20` safely lowercases a letter?
+
+</Checklist>

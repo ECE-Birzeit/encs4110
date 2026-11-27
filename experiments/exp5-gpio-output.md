@@ -1,5 +1,6 @@
 ---
 title: "Microcontroller Architecture and GPIO Output"
+short: "GPIO Output"
 description: "This experiment introduces the TM4C123 microcontroller architecture and digital I/O interfacing through GPIO ports."
 outline: deep
 lastUpdated: true
@@ -386,6 +387,16 @@ Address Masking for PF1, PF2, PF3:
 
 <<< @/snippets/gpio/example2.asm
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- Does Example 1 blink the red LED?
+- Can you work out the masked address `0x40025008` for PF1 yourself?
+- Does Example 2 cycle through red, green and blue?
+- In Peripherals, System Viewer, GPIOF, did you see `DATA` change with each colour?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Adjust the Blink Rate
 
@@ -396,3 +407,12 @@ Modify the delay routine in **Example 1** to change the blinking speed of the Re
 Expand **Example 2** to include additional colors by combining the Red, Green, and Blue LEDs. Create a program that automatically cycles through all color combinations listed in the LED color table of the lab manual.
 
 *Hint:* Use a loop to step through the color sequence repeatedly instead of writing separate code for each color.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: does the red LED blink at about 1 Hz, one second on and one second off?
+- Lab work 2: does your program cycle through every colour combination in the table?
+- Did you use a loop over the colours instead of repeating the code for each one?
+- Can you say why a write to the masked address changes only the selected pins?
+
+</Checklist>

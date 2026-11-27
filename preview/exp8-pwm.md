@@ -4,7 +4,6 @@ description: "Generate pulse-width modulated signals in hardware with the TM4C12
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=704"
-current: "/experiments/exp11-pwm-timers"
 short: "PWM"
 search: false
 prev: false
@@ -19,8 +18,8 @@ head:
 
 This experiment uses the General-Purpose Timer Modules (GPTM) from [Experiment 7](/preview/exp7-timers) in a new mode: **PWM mode**, where the timer drives a pin high and low by itself, with no interrupt and no CPU time. You will set a PWM signal's frequency and duty cycle from two registers, route the timer's output to an LED pin, and change the duty cycle at run time to fade the LED. The same technique drives servo motors, sets DC motor speed, and dims lights.
 
-::: warning Reworked version: in testing
-This is the reworked version of [Experiment 11](/experiments/exp11-pwm-timers), shared for TAs to test. In the new order it becomes Experiment 8. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp11-pwm-timers)** until this one replaces it.
+::: warning New experiment: in testing
+This experiment is part of the new lab manual, shared for TAs to test.
 :::
 
 ::: warning In development

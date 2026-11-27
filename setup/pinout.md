@@ -33,7 +33,7 @@ These pins already connect to something on the LaunchPad. Use them for that part
 
 | Part | Pins | Note |
 | --- | --- | --- |
-| RGB LED (red, blue, green) | PF1, PF2, PF3 | Active high. Also the timer outputs T0CCP1, T1CCP0, T1CCP1 ([Experiment 11](/experiments/exp11-pwm-timers)). |
+| RGB LED (red, blue, green) | PF1, PF2, PF3 | Active high. Also the timer outputs T0CCP1, T1CCP0, T1CCP1 ([Experiment 8, new manual](/preview/exp8-pwm)). |
 | SW1, SW2 | PF4, PF0 | Active **low**: they connect to GND, so enable the pull-ups. PF0 is locked; unlock it first ([Experiment 6](/experiments/exp6-gpio-interrupts)). |
 | Virtual COM port (UART0) | PA0 (U0Rx), PA1 (U0Tx) | Go to the debugger's USB link, not to the headers ([Experiment 10](/experiments/exp10-uart)). |
 | JTAG debug | PC0 to PC3 | Not on the headers. Never reconfigure them: the debugger loses the board. |
@@ -68,9 +68,9 @@ Free pins with ADC inputs: PE3 (AIN0), PE2 (AIN1), PE1 (AIN2), PE0 (AIN3), PD3 (
 | [8. Parallel LCD](/experiments/exp8-lcd) | RS, RW, E; D4 to D7 | PB0, PB1, PB2; PB4 to PB7 |
 | [9. ADC](/experiments/exp9-adc) | Potentiometer | PE3 (AIN0) |
 | [10. UART](/experiments/exp10-uart) | Virtual COM port | PA0, PA1 (on board, no wiring) |
-| [11. PWM](/experiments/exp11-pwm-timers) | RGB LED by PWM; potentiometer (Task) | PF1, PF2, PF3; PE3 |
-| [12. QEI](/experiments/exp12-qei) | HW-040 CLK, DT, SW | PC5 (PhA1), PC6 (PhB1), PC4 |
-| [13. I2C LCD](/experiments/exp13-i2c-lcd) | SCL, SDA | PB2, PB3 |
+| [8. PWM (new manual)](/preview/exp8-pwm) | RGB LED by PWM | PF1, PF2, PF3 |
+| [12. QEI (new manual)](/preview/exp12-qei) | HW-040 CLK, DT, SW | PC5 (PhA1), PC6 (PhB1), PC4 |
+| [11. I2C LCD (new manual)](/preview/exp11-i2c-lcd) | SCL, SDA | PB2, PB3 |
 
 ::: tip PB6 and PB7 in Experiment 8
 The parallel LCD's D6 and D7 are on PB6 and PB7, which R9 and R10 join to PD0 and PD1. That's fine as long as nothing drives PD0 or PD1: they're inputs after reset, so leave them alone.

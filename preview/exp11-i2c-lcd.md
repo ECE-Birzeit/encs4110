@@ -4,7 +4,6 @@ description: "Drive an HD44780 16x2 character LCD over two wires: configure the 
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=997"
-current: "/experiments/exp13-i2c-lcd"
 short: "I2C and LCD"
 search: false
 prev: false
@@ -19,8 +18,8 @@ head:
 
 This experiment drives a 16x2 character LCD, the HD44780 kind found on countless devices, over just two signal wires. A small **PCF8574 backpack** soldered to the LCD turns bytes sent over **I2C** into the levels on the LCD's pins, so the LaunchPad needs only SCL, SDA, power, and ground: four jumper wires instead of eleven. You'll learn how I2C works, set up the TM4C123's I2C module as a master, and use an LCD driver built on top of it to show text and a counter. I2C is also how most sensors, real-time clocks, and small displays connect.
 
-::: warning Reworked version: in testing
-This is the reworked version of [Experiment 13](/experiments/exp13-i2c-lcd), shared for TAs to test. In the new order it becomes Experiment 11, one of the two extra experiments. It has the background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp13-i2c-lcd)** until this one replaces it.
+::: warning New experiment: in testing
+This experiment is part of the new lab manual, shared for TAs to test.
 :::
 
 ## Objectives

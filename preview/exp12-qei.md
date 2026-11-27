@@ -4,7 +4,6 @@ description: "Read a rotary encoder in hardware with the TM4C123's Quadrature En
 outline: deep
 lastUpdated: true
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=1305"
-current: "/experiments/exp12-qei"
 short: "QEI"
 search: false
 prev: false
@@ -19,8 +18,8 @@ head:
 
 This experiment reads a **rotary encoder**, the knob used for volume controls and menus, and the sensor on the shaft of most robot and industrial motors. The TM4C123 has a dedicated peripheral for it, the **Quadrature Encoder Interface (QEI)**, which decodes the encoder's two signals in hardware: it keeps the position, knows which way the shaft last turned, and measures how fast it's turning, all without CPU time. You will wire an HW-040 encoder module to QEI1, read its position and speed, and use it as a dimmer for the PWM output from [Experiment 8](/preview/exp8-pwm).
 
-::: warning Reworked version: in testing
-This is the reworked version of [Experiment 12](/experiments/exp12-qei), shared for TAs to test. In the new order it becomes Experiment 12. It has the same background, then one Activity built step by step and one Task. **Students: use the [current version](/experiments/exp12-qei)** until this one replaces it.
+::: warning New experiment: in testing
+This experiment is part of the new lab manual, shared for TAs to test.
 :::
 
 ::: warning In development

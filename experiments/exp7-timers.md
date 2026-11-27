@@ -1,5 +1,6 @@
 ---
 title: "Hardware Timers and Timing Control"
+short: "Timers"
 description: "This experiment introduces precise timing control using the TM4C123’s SysTick timer and General-Purpose Timer Modules (GPTM)."
 outline: deep
 lastUpdated: true
@@ -648,6 +649,16 @@ This example configures TIMER1 in 16-bit periodic mode with maximum prescaler to
 - `NVIC->ISER[0] |= (1<<21);` enables TIMER1A interrupt (IRQ 21).
 - `TIMER1A_Handler()` toggles the blue LED and clears the interrupt flag.
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- Does Example 1 toggle the green LED every 100 ms?
+- In the Watch window, does `systick_counter` grow by 100 with each interrupt?
+- Does Example 2 toggle the blue LED about every 0.335 s?
+- Can you work out that 0.335 s from `TAILR` and `TAPR`?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Debouncing a Push Button with SysTick
 
@@ -687,3 +698,13 @@ Use three GPTM timers (TIMER0A, TIMER1A, TIMER2A) to blink the three LEDs at dif
 - Enable interrupts for each timer in the NVIC.
 - Implement separate ISRs (`TIMER0A_Handler()`, `TIMER1A_Handler()`, `TIMER2A_Handler()`).
 - Each ISR should toggle its corresponding LED and clear the interrupt flag.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: does the red LED toggle exactly once per SW1 press, debounced with SysTick?
+- Lab work 2: do red, blue and green blink every 250, 500 and 1000 ms, each from its own timer?
+- Did you work out the three `TAILR` values yourself?
+- Does each handler clear its own timer's flag in `ICR`?
+- Can you say why each timer needs its own handler?
+
+</Checklist>

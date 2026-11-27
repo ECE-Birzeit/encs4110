@@ -397,3 +397,13 @@ The code is split into three files:
 ![PuTTY serial configuration](/putty.png)
 
 Replace the `COM` port with the one assigned to your TM4C123G LaunchPad. You can find it in Device Manager under Ports (COM & LPT). The baud rate must match the one set in your code (e.g., 115200).
+
+<Checklist id="examples" title="Example checklist">
+
+- Did you open PuTTY on your board's COM port at 115200 baud?
+- Did "Hello World!" appear when the board started?
+- When you typed a line and pressed Enter, did it come back after "Received: "?
+- Can you work out the divisors for 115200 baud at 50 MHz, `IBRD` = 27 and `FBRD` = 8?
+- Can you say what you'd see if PuTTY and the board used different baud rates?
+
+</Checklist>

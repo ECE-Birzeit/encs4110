@@ -1,5 +1,6 @@
 ---
 title: "Assembly Basics and Program Structure"
+short: "Assembly Basics"
 description: "This experiment introduces ARM Cortex-M4 assembly programming fundamentals, including register architecture, status flags, and memory organization."
 outline: deep
 lastUpdated: true
@@ -159,3 +160,13 @@ This experiment is written in assembly and runs in Keil's simulator. If you have
 The following example demonstrates basic arithmetic operations, flag manipulation.
 
 <<< @/snippets/assembly/exp1/example1.asm
+
+<Checklist id="examples" title="Example checklist">
+
+- Did you single-step the example and fill in every `R = ?` comment from the Registers window?
+- Did you see `MOV` and `MOVT` build `0x76543210` in R5, one half at a time?
+- After an `ADDS`, did you read N, Z, C and V in xPSR, and see that `ADD` without S leaves them unchanged?
+- Did you see the V flag set when two large positive numbers overflow, and Z set on a zero result?
+- Can you say the difference between C (unsigned carry) and V (signed overflow)?
+
+</Checklist>

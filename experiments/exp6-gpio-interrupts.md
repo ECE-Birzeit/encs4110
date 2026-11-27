@@ -1,5 +1,6 @@
 ---
 title: "GPIO Inputs and Interrupt Handling"
+short: "GPIO Interrupts"
 description: "This experiment extends GPIO functionality to inputs and introduces interrupt-driven programming."
 outline: deep
 lastUpdated: true
@@ -632,6 +633,16 @@ This example configures SW1 and SW2 to generate interrupts on button presses and
 - The ISR checks `GPIOF->MIS` to identify which switch caused the interrupt.
 - Each interrupt flag must be cleared with `GPIOF->ICR` to prevent re-triggering.
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- Does Example 1 light the red LED only while SW1 is held?
+- Does Example 2 toggle the green LED on both SW1 and SW2?
+- Did you find where the handler reads `MIS` to tell the two buttons apart?
+- Can you say why PF0 has to be unlocked before SW2 can be used?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Toggle LED Using Polling
 
@@ -657,3 +668,12 @@ Modify Example 2 to cycle through LED colors using interrupts:
 
 **Hint:**
 Use a global variable (e.g., `sw1_state`) to track the current position in the sequence. In the ISR, increment the state and use a switch-case or modulo operation to cycle through colors. Refer to the LED color table in [Experiment 5](./exp5-gpio-output) for LED color codes.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: does the green LED toggle exactly once per SW1 press, by polling with a 20 ms debounce?
+- Lab work 2: does SW1 cycle red, blue, green, and SW2 yellow, magenta, cyan, each with its own state?
+- Does the handler clear each button's flag in `ICR`?
+- Can you say why the delay after a press stops one press from counting twice?
+
+</Checklist>

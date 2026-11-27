@@ -48,6 +48,9 @@ const moved: Record<string, string> = {
   "/experiments/8": "/experiments/exp8-lcd",
   "/experiments/9": "/experiments/exp9-adc",
   "/experiments/10": "/experiments/exp10-uart",
+  "/experiments/exp11-pwm-timers": "/preview/exp8-pwm",
+  "/experiments/exp12-qei": "/preview/exp12-qei",
+  "/experiments/exp13-i2c-lcd": "/preview/exp11-i2c-lcd",
   "/assembly-project": "/setup/assembly-project",
   "/tiva-project": "/setup/tiva-project",
 }

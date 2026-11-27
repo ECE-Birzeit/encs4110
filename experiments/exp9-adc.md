@@ -1,5 +1,6 @@
 ---
 title: "Analog-to-Digital Converter (ADC)"
+short: "ADC"
 description: "This experiment introduces analog-to-digital conversion using the TM4C123’s dual 12-bit ADC modules."
 outline: deep
 lastUpdated: true
@@ -515,9 +516,28 @@ In this example, you will configure the ADC to read the internal temperature sen
 
 **Example 2 — Interrupt-Driven:** `ADC0->IM` unmasks the SS3 interrupt and `NVIC_EnableIRQ(ADC0SS3_IRQn)` enables it in the NVIC. Because `EMUX` is set to continuous mode, the ADC keeps sampling on its own and `ADC0SS3_Handler()` fires after every conversion: it reads `SSFIFO3`, converts the result to a temperature, and clears the interrupt flag via `ADCISC`. The main loop does nothing but wait.
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- Example 1: does the LED turn on once the knob's voltage passes the threshold?
+- Did you see the raw ADC value change as you turn the knob?
+- Example 2: did you see the temperature in the Watch window?
+- Can you say why PE3 needs `AMSEL` set and `DEN` cleared?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Timer-Based Temperature Measurement
 Modify Example 2 so that the ADC sampling is triggered by a timer every second, instead of using continuous sampling mode. Connect an analog temperature sensor (e.g., TMP36) to an ADC input channel (such as AIN0 on PE3). Configure the ADC to read the sensor voltage on each timer trigger and calculate the corresponding temperature. Monitor the temperature values in real time by adding the variable `temp` to the Watch window in the debugger.
 
 ### Lab work 2: Comparing Two ADC Channels Using Dual Modules
 Extend Example 2 to read two different analog inputs using separate ADC modules: use the **ADC0 module** to sample AIN0 (PE3) and the **ADC1 module** to sample AIN1 (PE2), both with sample sequencer 3 (SS3). Configure both ADC modules to use interrupts so that each conversion triggers its respective ISR. In the interrupt handlers, compare the two ADC values and use the result to control LEDs on GPIOF: for example, turn on the green LED if ADC0's value is higher, or turn on the red LED if ADC1's value is higher. This demonstrates simultaneous sampling using both ADC modules. Display both ADC values in the debugger Watch window to observe the comparison in real time.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: is the ADC triggered by a timer, once a second?
+- Does the sensor's temperature come out near room temperature?
+- Lab work 2: does ADC0 read PE3 and ADC1 read PE2, each through its own interrupt?
+- Did you compare the two readings in the Watch window?
+
+</Checklist>

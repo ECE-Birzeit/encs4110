@@ -1,5 +1,6 @@
 ---
 title: "Character LCD Display Interface"
+short: "Parallel LCD"
 description: "This experiment introduces LCD interfacing using the HD44780-based 16x2 character display module."
 outline: deep
 lastUpdated: true
@@ -294,6 +295,16 @@ Then sends the address as a command.
 
 The `LCD_Print(str)` function iterates through the string and sends each character using `LCD_Data()`.
 
+
+<Checklist id="examples" title="Example checklist">
+
+- Is the LCD wired as in the figure, and does the example's text appear?
+- Did you turn the potentiometer until the characters are clear?
+- Can you say what RS selects, and what the falling edge of E does?
+- Can you say why initialization sends `0x03` three times, then `0x02`?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Display Your Name and ID
 
@@ -341,3 +352,12 @@ Write a program that displays your name on line 1 and your student ID on line 2,
 
 **Hint:**
 The display-shift commands from Task 2 (`0x18`/`0x1C`) move **both** lines together, so they cannot scroll the two lines in opposite directions. Instead, keep each line's text in a 16-character buffer padded with spaces. On every timer tick, rotate line 1's buffer one position right and line 2's buffer one position left, then rewrite both lines with `LCD_SetCursor()` and `LCD_Print()`.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: is your name on line 1 and your student ID on line 2?
+- Lab work 2: does SW1 shift the display left and SW2 right, only when pressed?
+- Lab work 3: after SW1, do the two lines scroll in opposite directions, timed by a timer, and stop on the next press?
+- Can you say why the `0x18` and `0x1C` shift commands can't scroll the two lines in opposite directions?
+
+</Checklist>

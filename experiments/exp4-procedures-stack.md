@@ -1,5 +1,6 @@
 ---
 title: "Procedures and the Stack"
+short: "Procedures and the Stack"
 description: "This experiment builds on the branching and loop patterns from Experiment 3 to write modular assembly code."
 outline: deep
 lastUpdated: true
@@ -162,6 +163,16 @@ This example demonstrates a nested call: `CountUpperNested(ptr)` scans a null-te
 
 **Check:** Verify that R0 = 5 after the call, and open a Memory window at `NUMSTR` to confirm the bytes `34 30 32 31 33 00` (`"40213"`). Single-step the first loop with the Registers window open and watch `SP` drop by 4 for each digit. Then confirm that it climbs back during the second loop. Try the value 0 as well; the result should be `"0"`.
 
+
+<Checklist id="examples" title="Examples checklist">
+
+- After Example 1, does `UPPERCOUNT` read 5?
+- Did you see `LR` saved before the nested call and restored after it?
+- After Example 2, does R0 read 5, and does `NUMSTR` hold `34 30 32 31 33 00` in the Memory window?
+- Did you watch `SP` drop by 4 with each `PUSH` and come back with each `POP`?
+
+</Checklist>
+
 ## Lab work
 ### Lab work 1: Count Vowels with Procedures
 Rewrite [Lab work 1 of Experiment 3](./exp3-branching-loops#lab-work-1-count-vowels-and-non-vowels-in-a-string) as procedures:
@@ -182,3 +193,13 @@ Implement a recursive procedure to calculate the factorial of a non-negative int
 - Manage the stack appropriately to save and restore registers as needed.
 - Follow AAPCS conventions for parameter passing and register usage.
 - Test the procedure with several inputs (including 0 and 1) to verify correctness.
+
+<Checklist id="labwork" title="Lab work checklist">
+
+- Lab work 1: does `CountVowels` give the same answer as your Experiment 3 program?
+- Do `IsVowel` and `CountVowels` take their argument in R0 and return their result in R0, following AAPCS?
+- Lab work 2: does `FactorialRec` return 1 for 0 and for 1, and 120 for 5?
+- Is `SP` back where it started after the outermost call returns?
+- Can you say why every recursive call must save `LR`?
+
+</Checklist>
