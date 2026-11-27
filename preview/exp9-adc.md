@@ -246,7 +246,7 @@ Selects trigger source for each sample sequencer. Each 4-bit field (EM0-EM3) spe
 *ADC Event Multiplexer Trigger Sources*
 
 **Timer-triggered sampling (EM = 0x5):**
-this hooks a GPTM directly to the ADC without any CPU involvement at sample time. Configure the timer (as in Experiment 7) in periodic mode, then set its `TnOTE` bit (bit 5 of `TIMERx->CTL` for Timer A, bit 13 for Timer B — the same `CTL` register from Experiment 7’s GPTM section) so that each timeout pulses the ADC trigger instead of (or in addition to) generating a CPU interrupt. Set the corresponding sequencer’s `ADCEMUX` field to `0x5`, and the ADC samples automatically every time the timer expires — this is what Task 1 asks you to wire up.
+this hooks a GPTM directly to the ADC without any CPU involvement at sample time. Configure the timer (as in Experiment 7) in periodic mode, then set its `TnOTE` bit (bit 5 of `TIMERx->CTL` for Timer A, bit 13 for Timer B — the same `CTL` register from Experiment 7’s GPTM section) so that each timeout pulses the ADC trigger instead of (or in addition to) generating a CPU interrupt. Set the corresponding sequencer’s `ADCEMUX` field to `0x5`, and the ADC samples automatically every time the timer expires — this is what the [Task](#task) asks you to wire up.
 
 #### ADCPSSI — ADC Processor Sample Sequence Initiate
 

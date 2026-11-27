@@ -82,12 +82,15 @@ void UART0_ReadLine(char *buf, uint32_t size)
 		c = UART0_ReadChar();
 		if (c == '\r' || c == '\n')				// Enter: the line is done
 			break;
-		if ((c == '\b' || c == 0x7F) && n > 0)	// Backspace (PuTTY sends 0x7F)
+		if (c == '\b' || c == 0x7F)			// Backspace (PuTTY sends 0x7F)
 		{
-			n--;
-			UART0_WriteString("\b \b");			// Move back, blank it, move back again
+			if (n > 0)							// Nothing to delete at an empty prompt
+			{
+				n--;
+				UART0_WriteString("\b \b");		// Move back, blank it, move back again
+			}
 		}
-		else if (c >= ' ' && n < size - 1)		// A printable character that still fits
+		else if (c >= ' ' && c < 0x7F && n < size - 1)	// A printable character that still fits
 		{
 			buf[n++] = c;
 			UART0_WriteChar(c);					// Echo it

@@ -33,7 +33,7 @@ This is the reworked version of [Experiment 10](/experiments/exp10-uart), shared
 - Implement basic UART transmission and reception functions in C.
 - Send and receive strings via serial communication using polling methods.
 - Interface with a PC terminal emulator for debugging and data visualization.
-- Calculate and verify baud rate divisors for different system clock frequencies.
+- Calculate the baud rate divisors for the 50 MHz system clock.
 - Understand UART FIFO buffering and status flag operations.
 
 ## Background
