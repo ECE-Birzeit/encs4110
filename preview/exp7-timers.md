@@ -566,6 +566,20 @@ NVIC_EnableIRQ(TIMER1A_IRQn);
 NVIC_EnableIRQ(TIMER2A_IRQn);
 ```
 
+#### Interrupt priorities
+
+Which handler can interrupt which comes down to a few rules:
+
+- The TM4C123 has 3 priority bits: **0 is the highest** priority, **7 the lowest**.
+- Peripheral interrupts (GPIO, timers, ...) start at **0**. `SysTick_Config` sets SysTick to **7**, the lowest.
+- A running handler can only be interrupted by a **strictly higher** priority (a smaller number). An interrupt of the same or a lower priority waits until the handler returns. The main program can be interrupted by any of them.
+
+In this experiment that means:
+
+- `GPIOF_Handler` and `TIMER1A_Handler` are both 0, so neither can cut into the other halfway through.
+- Both can cut into `SysTick_Handler`. That's why the Task, with two buttons, debounces with a `ready` flag per button instead of masking each one in `IM`: `GPIOF_Handler` could interrupt `SysTick_Handler` halfway through changing `IM`, and one of the two changes would be lost.
+- Inside any other handler, SysTick can't run, so `ms` stops counting. A loop that waits for `ms` to change, like a `delay_ms()`, never ends there.
+
 ### Configuration Workflow
 
 #### SysTick Configuration Steps
@@ -663,7 +677,7 @@ Add `show()` and the handlers after the definitions:
 - **`SysTick_Handler`** adds one to `ms` every millisecond, a running clock like Arduino's `millis()`. It also waits for the release: while SW1 is down or bouncing, it keeps `up_ms` at 0. Once SW1 has been up for `DEBOUNCE_MS` in a row, it clears the flags the release bounces left in `ICR` and unmasks SW1, ready for the next press. SysTick needs no flag cleared: the core clears its pending interrupt when the handler starts.
 - Follow one press: the first falling edge interrupts, and the colour changes. The press bounces and the hold are ignored, because SW1 is masked. The release bounces keep setting `up_ms` back to 0. 20 ms after the last one, SW1 listens again.
 - **A press restarts the heartbeat.** If you pressed while the LED was off, you'd wait up to half a second to see the new colour. So the handler turns the LED on at once and writes `HEARTBEAT_LOAD` back into `TAILR`. With `TAILD` 0 in [GPTMTAMR](#gptmtamr-—-timer-a-mode-register), the default, the timer loads a new `TAILR` value on the next clock cycle: the countdown starts over, and the new colour stays on for a full 500 ms. If the old countdown had **just** run out, its time-out is already waiting, and `TIMER1A_Handler` would run straight after and turn the new colour off. So the handler drops it: `ICR` clears the timer's flag, and `NVIC_ClearPendingIRQ` clears the NVIC's note that the interrupt is waiting.
-- Both `GPIOF_Handler` and `TIMER1A_Handler` call `show()`. Interrupts at the same priority never interrupt each other, and these two have the same (default) priority, so one can't cut into the other's write to `GPIOF->DATA`.
+- Both `GPIOF_Handler` and `TIMER1A_Handler` call `show()`. Interrupts at the same priority never interrupt each other, and these two have the same (default) priority, so one can't cut into the other's write to `GPIOF->DATA`. See [Interrupt priorities](#interrupt-priorities).
 ::: info Why not "time since the last press"?
 The common version, `if (ms - last_press >= 150) { toggle; last_press = ms; }`, times from the last **press**. Hold the button for more than 150 ms and let go: the release bounces include falling edges, the last press was long ago, and the LED toggles on release. Waiting for the release closes that hole: SW1 isn't listened to again until it has been up and quiet.
 :::
@@ -688,7 +702,14 @@ Add `main` at the end of the file:
 
 - Set `DEBOUNCE_MS` to 1 and press SW1 a few times: some releases now count as presses and skip a colour, because SW1 listens again in the middle of the release bounce. Then try 300 and press quickly: fast double presses count as one, because the second comes before SW1 listens again. Put it back to 20.
 - Remove the `TIMER1->TAILR = HEARTBEAT_LOAD;` line and press SW1 several times: now the new colour sometimes flashes for an instant and goes off, because the old countdown was about to end. Put it back.
-- Change `HEARTBEAT_MS` to 100: the LED blinks five times faster, while the button still works the same.
+- Change `HEARTBEAT_MS` to 100: the LED blinks five times faster, while the button still works the same. Before you build, work out `HEARTBEAT_LOAD` by hand with the [32-bit formula](#_32-bit-mode-no-prescaler), then add `TIMER1->TAILR` to the Watch window and compare. Put it back to 500.
+- **Use a 16-bit timer with the prescaler.** Make Timer1A 16-bit (`CFG` = `0x4`) with a 250 ms heartbeat. 250 ms is 12,500,000 clock cycles, far more than `TAILR` holds in 16-bit mode (65,535), so the [prescaler](#_16-bit-mode-with-prescaler) `TAPR` divides the clock first. Choose `TAPR` so that `TAILR` fits, work out `TAILR`, then: set `CFG` to `0x4`, write `TIMER1->TAPR` right after it, and define `HEARTBEAT_LOAD` as your `TAILR`. Time ten blinks against a phone: about 5 s.
+
+  ::: details One answer
+  `TAPR` = 199 divides 50 MHz by 200, down to 250 kHz: a tick every 4 µs. 250 ms is 62,500 ticks, so `TAILR` = 62,499, which fits. Other pairs work too, as long as (`TAILR` + 1) × (`TAPR` + 1) = 12,500,000 and `TAILR` ≤ 65,535.
+
+  Now try a 500 ms heartbeat in 16-bit mode: no pair fits. The most a 16-bit timer can count at 50 MHz is 65,536 × 256 clock cycles, about 0.335 s. That's why the Activity uses the 32-bit timer.
+  :::
 
 ::: details The complete program
 <<< @/snippets/preview/exp7/main.c#full{c}
@@ -725,7 +746,7 @@ Start from this program. It compiles and runs as it is, but does nothing yet: th
 
 <<< @/snippets/preview/exp7/task.c{c}
 
-**The provided part.** The debounce is the Activity's, for each button on its own. With two buttons, `GPIOF_Handler` and `SysTick_Handler` could both be halfway through changing `IM` at the same moment. So instead of masking, each button has a **`ready`** flag. A falling edge counts only while its button is ready: `GPIOF_Handler` calls `on_press()` once, with the button, and clears its flag. The bounces still interrupt, but they're ignored. Every millisecond, `SysTick_Handler` keeps the `ms` clock and calls `check_release()` for each button: once a pressed button has been up for `DEBOUNCE_MS`, it's ready again. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
+**The provided part.** The debounce is the Activity's, for each button on its own. With two buttons, `GPIOF_Handler` could interrupt `SysTick_Handler` halfway through changing `IM` (see [Interrupt priorities](#interrupt-priorities)). So instead of masking, each button has a **`ready`** flag. A falling edge counts only while its button is ready: `GPIOF_Handler` calls `on_press()` once, with the button, and clears its flag. The bounces still interrupt, but they're ignored. Every millisecond, `SysTick_Handler` keeps the `ms` clock and calls `check_release()` for each button: once a pressed button has been up for `DEBOUNCE_MS`, it's ready again. `show(led)` lights exactly the colours in `led`, or none for 0. Don't change these.
 
 :::: details What to write: the five TODOs
 Each TODO is highlighted in the starter, exactly where its code goes. Write them in this order: **1, 5, 4, 2**, then **3**. That way you can test halfway: after TODO 2, SW1 already makes the LED turn green after a random wait.
@@ -751,7 +772,8 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 
 ::: details TODO 2: start a round (`on_press()`, `case IDLE`)
 - Only on **SW1**: check `button == SW1`. Without the check, SW2 in Idle starts a round too.
-- Turn the LED off, load `TAILR` with the random wait in clock cycles, `(SystemCoreClock / 1000) * (1000 + ms % 2000) - 1`, set `TAEN`, and go to `WAITING`.
+- Turn the LED off, load `TAILR` with the random wait, set `TAEN`, and go to `WAITING`.
+- The wait is `1000 + ms % 2000` milliseconds, but `TAILR` counts clock cycles. Work out the expression with the [32-bit formula](#_32-bit-mode-no-prescaler): how many cycles is one millisecond at `SystemCoreClock`, and don't forget the `- 1`.
 - The wait is random because nobody presses SW1 at the same millisecond twice.
 
 :::

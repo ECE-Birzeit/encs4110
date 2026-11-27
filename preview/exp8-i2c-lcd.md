@@ -472,7 +472,7 @@ Add the LCD functions after the I2C ones:
 <<< @/snippets/preview/exp8/main.c#lcd{c}
 
 - **A 1 ms clock comes first.** Once `main` starts SysTick with an interrupt every millisecond, `SysTick_Handler` counts in `ms`, and **`millis()`** returns it, like Arduino's. **`delay_ms(n)`** notes `ms` and waits until it has moved on by `n`. The subtraction `ms - start` is unsigned, so it's still right when `ms` wraps around after 49 days. SysTick keeps running for the whole program, free for anything else that needs the time.
-- Don't call `delay_ms()`, or any LCD function, from an interrupt handler as things stand. `SysTick_Config` gives SysTick the lowest priority, so inside another handler `ms` stops counting, and `delay_ms()` waits forever. The [Task](#task) shows how to raise SysTick's priority so a handler can use the LCD.
+- Never call `delay_ms()`, or any LCD function, from an interrupt handler. `SysTick_Config` gives SysTick the lowest priority, so inside another handler `ms` stops counting, and `delay_ms()` waits forever (see [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7).
 - **`LCD_SendNibble()`** is the only LCD function that knows about I2C. It builds one byte (the nibble in bits 7:4, then `LCD_BL`, `LCD_EN`, and `RS`) and sends it three times: E low, E high, E low. The LCD latches the nibble when E falls. `LCD_BL` is in every byte because the PCF8574 shows the whole last byte on its outputs: a byte without it would switch the backlight off.
 - **`LCD_Command()`**, **`LCD_Data()`**, and **`LCD_Init()`** follow the Background: two nibbles per byte, RS = 0 for commands and 1 for characters, and the [initialization sequence](#lcd-initialization-sequence). There are almost no delays, because one nibble already takes three I2C bytes, about 0.6 ms. Only the power-up and Clear (1.6 ms) still wait.
 - **`LCD_Print()`** takes a `const char *`: it only reads the string, and a string literal such as `"ENCS4110 Lab"` can't be changed.
@@ -511,7 +511,7 @@ One character is two nibbles, six I2C bytes: about **1.2 ms**. A full 16-charact
 | Program hangs in `I2C0_Write` | The module isn't running the bus: `RCGCI2C` or `MCR_MFE` is missing, or `AFSEL` isn't set for PB2 and PB3. |
 | Backlight on, but boxes stay on line 1 | The initialization didn't reach the LCD. Check `LCD_SendNibble()` puts the nibble in bits 7:4 and pulses `LCD_EN`. |
 | Display blank, no boxes, no text | Contrast: turn the blue trimmer on the back of the backpack while the program runs. |
-| Program hangs in `delay_ms()` | `ms` isn't counting: `SysTick_Config` is missing from `main`, or `delay_ms()` was called from inside an interrupt handler whose priority isn't below SysTick's. |
+| Program hangs in `delay_ms()` | `ms` isn't counting: `SysTick_Config` is missing from `main`, or `delay_ms()` (or an LCD function) was called from inside an interrupt handler. |
 | Random characters | A nibble went missing: the delays after the first `0x03` (5 ms) and after Clear (2 ms) are too short or missing. |
 | Backlight goes off when text is printed | `LCD_BL` is missing from the byte in `LCD_SendNibble()`. |
 
@@ -535,11 +535,11 @@ There's no starter this time: you've already written every piece. Start from you
 - Set up Port F before `SysTick_Config`: `SysTick_Handler` reads the buttons, and reading Port F before its clock is on crashes.
 :::
 
-::: details Everything in the button handler
-- As in Experiment 6, `GPIOF_Handler` does all the work: read `MIS` to see which button caused the interrupt, and for a ready button, change the count and redraw line 2. `main` sets everything up, then loops doing nothing.
-- The catch: the LCD functions call `delay_ms()`, which waits for SysTick to count `ms`. `SysTick_Config` gives SysTick the **lowest** priority, 7, so it can't interrupt `GPIOF_Handler`, and `delay_ms()` would wait there forever.
-- So after `SysTick_Config`, raise SysTick above the button: `NVIC_SetPriority(SysTick_IRQn, 0)` and `NVIC_SetPriority(GPIOF_IRQn, 1)`. A lower number is a higher priority. Now SysTick keeps counting while `GPIOF_Handler` runs.
-- Call `NVIC_EnableIRQ(GPIOF_IRQn)` last, after `LCD_Init()` and the first drawing, so a press can't cut into `main` halfway through writing the LCD.
+::: details The handler changes the count, main redraws it
+- As in Experiment 6, `GPIOF_Handler` reads `MIS` to see which button caused the interrupt, and for a ready button, changes the count. Then it sets a flag, say `changed = 1`, and returns.
+- The main loop does the slow part: when `changed` is 1, it clears it and redraws line 2.
+- Why not redraw in the handler? The LCD functions take milliseconds, and some of them call `delay_ms()`, which waits for SysTick to count `ms`. SysTick has the lowest priority, so inside `GPIOF_Handler` it can't run and `delay_ms()` would wait forever. See [Interrupt priorities](/preview/exp7-timers#interrupt-priorities) in Experiment 7. Handlers change state and return quickly; `main` does the output.
+- `count` and `changed` are shared between the handler and `main`: make them `volatile`.
 :::
 
 ::: details The count
