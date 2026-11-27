@@ -6,6 +6,7 @@ lastUpdated: true
 short: "UART"
 manual: "/manual/encs4110_manual.pdf#nameddest=chapter.10"
 datasheet: "/datasheets/tm4c123gh6pm.pdf#page=893"
+preview: "/preview/exp10-uart"
 part: "Part 2: TM4C123 LaunchPad"
 ---
 
