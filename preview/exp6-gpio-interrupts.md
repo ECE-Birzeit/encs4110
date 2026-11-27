@@ -662,103 +662,111 @@ It follows the [Configuration Workflow](#configuration-workflow):
 3. **SW1's interrupt.** Edge-sensitive (`IS`), one edge (`IBE`), the falling one (`IEV`): the moment of the press. `ICR` clears any edge seen while the pins were being set up, `IM` lets SW1 interrupt, and `NVIC_EnableIRQ` lets Port F's interrupt reach the CPU. SW2's bit stays clear in `IM`: it never interrupts.
 4. **The loop polls SW2** and drives the LED: dark while SW2 reads 0 (held), the selected colour otherwise.
 
-**Check:** build, flash, and run. The LED starts red. Each press of SW1 moves one colour forward (red, yellow, green, cyan, blue, magenta, white, then red again). Hold SW2: the LED goes dark, and comes back when you let go. Press SW1 while holding SW2, then release SW2: the colour has moved on, because the interrupt still ran.
+Build, flash, and run.
 
-**Then try:**
+<Checklist id="activity" title="Activity checklist">
 
-- Add `presses` to the Watch window and press SW1 slowly ten times. Sometimes `presses` jumps by 2 or 3 for one press, and the colour skips. That's [switch bounce](#switch-bouncing-and-debouncing): the contacts close and open a few times in a millisecond, and every falling edge is an interrupt. SW2 has the same bounce, but you never see it: polling only asks "held or not?", and a few flickers at the start of a long hold don't matter. The [Task](#task) fixes the bounce with a delay loop, and [Experiment 7](/preview/exp7-timers) with a timer.
-- Swap the roles: read SW1 by polling in the loop too (`if ((GPIOF->DATA & SW1) == 0) color_index = (color_index + 1) % 7;`), and comment out the `IM` line so its interrupt is off. One press now races through many colours, because the loop sees the button held thousands of times. Catching a *press* by polling needs you to remember the last level and look for the change: that's what the interrupt's edge detection does for you.
-- Fix the polled SW1 with a **delay-loop debounce**: after the step, wait about 20 ms for the bounce to die out, wait for the release, and wait 20 ms again. Now each press steps exactly once:
+- Does the LED start red, and does each SW1 press move it one colour on: red, yellow, green, cyan, blue, magenta, white, then red again?
+- Does the LED go dark while you hold SW2, and come back when you let go?
+- Press SW1 while holding SW2, then let go: has the colour moved on?
+- In the Watch window, does `presses` sometimes jump by 2 or 3 for one slow press?
+- Can you say why SW1 needs an interrupt but SW2 can be polled?
 
-  ```c
-  if ((GPIOF->DATA & SW1) == 0)                           // SW1 pressed
-  {
-  	color_index = (color_index + 1) % 7;
-  	for (volatile uint32_t i = 0; i < 140000; i++);     // About 20 ms: the press bounce
-  	while ((GPIOF->DATA & SW1) == 0);                   // Wait for the release
-  	for (volatile uint32_t i = 0; i < 140000; i++);     // About 20 ms: the release bounce
-  }
-  ```
+</Checklist>
 
-  One pass of that loop takes about 7 clock cycles, so 140000 passes at 50 MHz are about 20 ms. The same pattern **toggles** instead of stepping: `on ^= 1;` flips a variable between 0 and 1 on each press, and the loop shows the colour only while `on` is 1. The price of polling: while the loop waits for the release, it does nothing else.
-- Enable the interrupt without the CMSIS function: replace `NVIC_EnableIRQ(GPIOF_IRQn);` with `NVIC->ISER[0] = 1U << 30;`. It works the same. Port F's interrupt is number **30** in the vector table (`GPIOF_IRQn` is 30 in `TM4C123.h`), and `ISER[0]` holds the enable bits of interrupts 0 to 31, so it's bit 30 of `ISER[0]` (see [NVIC_ISER](#nvic-iser-—-interrupt-set-enable-registers)). Writing a 0 to an `ISER` bit does nothing, so a plain `=` doesn't turn off the interrupts that are already enabled: no `|=` needed. Try `1U << 29` instead: SW1 does nothing, because that's another peripheral's interrupt.
-- Comment out the `ICR` line in the handler and re-flash: the first press freezes the board inside the handler, which runs again and again. Pause the debugger to see where it's stuck.
+::: details More to try (optional)
+| Try this | What you'll see |
+| --- | --- |
+| Read SW1 by polling too: comment out the `IM` line and add `if ((GPIOF->DATA & SW1) == 0) color_index = (color_index + 1) % 7;` to the loop | One press races through many colours: the loop sees the button held thousands of times. The interrupt's edge detection catches the *change* for you. |
+| Debounce the polled SW1 with delay loops (code below) | Each press steps exactly once, but the loop does nothing else while it waits for the release. |
+| Make the polled SW1 a toggle: `on ^= 1;` instead of the step, and show the colour only while `on` is 1 | Each press turns the LED off or back on. |
+| Replace `NVIC_EnableIRQ(GPIOF_IRQn);` with `NVIC->ISER[0] = 1U << 30;` | It works the same: Port F is interrupt 30 (why below). With `1U << 29` instead, SW1 does nothing. |
+| Comment out the `ICR` line in the handler | The first press freezes the board: the handler runs again and again. Pause the debugger to see where it's stuck. |
+
+The delay-loop debounce. One pass of the loop is about 7 clock cycles, so 140000 passes at 50 MHz are about 20 ms:
+
+```c
+if ((GPIOF->DATA & SW1) == 0)                           // SW1 pressed
+{
+	color_index = (color_index + 1) % 7;
+	for (volatile uint32_t i = 0; i < 140000; i++);     // About 20 ms: the press bounce
+	while ((GPIOF->DATA & SW1) == 0);                   // Wait for the release
+	for (volatile uint32_t i = 0; i < 140000; i++);     // About 20 ms: the release bounce
+}
+```
+
+Why `1U << 30`: `GPIOF_IRQn` is 30 in `TM4C123.h`, and `ISER[0]` holds the enable bits of interrupts 0 to 31, so Port F is bit 30 of `ISER[0]` ([NVIC_ISER](#nvic-iser-—-interrupt-set-enable-registers)). Writing 0 to an `ISER` bit does nothing, so a plain `=` leaves the other interrupts enabled.
+:::
 
 ::: details The complete program
 <<< @/snippets/preview/exp6/main.c#full{c}
 :::
 
-## Common problems
-
+::: details Common problems
 | Symptom | Cause and fix |
 | --- | --- |
 | SW2 does nothing | PF0 isn't unlocked: `LOCK` must get the key **before** `CR` is written. |
 | SW1 does nothing | `NVIC_EnableIRQ(GPIOF_IRQn)` or the `IM` line is missing, or the handler isn't named exactly `GPIOF_Handler`. |
-| The first press freezes the board: the colour never changes again | The flag isn't cleared, so the handler runs again and again and the main loop never gets to update the LED: write SW1's bit to `ICR` in the handler. |
+| The first press freezes the board: the colour never changes again | The flag isn't cleared, so the handler runs again and again: write SW1's bit to `ICR` in the handler. |
 | The LED is always dark, or presses fire by themselves | The pull-ups are missing: set `PUR` for both switches. |
-| Colours skip sometimes | That's bounce, expected in this experiment. See the first "Then try". |
+| Colours skip sometimes | That's [switch bounce](#switch-bouncing-and-debouncing), expected in the Activity. The Task fixes it with a delay loop, and [Experiment 7](/preview/exp7-timers) with a timer. |
 | LEDs stay off | `DIR` or `DEN` doesn't include the LED bits. |
+:::
 
 ## Task
 
-Give each button its own colours, both by interrupt:
-
-- **SW1** steps through **red, blue, green**, then red again.
-- **SW2** steps through **yellow, magenta, cyan**, then yellow again.
-
-The LED shows the colour of the last press. Each button keeps **its own place** in its own sequence: red, then SW2 (yellow), then SW1 again gives blue, not red.
-
-Both buttons now interrupt, and Port F has one handler for all its pins, so `GPIOF_Handler` checks `MIS` to tell them apart, as in [Interrupt Service Routine](#interrupt-service-routine-isr). And this time every press counts exactly once: the bounce you saw in the Activity is handled for you.
+Give each button its own colours, both by interrupt: **SW1** steps through **red, blue, green**, and **SW2** through **yellow, magenta, cyan**. The LED shows the colour of the last press, and each button keeps **its own place** in its own sequence. One `GPIOF_Handler` serves both: it checks `MIS` to tell them apart ([Interrupt Service Routine](#interrupt-service-routine-isr)).
 
 ### The starter program
 
-Start from this program. It's the Activity's program with SW1's sequence and a debounce added: SW1 already works, and SW2 is yours to add.
+Start from this program. SW1 and the debouncing already work: SW2 is yours to add.
 
 <<< @/snippets/preview/exp6/task.c{c}
 
-**Test now, before writing anything:** build, flash, and run. The LED starts off, and SW1 steps red, blue, green. Press it slowly ten times: unlike the Activity, the colour never skips. SW2 does nothing yet.
+**Test now, before writing anything:** the LED starts off, and SW1 steps red, blue, green, never skipping a colour. SW2 does nothing yet.
 
-**The provided part: how the debouncing works.** It's the delay loop from the Activity's "Then try", for each button on its own, so a press of one button is never lost while the other is held:
+::: details How the provided part works
+Each button is debounced on its own, with the delay loop from "More to try", so a press of one button is never lost while the other is held:
 
-1. Each button has a **`ready`** flag, 1 at the start. The first falling edge of a press interrupts while the button is ready: `GPIOF_Handler` steps the colour and clears the flag. The bounces that follow still interrupt, but the flag is 0, so they're ignored.
-2. The main loop shows the colour, and sees the cleared flag: it calls `debounce()` for that button.
-3. `debounce()` waits about 20 ms for the press bounce to die out, waits until the button is released (still showing the colour), and waits another 20 ms for the release bounce. Then it sets the `ready` flag again, for the next press.
+1. Each button has a **`ready`** flag, 1 at the start. The first falling edge of a press interrupts while the button is ready: `GPIOF_Handler` steps the colour and clears the flag. The bounces still interrupt, but the flag is 0, so they're ignored.
+2. The main loop shows the colour, sees the cleared flag, and calls `debounce()` for that button.
+3. `debounce()` waits about 20 ms, waits until the button is released (still showing the colour), and waits another 20 ms. Then it sets the `ready` flag again.
 
-Don't change the provided part. If a press ever seems to count twice, ask your instructor before touching it.
+Don't change the provided part.
+:::
 
 :::: details What to write: the four TODOs
-Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3, 4**. Write TODO 2 before TODO 4: an interrupt with no code to clear its flag freezes the board (the Activity's last "Then try").
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3, 4**. TODO 2 must come before TODO 4: an interrupt nothing clears freezes the board.
 
 ::: details TODO 1: SW2's colours (`colors2`)
-- Replace the three zeros with yellow, magenta, and cyan, in that order.
-- Each is two LEDs on at once, joined with `|`: yellow is `RED_LED | GREEN_LED`. Look up the other two in the Activity's `colors` table, or in the colour table of [Experiment 5](/preview/exp5-gpio-output).
+- Replace the three zeros with yellow, magenta, and cyan, each two LEDs joined with `|`: yellow is `RED_LED | GREEN_LED`. The others are in the Activity's `colors` table.
 
 :::
 
 ::: details TODO 2: SW2 in the handler (`GPIOF_Handler`, after SW1's block)
-- Copy SW1's whole `if (GPIOF->MIS & SW1)` block, and change everything that belongs to SW1 into SW2's: `SW2` in `MIS` and `ICR`, `ready[1]`, `colors2`, `index2`.
-- Put it after SW1's block, not inside it: SW2's `if` has to run even when SW1 didn't interrupt.
-- Clear SW2's flag with `GPIOF->ICR = SW2;`, as the Activity's handler does for SW1. A plain `=` is right: writing 0 to SW1's `ICR` bit doesn't clear it.
+- Copy SW1's whole `if (GPIOF->MIS & SW1)` block after it (not inside it), and change SW1's parts into SW2's: `SW2` in `MIS` and `ICR`, `ready[1]`, `colors2`, `index2`.
 
 :::
 
 ::: details TODO 3: unlock PF0 (`main`, before the pins are set up)
-- It's the three lines of the Activity's `main`: write `GPIO_UNLOCK` to `LOCK`, set SW2's bit in `CR`, then write 0 to `LOCK`.
-- It must come **before** the `DIR`, `PUR` and `DEN` lines: until PF0 is unlocked, their writes to SW2's bit are ignored.
+- The three lines of the Activity's `main`: `GPIO_UNLOCK` to `LOCK`, SW2's bit in `CR`, then 0 to `LOCK`. Before `DIR`, `PUR` and `DEN`: until then, their writes to SW2's bit are ignored.
 
 :::
 
 ::: details TODO 4: SW2's interrupt (`main`, after SW1's interrupt lines)
-- The same five lines as SW1's, with `SW2`: edge-sensitive (`IS`), one edge (`IBE`), falling (`IEV`), clear its flag (`ICR`), let it interrupt (`IM`).
-- `NVIC_EnableIRQ(GPIOF_IRQn)` is already there and needs no change: both buttons are on Port F, interrupt 30.
+- The same five lines as SW1's, with `SW2`: `IS`, `IBE`, `IEV`, `ICR`, `IM`. `NVIC_EnableIRQ(GPIOF_IRQn)` needs no change: both buttons are on Port F, interrupt 30.
 
 :::
 ::::
 
-**Check:** build and flash, and add `index1`, `index2`, and `led` to the Watch window.
+Build and flash, and add `index1`, `index2`, and `led` to the Watch window.
 
-- **SW2:** press it four times: yellow, magenta, cyan, yellow.
-- **Separate state:** SW1 (red), SW2 (yellow), SW1 again: blue, not red. Each button carries on from where *it* left off, whatever the other did in between.
-- **No bounce:** press either button slowly ten times: the colour moves exactly one step each time, and its index changes once per press.
-- **Both at once:** hold SW1, and press and release SW2: the LED changes to SW2's next colour while SW1 is still held.
+<Checklist id="task" title="Task checklist">
 
+- Did you write SW2's handler block and its interrupt setup yourself?
+- Does SW2 step yellow, magenta, cyan, then yellow again?
+- SW1 (red), SW2 (yellow), SW1 again: is it blue, not red?
+- Ten slow presses of either button: exactly one step each, and its index changes once per press?
+- Hold SW1, press and release SW2: does the LED change to SW2's colour while SW1 is still held?
+
+</Checklist>
