@@ -27,11 +27,12 @@ This is the reworked version of [Experiment 6](/experiments/exp6-gpio-interrupts
 
 ## Objectives
 
-- Configure GPIO inputs with digital enable and internal pull resistors.
-- Read switches via polling, and see switch bounce for yourself.
-- Configure edge-triggered GPIO interrupts and write minimal ISRs.
-- Enable and manage interrupts in the NVIC (IRQ mapping, ISER).
-- Unlock and configure protected pins (PF0/NMI) for general-purpose use.
+- Configure the LaunchPad buttons as GPIO inputs with digital enable and internal pull-ups.
+- Read a button by polling, see switch bounce for yourself, and debounce a polled button with a delay.
+- Configure falling-edge GPIO interrupts (`IS`, `IBE`, `IEV`, `ICR`, `IM`) and write a short `GPIOF_Handler`.
+- Enable Port F's interrupt (IRQ 30) in the NVIC, with `NVIC_EnableIRQ` and with `ISER` directly.
+- Unlock PF0 (SW2) for general-purpose use.
+- Handle two buttons in one handler: tell them apart with `MIS`, each with its own state and its own debounce.
 
 ## Background
 
@@ -665,8 +666,22 @@ It follows the [Configuration Workflow](#configuration-workflow):
 
 **Then try:**
 
-- Add `presses` to the Watch window and press SW1 slowly ten times. Sometimes `presses` jumps by 2 or 3 for one press, and the colour skips. That's [switch bounce](#switch-bouncing-and-debouncing): the contacts close and open a few times in a millisecond, and every falling edge is an interrupt. SW2 has the same bounce, but you never see it: polling only asks "held or not?", and a few flickers at the start of a long hold don't matter. [Experiment 7](/preview/exp7-timers) fixes SW1's bounce with a timer.
-- Swap the roles: read SW1 by polling in the loop too (`if ((GPIOF->DATA & SW1) == 0) color_index = (color_index + 1) % 7;`). One press now races through many colours, because the loop sees the button held thousands of times. Catching a *press* by polling needs you to remember the last level and look for the change: that's what the interrupt's edge detection does for you.
+- Add `presses` to the Watch window and press SW1 slowly ten times. Sometimes `presses` jumps by 2 or 3 for one press, and the colour skips. That's [switch bounce](#switch-bouncing-and-debouncing): the contacts close and open a few times in a millisecond, and every falling edge is an interrupt. SW2 has the same bounce, but you never see it: polling only asks "held or not?", and a few flickers at the start of a long hold don't matter. The [Task](#task) fixes the bounce with a delay loop, and [Experiment 7](/preview/exp7-timers) with a timer.
+- Swap the roles: read SW1 by polling in the loop too (`if ((GPIOF->DATA & SW1) == 0) color_index = (color_index + 1) % 7;`), and comment out the `IM` line so its interrupt is off. One press now races through many colours, because the loop sees the button held thousands of times. Catching a *press* by polling needs you to remember the last level and look for the change: that's what the interrupt's edge detection does for you.
+- Fix the polled SW1 with a **delay-loop debounce**: after the step, wait about 20 ms for the bounce to die out, wait for the release, and wait 20 ms again. Now each press steps exactly once:
+
+  ```c
+  if ((GPIOF->DATA & SW1) == 0)                           // SW1 pressed
+  {
+  	color_index = (color_index + 1) % 7;
+  	for (volatile uint32_t i = 0; i < 140000; i++);     // About 20 ms: the press bounce
+  	while ((GPIOF->DATA & SW1) == 0);                   // Wait for the release
+  	for (volatile uint32_t i = 0; i < 140000; i++);     // About 20 ms: the release bounce
+  }
+  ```
+
+  One pass of that loop takes about 7 clock cycles, so 140000 passes at 50 MHz are about 20 ms. The same pattern **toggles** instead of stepping: `on ^= 1;` flips a variable between 0 and 1 on each press, and the loop shows the colour only while `on` is 1. The price of polling: while the loop waits for the release, it does nothing else.
+- Enable the interrupt without the CMSIS function: replace `NVIC_EnableIRQ(GPIOF_IRQn);` with `NVIC->ISER[0] = 1U << 30;`. It works the same. Port F's interrupt is number **30** in the vector table (`GPIOF_IRQn` is 30 in `TM4C123.h`), and `ISER[0]` holds the enable bits of interrupts 0 to 31, so it's bit 30 of `ISER[0]` (see [NVIC_ISER](#nvic-iser-—-interrupt-set-enable-registers)). Writing a 0 to an `ISER` bit does nothing, so a plain `=` doesn't turn off the interrupts that are already enabled: no `|=` needed. Try `1U << 29` instead: SW1 does nothing, because that's another peripheral's interrupt.
 - Comment out the `ICR` line in the handler and re-flash: the first press freezes the board inside the handler, which runs again and again. Pause the debugger to see where it's stuck.
 
 ::: details The complete program
@@ -686,56 +701,64 @@ It follows the [Configuration Workflow](#configuration-workflow):
 
 ## Task
 
-Build the controller of a **vending machine**. A drink costs two coins: **SW1** inserts a coin, and **SW2** is the machine's one button. The LED shows what the machine is doing.
+Give each button its own colours, both by interrupt:
 
-A vending machine is a **state machine**: it is always in exactly one **state**, and each button press moves it to a next state that depends on *both* the state and the button. That's why SW2 means *refund* with one coin in, but *dispense* with two: same button, different state, different result.
+- **SW1** steps through **red, blue, green**, then red again.
+- **SW2** steps through **yellow, magenta, cyan**, then yellow again.
 
-![State diagram of the vending machine. Idle, LED off: SW1 goes to One coin; SW2 stays in Idle. One coin, blue: SW1 goes to Ready; SW2 refunds and goes back to Idle. Ready, green: SW2 dispenses and goes to Vend; SW1 stays in Ready, the coin is refused. Vend, white: SW1 goes to One coin; SW2 goes to Idle.](/images/exp6/vending-machine.svg)
+The LED shows the colour of the last press. Each button keeps **its own place** in its own sequence: red, then SW2 (yellow), then SW1 again gives blue, not red.
 
-Each circle is a state, filled with the colour the LED shows in it. Each arrow is a button press: follow the arrows that leave the current state to see where each button takes the machine. An arrow that loops back to the same circle means that button changes nothing there. A purchase is SW1, SW1, SW2: Idle, One coin, Ready, Vend.
+Both buttons now interrupt, and Port F has one handler for all its pins, so `GPIOF_Handler` checks `MIS` to tell them apart, as in [Interrupt Service Routine](#interrupt-service-routine-isr). And this time every press counts exactly once: the bounce you saw in the Activity is handled for you.
 
 ### The starter program
 
-Start from this program. It compiles and runs as it is: the pins, the interrupts, and the **debouncing** are done, and only the state machine is left to write.
+Start from this program. It's the Activity's program with SW1's sequence and a debounce added: SW1 already works, and SW2 is yours to add.
 
 <<< @/snippets/preview/exp6/task.c{c}
 
-**The provided part: how the debouncing works.** Each press reaches the state machine exactly once:
+**Test now, before writing anything:** build, flash, and run. The LED starts off, and SW1 steps red, blue, green. Press it slowly ten times: unlike the Activity, the colour never skips. SW2 does nothing yet.
 
-1. Each button has a **`ready`** flag, 1 at the start. The first falling edge of a press interrupts while the button is ready: `GPIOF_Handler` notes the button in `button` and clears its `ready` flag. The bounces that follow still interrupt, but the flag is 0, so they're ignored.
-2. `main` sees `button`, clears it, runs one step of the state machine with `next_state()`, and shows the new state.
-3. `debounce()` waits about 40 ms for the press bounce to die out, waits until that button is released, and waits another 40 ms for the release bounce. Then it sets the button's `ready` flag again, for its next press.
+**The provided part: how the debouncing works.** It's the delay loop from the Activity's "Then try", for each button on its own, so a press of one button is never lost while the other is held:
 
-Each button is debounced on its own: a press of SW2 while SW1 is held isn't lost. It's handled as soon as SW1's debounce ends.
+1. Each button has a **`ready`** flag, 1 at the start. The first falling edge of a press interrupts while the button is ready: `GPIOF_Handler` steps the colour and clears the flag. The bounces that follow still interrupt, but the flag is 0, so they're ignored.
+2. The main loop shows the colour, and sees the cleared flag: it calls `debounce()` for that button.
+3. `debounce()` waits about 20 ms for the press bounce to die out, waits until the button is released (still showing the colour), and waits another 20 ms for the release bounce. Then it sets the `ready` flag again, for the next press.
 
 Don't change the provided part. If a press ever seems to count twice, ask your instructor before touching it.
 
-:::: details What to write: the three TODOs
-Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3**.
+:::: details What to write: the four TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3, 4**. Write TODO 2 before TODO 4: an interrupt with no code to clear its flag freezes the board (the Activity's last "Then try").
 
-::: details TODO 1: the states (in `enum State`)
-- Add `READY` (two coins in) and `VEND` (the drink is out). `IDLE` and `ONE_COIN` are already there.
-
-:::
-
-::: details TODO 2: the arrows (`next_state()`, after `case IDLE`)
-- Add one `case` each for `ONE_COIN`, `READY`, and `VEND`.
-- In each case, look at the arrows leaving that circle in the diagram: for each button with an arrow, `if (pressed == ...) return` the state it points to. Copy the shape of the `IDLE` case.
-- A button whose arrow loops back to the same circle needs no code: it falls through to `return s`, and the state stays the same.
+::: details TODO 1: SW2's colours (`colors2`)
+- Replace the three zeros with yellow, magenta, and cyan, in that order.
+- Each is two LEDs on at once, joined with `|`: yellow is `RED_LED | GREEN_LED`. Look up the other two in the Activity's `colors` table, or in the colour table of [Experiment 5](/preview/exp5-gpio-output).
 
 :::
 
-::: details TODO 3: the LED (`show()`, after `case ONE_COIN`)
-- Add a `case` for `READY` (`GREEN_LED`) and for `VEND` (white is all three: `LEDS`).
+::: details TODO 2: SW2 in the handler (`GPIOF_Handler`, after SW1's block)
+- Copy SW1's whole `if (GPIOF->MIS & SW1)` block, and change everything that belongs to SW1 into SW2's: `SW2` in `MIS` and `ICR`, `ready[1]`, `colors2`, `index2`.
+- Put it after SW1's block, not inside it: SW2's `if` has to run even when SW1 didn't interrupt.
+- Clear SW2's flag with `GPIOF->ICR = SW2;`, as the Activity's handler does for SW1. A plain `=` is right: writing 0 to SW1's `ICR` bit doesn't clear it.
 
 :::
 
-**The compiler helps:** it warns about every state a `switch` doesn't handle yet ("enumeration value not handled in switch"). The starter already shows one, for `ONE_COIN` in `next_state()`. When the warnings are gone, every state has its case.
+::: details TODO 3: unlock PF0 (`main`, before the pins are set up)
+- It's the three lines of the Activity's `main`: write `GPIO_UNLOCK` to `LOCK`, set SW2's bit in `CR`, then write 0 to `LOCK`.
+- It must come **before** the `DIR`, `PUR` and `DEN` lines: until PF0 is unlocked, their writes to SW2's bit are ignored.
+
+:::
+
+::: details TODO 4: SW2's interrupt (`main`, after SW1's interrupt lines)
+- The same five lines as SW1's, with `SW2`: edge-sensitive (`IS`), one edge (`IBE`), falling (`IEV`), clear its flag (`ICR`), let it interrupt (`IM`).
+- `NVIC_EnableIRQ(GPIOF_IRQn)` is already there and needs no change: both buttons are on Port F, interrupt 30.
+
+:::
 ::::
 
-**Check:** build and flash, and add `state` and `button` to the Watch window.
+**Check:** build and flash, and add `index1`, `index2`, and `led` to the Watch window.
 
-- **A purchase:** SW1, SW1, SW2. The LED goes blue, green, white, and `state` goes `ONE_COIN`, `READY`, `VEND`. Then SW2 again: off, `IDLE`.
-- **A refund:** SW1, then SW2: blue, then off.
-- **A refused coin:** SW1, SW1, SW1: the third coin leaves the LED green.
-- **The next customer:** from white (Vend), SW1 goes straight to blue.
+- **SW2:** press it four times: yellow, magenta, cyan, yellow.
+- **Separate state:** SW1 (red), SW2 (yellow), SW1 again: blue, not red. Each button carries on from where *it* left off, whatever the other did in between.
+- **No bounce:** press either button slowly ten times: the colour moves exactly one step each time, and its index changes once per press.
+- **Both at once:** hold SW1, and press and release SW2: the LED changes to SW2's next colour while SW1 is still held.
+
