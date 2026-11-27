@@ -30,10 +30,11 @@ This experiment is new and isn't in the lab manual yet. If something on this pag
 ## Objectives
 
 - Explain what frequency and duty cycle mean for a PWM signal, and why PWM can control brightness or speed.
-- Configure a GPTM timer in PWM mode and route its output to a pin with `AFSEL` and `PCTL`.
+- Configure a GPTM timer half (Timer A or Timer B) in PWM mode and route its output to a pin with `AFSEL` and `PCTL`.
 - Calculate `TAILR` and `TAMATCHR` for a given frequency and duty cycle.
-- Use the prescaler as a timer extension to reach long PWM periods, such as the 20 ms of a servo signal.
-- Change the duty cycle at run time from a SysTick interrupt.
+- Use the prescaler as a timer extension (`TAPR` and `TAPMR`) to reach long PWM periods, such as the 20 ms of a servo signal.
+- Change the duty cycle at run time, from a SysTick interrupt and from button presses.
+- Drive several PWM outputs at once, including both halves of one timer, to mix colours on the RGB LED.
 
 ## Background
 
@@ -323,7 +324,16 @@ It does three things, in order:
 
 **Check:** build, flash, and run. The LED should fade in and out, one breath about every 2 seconds. Add `level` to the Watch window: it sweeps between 1 and 99.
 
-**Then try** the PWM signal on its own: comment out the `SysTick_Config` line and re-flash. The LED now glows steadily at `DUTY`, 25%. Change `DUTY` to 5, 50, and 95: the brightness changes, with no flicker, because 1 kHz is far too fast for the eye. In the debugger, **Peripherals → System Viewer → GPIOF** shows `AFSEL = 0x04` and `PCTL = 0x00000700`.
+**Then try:**
+
+- **The PWM signal on its own.** Comment out the `SysTick_Config` line and re-flash. The LED now glows steadily at `DUTY`, 25%. Change `DUTY` to 5, 50, and 95: the brightness changes, with no flicker, because 1 kHz is far too fast for the eye. In the debugger, **Peripherals → System Viewer → GPIOF** shows `AFSEL = 0x04` and `PCTL = 0x00000700`.
+- **A 50 Hz signal, with the prescaler as an extension.** Keep SysTick off and `DUTY` at 25, and slow the signal down to 50 Hz, the 20 ms period of a servo. That's $50{,}000{,}000 / 50 = 1{,}000{,}000$ counts, so set `PERIOD` to `1000000`. First change only `PERIOD` and re-flash: there's no 50 Hz flicker, because the timer keeps only the low 16 bits of `TAILR` and `TAMATCHR`, and 999,999 doesn't fit in 16 bits. So use the 24-bit [timer extension](#the-prescaler-is-a-timer-extension-in-pwm-mode): the start value's top 8 bits go into `TAPR` and its low 16 bits into `TAILR`, and the match value is split the same way into `TAPMR` and `TAMATCHR`. Change the `TAPR` and `TAILR` lines in `main`, and the write in `pwm_set()`. Work out all four values for 25% by hand first, then compare them with **Peripherals → System Viewer → TIMER1**. Now the LED **flickers**: 50 times a second is slow enough to see, most clearly out of the corner of your eye or when you move the board. Turn SysTick back on: the breath still works, but flickers. Put `PERIOD` and the three changes back.
+
+  ::: details One answer
+  In `main`: `TIMER1->TAPR = (PERIOD - 1) >> 16;` and `TIMER1->TAILR = (PERIOD - 1) & 0xFFFF;`. In `pwm_set()`, keep the match in a variable, `uint32_t match = (PERIOD - 1) - (PERIOD / 100) * (uint32_t)percent;`, then write `TIMER1->TAPMR = match >> 16;` and `TIMER1->TAMATCHR = match & 0xFFFF;`.
+
+  For 50 Hz: the start value is 999,999 = `0x0F423F`, so `TAPR = 0x0F` and `TAILR = 0x423F`. For 25% the high time is 250,000 counts, so the match is 999,999 − 250,000 = 749,999 = `0x0B71AF`: `TAPMR = 0x0B` and `TAMATCHR = 0x71AF`. On an oscilloscope, PF2 is high for 5 ms of every 20 ms. A servo would want a 1 to 2 ms pulse in that period: a duty of 5 to 10%.
+  :::
 
 ::: tip See it on the oscilloscope
 Probe **PF2** on the LaunchPad header (ground on any GND pin). With SysTick off and `DUTY` at 25, you should see a 1 kHz square wave, high for 250 µs of every 1 ms. Changing `DUTY` changes the width of the high part, not the frequency. With SysTick back on, the high part grows and shrinks as you watch.
@@ -350,31 +360,65 @@ The eye's response to brightness isn't linear: the change from 1% to 10% looks m
 
 ## Task
 
-Build a **colour knob**: turning a potentiometer moves the RGB LED smoothly from red to green to blue and back toward red, with all three colours made by PWM in hardware.
+Build an **RGB colour picker** with the two buttons. All three LEDs are driven by PWM, so each colour has its own level, and together they mix: red and green make yellow, green and blue make cyan, red and blue make magenta, and all three make white.
 
-**Requirements:**
-- Drive all three LEDs with PWM at 1 kHz: **Timer0B on PF1** (red), **Timer1A on PF2** (blue), and **Timer1B on PF3** (green), using the table in [Which timer drives each LaunchPad LED](#which-timer-drives-each-launchpad-led). Add `#define`s for the new pins, `PCTL` fields, and Timer B bits, in the style of Step 1.
-- Write `set_color(int32_t r, int32_t g, int32_t b)`, which takes three percentages and clamps each to 1–99, like `pwm_set()`.
-- Read a potentiometer on **AIN0 (PE3)** with sample sequencer 3, by polling, as in [Experiment 9, Example 1](/preview/exp9-adc#example-1-single-adc-channel-reading-polling-method). Take a new reading every 20 ms, timed with SysTick.
-- Map the 12-bit reading (0 to 4095) to a colour as described in the hint, and update the LED after every reading.
-- Add the ADC reading and the three percentages to the Watch window, and check they change as you turn the knob.
+- **SW1** selects the colour to change: red, green, blue, and round again.
+- **SW2** adds 20% to the selected colour: 0, 20, 40, 60, 80, 100, then back to 0.
 
-**Wiring:** the potentiometer's outer pins to **3.3 V** and **GND**, and its middle pin (the wiper) to **PE3**, as in Experiment 9.
+The levels are kept as round percentages, and the PWM code clamps them as `pwm_set()` does: 0 is shown as 1%, a faint glow, and 100 as 99%.
 
-**Hint:** Timer B uses `TBMR`, `TBILR`, `TBMATCHR`, `TBPR`, and `TBEN` (bit 8 of `CTL`). Timer0 and Timer1 each need their own `RCGCTIMER` bit, and Timer1's two halves share one `CFG` and one `CTL`: configure both halves before enabling either, and set the enable bits with `|=` so one doesn't clear the other.
+The three LEDs use three timer outputs, from the table in [Which timer drives each LaunchPad LED](#which-timer-drives-each-launchpad-led): **Timer0B on PF1** (red), **Timer1A on PF2** (blue, as in the Activity), and **Timer1B on PF3** (green). Timer B works exactly like Timer A, with its own registers: `TBMR`, `TBPR`, `TBILR`, and `TBMATCHR`, and its enable bit `TBEN` at bit 8 of `CTL`.
 
-::: details Hint: mapping the knob to a colour
-Split the knob's range into three equal parts. In each part, one colour fades out while the next fades in:
+### The starter program
 
-| Reading | Red | Green | Blue |
-|:---|:---|:---|:---|
-| 0 to 1365 | 99% to 0% | 0% to 99% | 0% |
-| 1366 to 2730 | 0% | 99% to 0% | 0% to 99% |
-| 2731 to 4095 | 0% to 99% | 0% | 99% to 0% |
+Start from this program. It compiles and runs as it is: red and blue glow, but green and the buttons do nothing yet.
 
-With `v` as the reading, `part = (v * 3) / 4096` gives which third you're in (0, 1 or 2), and `f = ((v * 3) % 4096) * 99 / 4096` how far through it you are (0 to 98). In part 0, red is `99 - f` and green is `f`; parts 1 and 2 follow the same pattern.
+<<< @/snippets/preview/exp8/task.c{c}
+
+**The provided part.** The pins, red, and blue are set up for you. **Red's Timer0B** is the Activity's Timer1A setup with the Timer B registers, and **blue's Timer1A** is the Activity's. **`pwm_match()`** is the Activity's `pwm_set()` without the write: it clamps the percentage to 1 to 99 and returns the match value, so it works for any timer half. The debounce is the one from the [Experiment 7 Task](/preview/exp7-timers#task): each button has a **`ready`** flag, `GPIOF_Handler` calls `on_press()` once per press, and `SysTick_Handler`, every millisecond, makes a released button ready again. Don't change these.
+
+`on_press()` runs inside `GPIOF_Handler`. That's fine here: setting a colour is only three register writes, with no waiting.
+
+:::: details What to write: the five TODOs
+Each TODO is highlighted in the starter, exactly where its code goes. Write them in order: **1, 2, 3** make green work, then **4** and **5** make the buttons work.
+
+::: details TODO 1: hand PF3 to Timer1B (in `main`)
+- Copy the two provided lines above it, for PF3: set `GREEN_LED` in `AFSEL`, then put 7 in PF3's `PCTL` field with `PCTL_PF3_MASK` and `PCTL_PF3_T1CCP1`.
+- Change only PF3's field, with the mask, so PF1 and PF2 keep theirs. It's the same line as Step 3 of the Activity.
+
 :::
 
-::: tip Keep this code
-`set_color()` and the three-LED setup come back in the [Experiment 13 Task](/preview/exp11-i2c-lcd#task), where a knob and an LCD menu set each colour.
+::: details TODO 2: set up green, Timer1B (in `main`)
+- Copy red's Timer0B block, for `TIMER1`: `TBMR`, `TBPR`, `TBILR`, and `TBMATCHR` (with `pwm_match(level[GREEN])`), then start it with `TBEN`.
+- **Leave out the `CFG` line.** Timer1A and Timer1B share one `CFG`, and the provided code already split Timer1 into two 16-bit halves, while both were stopped.
+- **Start it with `|=`:** `TIMER1->CTL |= CTL_TBEN`. The halves share one `CTL` too, and `TIMER1->CTL = CTL_TBEN` would clear `TAEN` and stop blue.
+
 :::
+
+::: details TODO 3: `set_color()`
+- Three lines, one per colour: write `pwm_match()` of its percentage into its timer half's match register. Red is `TIMER0->TBMATCHR`, green `TIMER1->TBMATCHR`, and blue `TIMER1->TAMATCHR`.
+- `pwm_match()` already clamps, so `set_color()` accepts any level.
+
+:::
+
+**Test now:** build and flash. All three colours start at 20%: the LED is a dim white. If it's purple, green is missing: check TODO 1 and TODO 2. Change the starting `level` values to `{ 100, 100, 0 }` and re-flash: yellow. Put them back.
+
+::: details TODO 4: SW1 selects the next colour (`on_press()`)
+- Step `selected` through `RED`, `GREEN`, `BLUE` (0, 1, 2), then back to `RED`. Either add one and go back to 0 after `BLUE`, or use `% 3`.
+- SW1 only selects: the LED doesn't change. Add `selected` to the Watch window to see it.
+
+:::
+
+::: details TODO 5: SW2 steps the selected colour (`on_press()`)
+- `level[selected]` is the selected colour's level. Add `STEP` to it, and if it went past 100, set it back to 0.
+- Then show the new mix: `set_color(level[RED], level[GREEN], level[BLUE])`.
+:::
+::::
+
+**Check:** build and flash, and add `selected` and `level` to the Watch window.
+
+- **At the start:** dim white, and `selected` is 0, red.
+- **SW2:** press it six times. `level[0]` goes 40, 60, 80, 100, 0, 20, one step per press, and the white turns pinker, then nearly loses its red (cyan), then comes back.
+- **SW1:** each press moves `selected` one step, 0, 1, 2, 0, and the LED doesn't change. SW2 then changes only the selected colour.
+- **Mix colours:** make yellow (red 100, green 100, blue 0), cyan, and magenta, then a bright white with all three at 100.
+- **On the oscilloscope**, if you have one: PF1, PF2, and PF3 each carry a 1 kHz signal, and each one's high time follows its own level.
