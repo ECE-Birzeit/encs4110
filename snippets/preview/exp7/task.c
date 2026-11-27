@@ -109,13 +109,14 @@ void on_press(uint32_t button)
 		//         loaded into Timer1A (TAILR) and the timer started (TAEN), then WAITING // [!code highlight]
 		break;
 	// TODO 3: add WAITING and GO. Only SW2 counts in them. In WAITING it's a false start: // [!code highlight]
-	//         stop the timer, show red, count it, back to IDLE. In GO: store the reaction, // [!code highlight]
-	//         update best if it's the first round or a better time, show blue, back to IDLE. // [!code highlight]
+	//         stop the timer and clear its flag, show red, count it, back to IDLE. // [!code highlight]
+	//         In GO: store the reaction, update best if it's the first round or a better // [!code highlight]
+	//         time, show blue, back to IDLE. // [!code highlight]
 	}
 }
 
-// TODO 4: when Timer1A runs out: clear its time-out flag, light green, // [!code highlight]
-//         note the time in go_ms, and go to GO // [!code highlight]
+// TODO 4: when Timer1A runs out: clear its time-out flag. Then, only if still WAITING: // [!code highlight]
+//         light green, note the time in go_ms, and go to GO // [!code highlight]
 void TIMER1A_Handler(void)
 {
 }

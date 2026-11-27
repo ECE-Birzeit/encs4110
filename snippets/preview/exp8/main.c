@@ -121,7 +121,7 @@ void LCD_Init(void)
 {
 	delay_ms(50);								// Let the LCD power up
 
-	LCD_SendNibble(0x03, 0);					// Same sequence as Experiment 8:
+	LCD_SendNibble(0x03, 0);					// The initialization sequence from the Background:
 	delay_ms(5);								// three 0x3s...
 	LCD_SendNibble(0x03, 0);
 	delay_ms(1);

@@ -230,7 +230,7 @@ LDR     R1, =0x400FE608     ; RCGCGPIO register
         STR     R0, [R1]
 ```
 
-Once the clock is enabled, a short delay or status polling ensures the peripheral is ready before further configuration. This delay exists because enabling a peripheral’s clock in `RCGCGPIO` doesn’t take effect instantaneously — the clock-gating logic needs a few cycles to settle before the port’s registers can be safely accessed. A couple of `NOP` instructions (as used in this experiment’s examples) are enough to bridge that gap; the exact count isn’t critical as long as some delay follows the clock-enable write. A more robust alternative — used later in this manual (see Experiment 8’s LCD driver) — is to poll a peripheral-ready register (`SYSCTL->PRGPIO`) instead of guessing a fixed number of `NOP`s.
+Once the clock is enabled, a short delay or status polling ensures the peripheral is ready before further configuration. This delay exists because enabling a peripheral’s clock in `RCGCGPIO` doesn’t take effect instantaneously — the clock-gating logic needs a few cycles to settle before the port’s registers can be safely accessed. A couple of `NOP` instructions (as used in this experiment’s examples) are enough to bridge that gap; the exact count isn’t critical as long as some delay follows the clock-enable write. A more robust alternative — used from [Experiment 6](/preview/exp6-gpio-interrupts) on — is to poll a peripheral-ready register (`SYSCTL->PRGPIO`) instead of guessing a fixed number of `NOP`s.
 
 #### 2. Unlock Protected Pins
 
@@ -466,7 +466,7 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 ::: details TODO 3: your own show (in the table, at the bottom)
 - Replace the three sample lines with at least **eight** steps, using at least **five** colours and at least **three** different durations. For example, a traffic light (green 3 s, yellow 1 s, red 3 s) followed by a fast white flash.
 - One step per line: `DCB colour, tenths`. `OFF` is a colour too: `DCB OFF, 5` is half a second dark.
-- Keep the `DCB END_MARK` line last, and don't use a duration of 0: the wait loop subtracts before it checks, so 0 would wait 256 times.
+- Keep the `DCB END_MARK` line last, and don't use a duration of 0: the wait loop subtracts before it checks, so 0 wraps around to 0xFFFFFFFF and waits about 13 years.
 :::
 ::::
 

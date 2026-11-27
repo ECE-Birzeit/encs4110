@@ -28,7 +28,7 @@ This is the reworked version of [Experiment 6](/experiments/exp6-gpio-interrupts
 ## Objectives
 
 - Configure GPIO inputs with digital enable and internal pull resistors.
-- Read switches via polling with software debouncing.
+- Read switches via polling, and see switch bounce for yourself.
 - Configure edge-triggered GPIO interrupts and write minimal ISRs.
 - Enable and manage interrupts in the NVIC (IRQ mapping, ISER).
 - Unlock and configure protected pins (PF0/NMI) for general-purpose use.
@@ -99,7 +99,7 @@ After detecting a button press (or release), wait for a short period (typically 
 - **Blocking delay debouncing**: Insert a fixed delay (busy-wait loop) after detecting an edge, then verify the input state. This is simple but prevents the CPU from doing other work during the delay period.
 - **Timer-based debouncing (non-blocking)**: Use a hardware timer to sample the input periodically without blocking the main program. Only register a press after multiple consistent readings across timer intervals.
 
-The polling example below is kept deliberately simple and does *not* debounce — it reads the raw switch state every loop iteration so you can first see how polling works on its own. Task 1 asks you to add delay-based debouncing to it. More sophisticated timer-based debouncing techniques will be covered in the following experiment.
+In the Activity, SW2 is read by polling and SW1 by interrupt, with no debouncing, so you can see the bounce for yourself. The Task's provided code debounces with delays, and [Experiment 7](/preview/exp7-timers) debounces with a timer.
 
 ### Reading GPIO Inputs: Polling vs. Interrupts
 
@@ -199,7 +199,7 @@ void GPIOF_Handler(void) {
         // Handle PF4 interrupt
         // ...
         
-        GPIOF->ICR |= (1 << 4);  // MUST clear flag!
+        GPIOF->ICR = (1 << 4);   // MUST clear flag!
     }
 }
 ```
@@ -596,11 +596,11 @@ When a GPIO interrupt occurs, the NVIC calls the corresponding ISR. For GPIO Por
 void GPIOF_Handler(void) {
     if (GPIOF->MIS & (1 << 4)) {     // Check if PF4 caused interrupt
         // Respond to SW1 press
-        GPIOF->ICR |= (1 << 4);      // Clear PF4 interrupt flag
+        GPIOF->ICR = (1 << 4);       // Clear PF4 interrupt flag
     }
     if (GPIOF->MIS & (1 << 0)) {     // Check if PF0 caused interrupt
         // Respond to SW2 press
-        GPIOF->ICR |= (1 << 0);      // Clear PF0 interrupt flag
+        GPIOF->ICR = (1 << 0);       // Clear PF0 interrupt flag
     }
 }
 ```
@@ -679,7 +679,7 @@ It follows the [Configuration Workflow](#configuration-workflow):
 | --- | --- |
 | SW2 does nothing | PF0 isn't unlocked: `LOCK` must get the key **before** `CR` is written. |
 | SW1 does nothing | `NVIC_EnableIRQ(GPIOF_IRQn)` or the `IM` line is missing, or the handler isn't named exactly `GPIOF_Handler`. |
-| A press changes the colour, then the board freezes | The flag isn't cleared: write SW1's bit to `ICR` in the handler. |
+| The first press freezes the board: the colour never changes again | The flag isn't cleared, so the handler runs again and again and the main loop never gets to update the LED: write SW1's bit to `ICR` in the handler. |
 | The LED is always dark, or presses fire by themselves | The pull-ups are missing: set `PUR` for both switches. |
 | Colours skip sometimes | That's bounce, expected in this experiment. See the first "Then try". |
 | LEDs stay off | `DIR` or `DEN` doesn't include the LED bits. |

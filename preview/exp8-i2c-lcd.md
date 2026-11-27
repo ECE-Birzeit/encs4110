@@ -258,7 +258,7 @@ The backpack is a small board soldered onto the LCD's 16 pins. Its main chip, th
 | P1 | 1 | RW (always 0 here) |
 | P0 | 0 | RS (0 = command, 1 = character) |
 
-So the LCD runs in **4-bit mode**, as described in [4-Bit Mode](#_4-bit-mode) above. The difference is how the pins change: instead of writing `GPIOB->DATA`, the driver writes a byte to the PCF8574. Sending one nibble takes three bytes (data with E low, then E high, then E low again), and one character takes two nibbles: six I2C bytes, about **1.2 ms** per character instead of a few microseconds.
+So the LCD runs in **4-bit mode**, as described in [4-Bit Mode](#_4-bit-mode) above. The difference is how the pins change: instead of the TM4C123 driving the LCD's pins directly, the driver writes a byte to the PCF8574, and the PCF8574 drives them. Sending one nibble takes three bytes (data with E low, then E high, then E low again), and one character takes two nibbles: six I2C bytes, about **1.2 ms** per character instead of a few microseconds.
 
 The board also has:
 
@@ -340,7 +340,7 @@ Setting bit *n* makes pin *n* open drain. Set it for **SDA only** (PB3). The dat
 | 7 | HS |
 | 6–0 | TPR |
 
-`TPR` sets the SCL rate. Each SCL period is 10 timer periods (6 low and 4 high), and each timer period is `TPR + 1` system clocks:
+`TPR` sets the SCL rate. Each SCL period is 10 timer periods (6 low and 4 high), and each timer period is `2 × (TPR + 1)` system clocks:
 
 $$
 \text{TPR} = \frac{f_{\text{clock}}}{2 \times (6 + 4) \times f_{\text{SCL}}} - 1

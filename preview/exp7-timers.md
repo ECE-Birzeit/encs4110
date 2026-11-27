@@ -662,7 +662,7 @@ Add `show()` and the handlers after the definitions:
 - **`GPIOF_Handler`** runs on SW1's falling edge: a press. It acts on it **at once**, then masks SW1 in `IM`, so the bounces that follow can't interrupt.
 - **`SysTick_Handler`** adds one to `ms` every millisecond, a running clock like Arduino's `millis()`. It also waits for the release: while SW1 is down or bouncing, it keeps `up_ms` at 0. Once SW1 has been up for `DEBOUNCE_MS` in a row, it clears the flags the release bounces left in `ICR` and unmasks SW1, ready for the next press. SysTick needs no flag cleared: the core clears its pending interrupt when the handler starts.
 - Follow one press: the first falling edge interrupts, and the colour changes. The press bounces and the hold are ignored, because SW1 is masked. The release bounces keep setting `up_ms` back to 0. 20 ms after the last one, SW1 listens again.
-- **A press restarts the heartbeat.** If you pressed while the LED was off, you'd wait up to half a second to see the new colour. So the handler turns the LED on at once and writes `HEARTBEAT_LOAD` back into `TAILR`. With `TAILD` 0 in [GPTMTAMR](#gptmtamr-—-timer-a-mode-register), the default, the timer loads a new `TAILR` value on the next clock cycle: the countdown starts over, and the new colour stays on for a full 500 ms.
+- **A press restarts the heartbeat.** If you pressed while the LED was off, you'd wait up to half a second to see the new colour. So the handler turns the LED on at once and writes `HEARTBEAT_LOAD` back into `TAILR`. With `TAILD` 0 in [GPTMTAMR](#gptmtamr-—-timer-a-mode-register), the default, the timer loads a new `TAILR` value on the next clock cycle: the countdown starts over, and the new colour stays on for a full 500 ms. If the old countdown had **just** run out, its time-out is already waiting, and `TIMER1A_Handler` would run straight after and turn the new colour off. So the handler drops it: `ICR` clears the timer's flag, and `NVIC_ClearPendingIRQ` clears the NVIC's note that the interrupt is waiting.
 - Both `GPIOF_Handler` and `TIMER1A_Handler` call `show()`. Interrupts at the same priority never interrupt each other, and these two have the same (default) priority, so one can't cut into the other's write to `GPIOF->DATA`.
 ::: info Why not "time since the last press"?
 The common version, `if (ms - last_press >= 150) { toggle; last_press = ms; }`, times from the last **press**. Hold the button for more than 150 ms and let go: the release bounces include falling edges, the last press was long ago, and the LED toggles on release. Waiting for the release closes that hole: SW1 isn't listened to again until it has been up and quiet.
@@ -745,7 +745,7 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 
 ::: details TODO 4: the wait is over (the body of `TIMER1A_Handler`)
 - Clear the time-out flag first, as in every timer handler: `TIMER1->ICR = TATO`.
-- Show green, store `ms` in `go_ms`, and go to `GO`.
+- Then, **only if the state is still `WAITING`**: show green, store `ms` in `go_ms`, and go to `GO`. A false start at the very moment the wait ran out may already have ended the round, and the handler still runs once.
 
 :::
 
@@ -760,7 +760,7 @@ Each TODO is highlighted in the starter, exactly where its code goes. Write them
 
 ::: details TODO 3: end a round (`on_press()`, add `case WAITING` and `case GO`)
 - Both react only to **SW2**: check the button, as in TODO 2.
-- `WAITING`, a false start: stop the timer (clear `TAEN`), show red, add one to `false_starts`, and go back to `IDLE`.
+- `WAITING`, a false start: stop the timer (clear `TAEN`) and clear its flag (`TIMER1->ICR = TATO`), show red, add one to `false_starts`, and go back to `IDLE`.
 - `GO`, the reaction: `reaction = ms - go_ms`. If `best` is 0 (the first round) or `reaction` is smaller, make it the new `best`. Show blue for a success, and go back to `IDLE`.
 :::
 ::::

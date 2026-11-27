@@ -72,6 +72,8 @@ void GPIOF_Handler(void)
 	led_on = 1;								// Show it now, whatever the heartbeat was doing...
 	show();
 	TIMER1->TAILR = HEARTBEAT_LOAD;			// ...and restart the heartbeat: a full 500 ms on
+	TIMER1->ICR = TATO;						// Drop a time-out that was already waiting, or it
+	NVIC_ClearPendingIRQ(TIMER1A_IRQn);		// would run next and turn the new colour straight off
 }
 
 // Every HEARTBEAT_MS: on, off, on, off...
