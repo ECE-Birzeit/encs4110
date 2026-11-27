@@ -392,7 +392,7 @@ The code is split into three files:
 <<< @/snippets/uart/uart.h
 :::
 
-`UART0_Init` initializes the UART0 module. `UART0_WriteChar` and `UART0_ReadChar` transmit and receive single characters, and `UART0_WriteString`/`UART0_ReadString` build on them to handle whole lines. The main loop prints a greeting, then echoes back every line it receives, prefixed with `Received: `. To communicate with the microcontroller, use a terminal program on your PC such as [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) to send and receive data over the serial port. Make sure the baud rate and other parameters match the configuration in your code. The following image shows how to set up the serial connection in PuTTY:
+`UART0_Init` initializes the UART0 module. Its register values are named at the top of `uart.c`: `IBRD_115200` and `FBRD_115200` for the divisors, `LCRH_WLEN_8 | LCRH_FEN` for the line format (`0x70`), and `CTL_UARTEN | CTL_TXE | CTL_RXE` to switch it on. `UART0_WriteChar` and `UART0_ReadChar` transmit and receive single characters, and `UART0_WriteString`/`UART0_ReadString` build on them to handle whole lines. The main loop prints a greeting, then echoes back every line it receives, prefixed with `Received: `. To communicate with the microcontroller, use a terminal program on your PC such as [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) to send and receive data over the serial port. Make sure the baud rate and other parameters match the configuration in your code. The following image shows how to set up the serial connection in PuTTY:
 
 ![PuTTY serial configuration](/putty.png)
 

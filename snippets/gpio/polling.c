@@ -1,20 +1,23 @@
-#include "TM4C123.h" 
+#include "TM4C123.h"
 
-#define RED_LED 1 << 1
-#define SWITCH 1 << 4
+#define RCGC_GPIOF   (1U << 5)          // RCGCGPIO bit for Port F
+#define RED_LED      (1U << 1)          // PF1
+#define SW1          (1U << 4)          // PF4: pressed reads 0
 
-int main(void) { 
-    unsigned int state;      
-    SYSCTL->RCGCGPIO |= (1<<5); 			// Enable Port F
-    GPIOF->PUR |= SWITCH;                   // Enable pull-up resistor on PF4
-    GPIOF->DIR |= RED_LED;                  // Set PF1 as an output pin and PF4 as an input pin
-    GPIOF->DEN |= (RED_LED | SWITCH);       // Enable PF1 and PF4 as a digital GPIO pins
-    while(1) {    
-        state = GPIOF->DATA & SWITCH;       // Read the state of the switch
-        if (state == 0) {                   // If the switch is pressed (since it's Pull-up)
-            GPIOF->DATA |= RED_LED;         // Turn on the LED
-        } else {                            // If the switch is not pressed
-            GPIOF->DATA &= ~RED_LED;        // Turn off the LED
-        }
-    } 
-} 
+int main(void)
+{
+	SYSCTL->RCGCGPIO |= RCGC_GPIOF;                 // Clock to Port F
+	while ((SYSCTL->PRGPIO & RCGC_GPIOF) == 0);     // Wait until Port F is ready
+
+	GPIOF->PUR |= SW1;                              // Pull-up on SW1
+	GPIOF->DIR  = (GPIOF->DIR | RED_LED) & ~SW1;    // LED out, SW1 in
+	GPIOF->DEN |= RED_LED | SW1;                    // Both digital
+
+	while (1)
+	{
+		if ((GPIOF->DATA & SW1) == 0)               // Pressed (the pull-up makes it active low)
+			GPIOF->DATA |= RED_LED;                 // LED on
+		else
+			GPIOF->DATA &= ~RED_LED;                // LED off
+	}
+}

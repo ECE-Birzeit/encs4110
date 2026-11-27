@@ -1,36 +1,54 @@
 #include "TM4C123.h"
-#define GREEN_LED 1 << 3
-volatile unsigned int adc_value;
+
+// Clocks
+#define RCGC_GPIOE    (1U << 4)         // RCGCGPIO bit for Port E (PE3 = AIN0)
+#define RCGC_GPIOF    (1U << 5)         // RCGCGPIO bit for Port F (LED)
+#define RCGC_ADC0     (1U << 0)         // RCGCADC bit for ADC0
+
+// Pins
+#define AIN0_PIN      (1U << 3)         // PE3
+#define GREEN_LED     (1U << 3)         // PF3
+
+// ADC0, sample sequencer 3
+#define SS3           (1U << 3)         // ACTSS, PSSI, RIS, ISC, IM: sequencer 3
+#define EMUX_SS3      0xF000            // EMUX: sequencer 3's trigger field (0 = software)
+#define SSCTL_END0    (1U << 1)         // SSCTL3: the first sample is the last
+#define SSCTL_IE0     (1U << 2)         // SSCTL3: set the flag after the first sample
+#define HALF_SCALE    2048              // 12 bits: 0 to 4095, so 2048 is about 1.65 V
+
+volatile uint32_t adc_value;
+
 int main(void)
 {
-    SYSCTL->RCGCGPIO |= (1 << 4); // Enable Clock to GPIOE or PE3/AN0
-    SYSCTL->RCGCADC |= (1 << 0);  // AD0 clock enable
-    
-    GPIOE->AFSEL |= (1 << 3);  // enable alternate function
-    GPIOE->DEN &= ~(1 << 3);   // disable digital function
-    GPIOE->AMSEL |= (1 << 3);  // enable analog function
-    GPIOE->DIR &= ~(1 << 3);   // clear direction bit (don't-care once AMSEL is set, but good practice)
+	SYSCTL->RCGCGPIO |= RCGC_GPIOE | RCGC_GPIOF;    // Clocks to Port E, Port F and ADC0
+	SYSCTL->RCGCADC  |= RCGC_ADC0;
+	while ((SYSCTL->PRGPIO & (RCGC_GPIOE | RCGC_GPIOF)) != (RCGC_GPIOE | RCGC_GPIOF));
+	while ((SYSCTL->PRADC & RCGC_ADC0) == 0);
 
-    ADC0->ACTSS &= ~(1 << 3);            // disable SS3 during configuration
-    ADC0->EMUX &= ~0xF000;                // Software Trigger
-    ADC0->SSMUX3 = 0;                    // get input from channel 0
-    ADC0->SSCTL3 |= (1 << 1) | (1 << 2); // take one sample at a time, set flag at 1st sample
-    ADC0->ACTSS |= (1 << 3);             // enable ADC0 sequencer 3
+	GPIOE->AFSEL |= AIN0_PIN;                       // Alternate function
+	GPIOE->DEN   &= ~AIN0_PIN;                      // Not digital
+	GPIOE->AMSEL |= AIN0_PIN;                       // Analog
+	GPIOE->DIR   &= ~AIN0_PIN;                      // Input (a don't-care once AMSEL is set)
 
-    SYSCTL->RCGCGPIO |= 0x20; // turn on bus clock for GPIOF
-    GPIOF->DIR |= GREEN_LED;       // set GREEN pin as a digital output pin
-    GPIOF->DEN |= GREEN_LED;       // Enable PF3 pin as a digital pin
+	ADC0->ACTSS  &= ~SS3;                           // Sequencer 3 off while configuring
+	ADC0->EMUX   &= ~EMUX_SS3;                      // Software trigger
+	ADC0->SSMUX3  = 0;                              // Input: channel 0 (AIN0)
+	ADC0->SSCTL3  = SSCTL_END0 | SSCTL_IE0;         // One sample, then set the flag
+	ADC0->ACTSS  |= SS3;                            // Sequencer 3 on
 
-    while (1)
-    {
-        ADC0->PSSI |= (1 << 3);            // initiate SS3 conversion
-        while ((ADC0->RIS & (1<<3)) == 0);      // Wait untill sample conversion completed
-        adc_value = ADC0->SSFIFO3;         // read adc coversion result from SS3 FIFO
-        ADC0->ISC = (1<<3);                     // clear coversion clear flag bit
+	GPIOF->DIR |= GREEN_LED;                        // Green LED out
+	GPIOF->DEN |= GREEN_LED;
 
-        if (adc_value >= 2048)
-            GPIOF->DATA |= GREEN_LED; // turn on green LED
-        else if (adc_value < 2048)
-            GPIOF->DATA &= ~GREEN_LED; // turn off green LED
-    }
+	while (1)
+	{
+		ADC0->PSSI = SS3;                           // Start a conversion
+		while ((ADC0->RIS & SS3) == 0);             // Wait until it's done
+		adc_value = ADC0->SSFIFO3;                  // Read the result
+		ADC0->ISC = SS3;                            // Clear the done flag
+
+		if (adc_value >= HALF_SCALE)
+			GPIOF->DATA |= GREEN_LED;               // Above half: green on
+		else
+			GPIOF->DATA &= ~GREEN_LED;              // Below half: green off
+	}
 }

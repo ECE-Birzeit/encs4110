@@ -508,9 +508,11 @@ In this example, you will configure the ADC to read the internal temperature sen
 
 ### Code Explanation
 
-**GPIO/ADC Setup:** Both examples follow the same pattern: enable the `RCGCGPIO` and `RCGCADC` clocks, then put PE3 into analog mode (`AFSEL`, `DEN`, `AMSEL`, `DIR`).
+**Names:** every register bit has a `#define`: `RCGC_ADC0`, `AIN0_PIN` for PE3, `SS3` for sample sequencer 3's bit in `ACTSS`, `PSSI`, `RIS`, `IM` and `ISC`, and `SSCTL_END0`, `SSCTL_IE0` and `SSCTL_TS0` for the `SSCTL3` bits.
 
-**Sequencer Configuration:** `ADC0->ACTSS` disables SS3 while it's being configured, `ADC0->EMUX` selects the trigger source (software in Example 1, continuous in Example 2), `ADC0->SSMUX3 = 0` selects input channel AIN0, and `ADC0->SSCTL3` marks the sample as the end of the sequence (and, in Example 2, additionally selects the internal temperature sensor and enables its per-sample interrupt).
+**GPIO/ADC Setup:** Example 1 enables the `RCGCGPIO` and `RCGCADC` clocks, waits on `PRGPIO` and `PRADC` until they're ready, then puts PE3 into analog mode (`AFSEL`, `DEN`, `AMSEL`, `DIR`). Example 2 reads the internal temperature sensor, not a pin, so it needs only the ADC clock.
+
+**Sequencer Configuration:** `ADC0->ACTSS` disables SS3 while it's being configured, `ADC0->EMUX` selects the trigger source (software in Example 1, continuous in Example 2), `ADC0->SSMUX3 = 0` selects input channel AIN0, and `ADC0->SSCTL3` marks the sample as the end of the sequence (and, in Example 2, also sets `TS0`, which samples the internal temperature sensor instead of the channel, and `IE0` for its interrupt).
 
 **Example 1 — Polling:** The main loop writes `ADCPSSI` to start a conversion, spins on `ADCRIS` until the raw-status bit for SS3 is set, reads the result from `ADCSSFIFO3`, and clears the flag via `ADCISC`, all under software control with no interrupt involved.
 

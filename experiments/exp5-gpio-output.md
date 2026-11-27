@@ -367,7 +367,7 @@ The following examples illustrate the complete process of initializing Port F an
 
 ### Example 1: Simple LED Blink
 
-This example initializes Port F and toggles the Red LED (PF1) on and off using address masking with a software delay.
+This example initializes Port F and toggles the Red LED (PF1) on and off using address masking with a software delay. Every address and bit has an `EQU` name at the top (`RCGCGPIO`, `GPIOF_DIR`, `PORTF`, `RED`, ...), so the code reads as what it does.
 
 Address Masking for PF1:
 ```
@@ -378,7 +378,7 @@ Address Masking for PF1:
 
 ### Example 2: Cycle Through RGB Colors
 
-This example extends the previous one by cycling through RGB LED colors (Red, Green, Blue) using a software delay.
+This example extends the previous one by cycling through RGB LED colors (Red, Blue, Green) using a software delay.
 
 Address Masking for PF1, PF2, PF3:
 ```
@@ -392,7 +392,7 @@ Address Masking for PF1, PF2, PF3:
 
 - Does Example 1 blink the red LED?
 - Can you work out the masked address `0x40025008` for PF1 yourself?
-- Does Example 2 cycle through red, green and blue?
+- Does Example 2 cycle through red, blue and green?
 - In Peripherals, System Viewer, GPIOF, did you see `DATA` change with each colour?
 
 </Checklist>

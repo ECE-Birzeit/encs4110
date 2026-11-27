@@ -627,9 +627,9 @@ This example configures the SysTick timer to generate interrupts every 100 ms an
 <<< @/snippets/timers/systick.c
 
 **Explanation:**
-- `SysTick->LOAD = 5000000 - 1;` sets the reload value for 100 ms at 50 MHz.
+- `SysTick->LOAD = TICKS_100MS - 1;` sets the reload value for 100 ms at 50 MHz (`TICKS_100MS` is 5,000,000).
 - `SysTick->VAL = 0;` clears the current counter value.
-- `SysTick->CTRL = 0x07;` enables the timer with processor clock and interrupt.
+- `SysTick->CTRL = STCTRL_CLK_SRC | STCTRL_INTEN | STCTRL_ENABLE;` (`0x07`) enables the timer with the processor clock and its interrupt.
 - `SysTick_Handler()` is called every 100 ms and toggles the LED.
 - `systick_counter` accumulates elapsed time in milliseconds (+100 per interrupt), which can be used for longer timing.
 
@@ -640,13 +640,13 @@ This example configures TIMER1 in 16-bit periodic mode with maximum prescaler to
 <<< @/snippets/timers/timers.c
 
 **Explanation:**
-- `SYSCTL->RCGCTIMER |= (1<<1);` enables clock to TIMER1.
-- `TIMER1->CFG = 0x4;` selects 16-bit mode.
-- `TIMER1->TAMR = 0x02;` configures periodic mode (count down).
-- `TIMER1->TAPR = (1 << 8) - 1;` sets the prescaler to its maximum (255, divisor = 256).
-- `TIMER1->TAILR = (1 << 16) - 1;` writes 65535 (`0xFFFF`, the 16-bit maximum).
+- `SYSCTL->RCGCTIMER |= RCGC_TIMER1;` enables the clock to Timer1, and the `PRTIMER` wait holds until it's ready.
+- `TIMER1->CFG = CFG_16BIT;` (`0x4`) selects 16-bit mode.
+- `TIMER1->TAMR = TAMR_PERIODIC;` (`0x2`) configures periodic mode (count down).
+- `TIMER1->TAPR = TAPR_MAX;` sets the prescaler to its maximum (255, divisor = 256).
+- `TIMER1->TAILR = TAILR_MAX;` writes 65535 (`0xFFFF`, the 16-bit maximum).
 - Period: $T = \frac{65536 \times 256}{50{,}000{,}000} \approx 0.335$ seconds.
-- `NVIC->ISER[0] |= (1<<21);` enables TIMER1A interrupt (IRQ 21).
+- `NVIC->ISER[0] = TIMER1A_IRQ_BIT;` enables the Timer1A interrupt (IRQ 21).
 - `TIMER1A_Handler()` toggles the blue LED and clears the interrupt flag.
 
 

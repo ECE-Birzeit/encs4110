@@ -1,124 +1,110 @@
 #include "lcd.h"
 
-#define CYCLES_PER_US   (SystemCoreClock / 1000000u)
+#define RCGC_GPIOB      (1U << 1)       // RCGCGPIO bit for Port B
+#define LCD_PINS        (RS | RW | EN | DATA_MASK)
 
-
+// SysTick, used here as a busy-wait timer
+#define STCTRL_ENABLE   (1U << 0)       // CTRL: counter on
+#define STCTRL_CLK_SRC  (1U << 2)       // CTRL: count the system clock
+#define STCTRL_COUNT    (1U << 16)      // CTRL: reached 0 since the last read
+#define CYCLES_PER_US   (SystemCoreClock / 1000000U)
 
 //====================[ SysTick Delay Functions ]====================
-void SysTick_Init(void)
-{
-    SysTick->CTRL = 0;
-    SysTick->LOAD = CYCLES_PER_US - 1;  // 1us delay at 50MHz
-    SysTick->VAL = 0;
-    SysTick->CTRL = 0x5;     // Enable with system clock
-}
-
 void delay_us(int us)
 {
-    SysTick->LOAD = (CYCLES_PER_US * us) - 1;
-    SysTick->VAL = 0;
-    SysTick->CTRL = 0x5; // Enable with system clock
-    while ((SysTick->CTRL & 0x10000) == 0);
-    SysTick->CTRL = 0;
+	SysTick->CTRL = 0;
+	SysTick->LOAD = CYCLES_PER_US * us - 1;
+	SysTick->VAL  = 0;
+	SysTick->CTRL = STCTRL_CLK_SRC | STCTRL_ENABLE;         // On, no interrupt
+	while ((SysTick->CTRL & STCTRL_COUNT) == 0);            // Wait until it reaches 0
+	SysTick->CTRL = 0;
 }
 
 void delay_ms(int ms)
 {
-    while (ms--)
-        delay_us(1000);
+	while (ms--)
+		delay_us(1000);
 }
 
 //====================[ LCD Helper Functions ]====================
 void LCD_EnablePulse(void)
 {
-    delay_us(1);
-    GPIOB->DATA |= EN;
-    delay_us(1);
-    GPIOB->DATA &= ~EN;
-    delay_us(1);
+	delay_us(1);
+	GPIOB->DATA |= EN;
+	delay_us(1);
+	GPIOB->DATA &= ~EN;                             // Falling edge: the LCD latches the nibble
+	delay_us(1);
 }
 
 void LCD_SendNibble(unsigned char nibble)
 {
-    // Send nibble to PB4-PB7
-    GPIOB->DATA = (GPIOB->DATA & ~DATA_MASK) | ((nibble << 4) & DATA_MASK);
-    LCD_EnablePulse();
+	GPIOB->DATA = (GPIOB->DATA & ~DATA_MASK) | ((nibble << 4) & DATA_MASK);    // On PB4-PB7
+	LCD_EnablePulse();
 }
 
 //====================[ LCD Initialization ]====================
 void LCD_Init(void)
 {
-    // Enable clock to PORTB
-    SYSCTL->RCGCGPIO |= (1 << 1);
-    while ((SYSCTL->PRGPIO & (1 << 1)) == 0)
-        ;
+	SYSCTL->RCGCGPIO |= RCGC_GPIOB;                 // Clock to Port B
+	while ((SYSCTL->PRGPIO & RCGC_GPIOB) == 0);     // Wait until it's ready
 
-    // Configure PB0 (RS), PB1 (RW), PB2 (EN), PB4-PB7 (data) as output
-    GPIOB->DIR |= RS | RW | EN | DATA_MASK;
-    GPIOB->DEN |= RS | RW | EN | DATA_MASK;
-    GPIOB->DATA &= ~(RS | RW | EN | DATA_MASK);  // Clear all
+	GPIOB->DIR  |= LCD_PINS;                        // RS, RW, EN and D4-D7 out
+	GPIOB->DEN  |= LCD_PINS;
+	GPIOB->DATA &= ~LCD_PINS;                       // All low
 
-    SysTick_Init();
+	delay_ms(50);                                   // Let the LCD power up
 
-    delay_ms(50);  // Wait for LCD to power up
+	// Start in 8-bit mode three times, then switch to 4-bit
+	LCD_SendNibble(0x03);
+	delay_ms(5);
+	LCD_SendNibble(0x03);
+	delay_us(150);
+	LCD_SendNibble(0x03);
+	delay_us(150);
+	LCD_SendNibble(0x02);                           // 4-bit mode
+	delay_us(150);
 
-    // Initialization sequence (8-bit interface mode to start)
-    LCD_SendNibble(0x03);
-    delay_ms(5);
-
-    LCD_SendNibble(0x03);
-    delay_us(150);
-
-    LCD_SendNibble(0x03);
-    delay_us(150);
-
-    LCD_SendNibble(0x02);  // Set 4-bit mode
-    delay_us(150);
-
-    // Now in 4-bit mode: use full commands
-    LCD_Command(0x28); // Function set: 4-bit, 2 lines, 5x8 dots
-    LCD_Command(0x0C); // Display ON, Cursor OFF
-    LCD_Command(0x06); // Entry mode: increment cursor
-    LCD_Command(0x01); // Clear display
-    delay_ms(2);
+	// Now in 4-bit mode: full commands
+	LCD_Command(LCD_FUNCTION_4BIT_2LINE);
+	LCD_Command(LCD_DISPLAY_ON);
+	LCD_Command(LCD_ENTRY_INCREMENT);
+	LCD_Command(LCD_CLEAR);
+	delay_ms(2);
 }
 
 //====================[ LCD Command/Data API ]====================
 void LCD_Command(unsigned char command)
 {
-    GPIOB->DATA &= ~RS; // RS = 0 for command
-    delay_us(1);
-    LCD_SendNibble(command >> 4);     // Upper nibble
-    LCD_SendNibble(command & 0x0F);   // Lower nibble
-    delay_ms(2);
+	GPIOB->DATA &= ~RS;                             // RS = 0: a command
+	delay_us(1);
+	LCD_SendNibble(command >> 4);                   // Upper nibble
+	LCD_SendNibble(command & 0x0F);                 // Lower nibble
+	delay_ms(2);
 }
 
 void LCD_Data(unsigned char data)
 {
-    GPIOB->DATA |= RS; // RS = 1 for data
-    delay_us(1);
-    LCD_SendNibble(data >> 4);
-    LCD_SendNibble(data & 0x0F);
-    delay_ms(1);
+	GPIOB->DATA |= RS;                              // RS = 1: a character
+	delay_us(1);
+	LCD_SendNibble(data >> 4);
+	LCD_SendNibble(data & 0x0F);
+	delay_ms(1);
 }
 
 void LCD_Clear(void)
 {
-    LCD_Command(0x01);
-    delay_ms(2);
+	LCD_Command(LCD_CLEAR);
+	delay_ms(2);
 }
 
 void LCD_SetCursor(unsigned char row, unsigned char col)
 {
-    unsigned char address = (row == 0) ? 0x80 + col : 0xC0 + col;
-    LCD_Command(address);
-    delay_ms(1);
+	LCD_Command((row == 0 ? LCD_LINE1 : LCD_LINE2) + col);
+	delay_ms(1);
 }
 
 void LCD_Print(char *str)
 {
-    while (*str)
-    {
-        LCD_Data(*str++);
-    }
+	while (*str)
+		LCD_Data(*str++);
 }

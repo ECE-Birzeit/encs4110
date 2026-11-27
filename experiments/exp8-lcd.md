@@ -270,7 +270,7 @@ The `LCD_Init()` function implements the complete 4-bit initialization:
 2. Waits 50 ms for LCD power-on stabilization
 3. Sends `0x03` (upper nibble) three times with delays (8-bit mode reset)
 4. Sends `0x02` (upper nibble) to switch to 4-bit mode
-5. Sends configuration commands: `0x28` (4-bit, 2 lines), `0x0C` (display on), `0x06` (entry mode), `0x01` (clear)
+5. Sends configuration commands, each named in `lcd.h`: `LCD_FUNCTION_4BIT_2LINE` (`0x28`), `LCD_DISPLAY_ON` (`0x0C`), `LCD_ENTRY_INCREMENT` (`0x06`), `LCD_CLEAR` (`0x01`)
 
 **Nibble Transmission**
 
@@ -287,7 +287,7 @@ The `LCD_SendNibble()` function:
 
 The `LCD_SetCursor(row, col)` function calculates the DDRAM address:
 ```c
-address = (row == 0) ? 0x80 + col : 0xC0 + col;
+address = (row == 0 ? LCD_LINE1 : LCD_LINE2) + col;    // 0x80 or 0xC0, plus the column
 ```
 Then sends the address as a command.
 

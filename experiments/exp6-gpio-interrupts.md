@@ -611,9 +611,10 @@ This example continuously polls the state of SW1 (PF4) and turns on the red LED 
 <<< @/snippets/gpio/polling.c
 
 **Explanation:**
-- `GPIOF->PUR |= SWITCH;` enables the internal pull-up resistor on PF4.
-- The `while(1)` loop continuously reads the switch state.
-- When `state == 0`, the button is pressed (pull-up makes it active-low).
+- Every pin and bit has a name: `RCGC_GPIOF`, `RED_LED` and `SW1`, each an unsigned mask like `(1U << 4)`.
+- The `while` loop after the clock enable waits on `PRGPIO` until Port F is ready.
+- `GPIOF->PUR |= SW1;` enables the internal pull-up resistor on PF4.
+- The `while (1)` loop reads the switch over and over: `(GPIOF->DATA & SW1) == 0` means pressed (the pull-up makes it active low).
 - The LED is controlled directly in the main loop without interrupts.
 
 ### Example 2: Interrupt-Driven Switch Input
@@ -623,13 +624,13 @@ This example configures SW1 and SW2 to generate interrupts on button presses and
 <<< @/snippets/gpio/interrupt.c
 
 **Explanation:**
-- `GPIOF->LOCK = 0x4C4F434B;` unlocks Port F for PF0 configuration.
-- `GPIOF->CR = 0x01;` allows changes to PF0.
-- `GPIOF->IS &= ~(SW1 | SW2);` configures edge-sensitive interrupts.
-- `GPIOF->IEV &= ~(SW1 | SW2);` selects falling-edge trigger (button press).
-- `GPIOF->ICR |= (SW1 | SW2);` clears any prior interrupt flags before enabling.
-- `GPIOF->IM |= (SW1 | SW2);` unmasks (enables) interrupts for SW1 and SW2.
-- `NVIC->ISER[0] |= (1<<30);` enables GPIO Port F interrupt in NVIC.
+- `GPIOF->LOCK = GPIO_UNLOCK;` (`0x4C4F434B`, "LOCK" in ASCII) unlocks Port F for PF0 configuration.
+- `GPIOF->CR |= SW2;` allows changes to PF0.
+- `GPIOF->IS &= ~SWITCHES;` configures edge-sensitive interrupts, where `SWITCHES` is `SW1 | SW2`.
+- `GPIOF->IEV &= ~SWITCHES;` selects falling-edge trigger (button press).
+- `GPIOF->ICR = SWITCHES;` clears any prior interrupt flags before enabling. `ICR` is write-1-to-clear, so it's written, not ORed.
+- `GPIOF->IM |= SWITCHES;` unmasks (enables) interrupts for SW1 and SW2.
+- `NVIC->ISER[0] = GPIOF_IRQ_BIT;` sets bit 30 of `ISER0`: Port F is interrupt 30. `NVIC_EnableIRQ(GPIOF_IRQn)` does the same.
 - The ISR checks `GPIOF->MIS` to identify which switch caused the interrupt.
 - Each interrupt flag must be cleared with `GPIOF->ICR` to prevent re-triggering.
 
